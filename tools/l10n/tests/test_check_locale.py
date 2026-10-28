@@ -359,8 +359,10 @@ class StrictAndroidTest(unittest.TestCase):
 
     def test_quot_entity_is_not_android_escaping(self) -> None:
         # &quot; XML-парсер превращает в кавычку — Android получает ту же «сырую»
-        # кавычку, поэтому это не экранирование.
-        code, output = self.check(self.locale("&quot;привет&quot;"), self.ALLOW_CJK, self.STRICT)
+        # кавычку, поэтому это не экранирование. Обёртка из &quot; по краям
+        # после XML decode становится валидными outer quotes, поэтому проверяем
+        # сырую кавычку ВНУТРИ значения.
+        code, output = self.check(self.locale("Скажи &quot;привет&quot; и всё"), self.ALLOW_CJK, self.STRICT)
         self.assertEqual(code, 1, output)
         self.assertIn("ERROR strings.xml q raw double quote", output)
 
@@ -393,9 +395,56 @@ class StrictAndroidTest(unittest.TestCase):
         self.assertEqual(output.strip(), "OK")
 
     def test_android_outer_quotes_allow_apostrophe(self) -> None:
-        code, output = self.check(self.locale('\\"It didn\'t work\\"'), self.ALLOW_CJK, self.STRICT)
+        # <string name="q">"It didn't work"</string>: обычные неэкранированные
+        # кавычки задают quoted-режим, апостроф внутри законен.
+        code, output = self.check(self.locale('"It didn\'t work"'), self.ALLOW_CJK, self.STRICT)
         self.assertEqual(code, 0, output)
         self.assertEqual(output.strip(), "OK")
+
+    def test_quot_outer_quotes_allow_apostrophe(self) -> None:
+        # &quot; после XML decode даёт ту же сырую кавычку, обёртка валидна.
+        code, output = self.check(self.locale("&quot;It didn't work&quot;"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_escaped_quotes_do_not_open_quoted_mode(self) -> None:
+        # Кавычка с обратным слэшем — буквальная кавычка, quoted-режим она не
+        # включает: сырой апостроф внутри такой «обёртки» остаётся ошибкой.
+        code, output = self.check(self.locale('\\"It didn\'t work\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q unescaped apostrophe", output)
+        self.assertNotIn("raw double quote", output)
+
+    def test_escaped_quotes_with_escaped_apostrophe_pass(self) -> None:
+        code, output = self.check(self.locale('\\"It didn\\\'t work\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_single_raw_inner_quote_inside_outer_quotes_is_error(self) -> None:
+        # Исключаются только две внешние кавычки: одиночная сырая внутри — ERROR.
+        code, output = self.check(self.locale('"Он сказал "привет"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+
+    def test_single_raw_quote_without_outer_wrapper_is_error(self) -> None:
+        code, output = self.check(self.locale('Он сказал "привет'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+
+    def test_outer_close_quote_with_even_backslashes(self) -> None:
+        # Два слэша перед кавычкой — экранированный слэш, кавычка сырая:
+        # обёртка закрывается, чётность слэшей сохраняется.
+        code, output = self.check(self.locale('"It didn\'t work\\\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_outer_close_quote_with_odd_backslash_is_not_wrapper(self) -> None:
+        # Нечётный слэш делает закрывающую кавычку буквальной: outer quotes не
+        # закрыты, поэтому сырые кавычка и апостроф — ошибки.
+        code, output = self.check(self.locale('"It didn\'t work\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+        self.assertIn("ERROR strings.xml q unescaped apostrophe", output)
 
     # --- реальные пробельные символы ---
 

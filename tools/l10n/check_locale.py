@@ -49,15 +49,20 @@ strings_l10n.xml):
      При флаге для каждого значения локали (в том числе для каждого item
      plurals/string-array) выдаётся ERROR на:
         - «сырую» `"` без обратного слэша (`\"` — правильная форма; `&quot;`
-          Android тоже получает как кавычку, поэтому она ошибка, а не экранирование);
+          Android тоже получает как кавычку, поэтому она ошибка, а не экранирование;
+          исключение — пара внешних outer quotes, см. ниже);
         - реальный перевод строки или табуляцию в значении (`\n`, `\t` — правильные
           формы: aapt2 сворачивает реальные пробельные символы и портит строку);
         - неэкранированный `'` без обратного слэша (`\'`).
-     Чётность обратных слэшей: экранирует только нечётное их число перед
-     символом, поэтому `\\"` — это экранированный слэш и «сырая» кавычка
-     (ERROR), а `\"` — экранированная кавычка (OK). Так же для апострофа.
-     Значение, целиком обёрнутое в Android outer double quotes (`\"…\"`),
-     корректно, и апостроф внутри такой обёртки допустим.
+     Чётность обратных слэшей: кавычку и апостроф экранирует только НЕЧЁТНОЕ
+     число слэшей перед символом, при чётном числе символ остаётся сырым.
+     Android outer quotes — это НЕэкранированные двойные кавычки в начале и в
+     конце значения: <string name="q">"It didn't work"</string>. Такая обёртка
+     задаёт quoted-режим, апостроф внутри неё допустим. Обратный слэш перед
+     кавычкой — это буквальная кавычка, а не переключение quoted-режима,
+     поэтому обёртка, набранная с обратными слэшами перед обеими кавычками,
+     апостроф НЕ разрешает. Из проверки сырых кавычек исключаются только две
+     внешние, сырая кавычка внутри значения — по-прежнему ERROR.
      Содержимое XML-атрибутов тегов (`<a href="…">`, `<xliff:g id="…">`) —
      не текст значения, кавычки там законны и не проверяются.
      Значение с CDATA-секцией не анализируется вообще: ElementTree отдаёт
@@ -351,14 +356,44 @@ def _unescaped_positions(text: str, char: str) -> list[int]:
     return found
 
 
-def _android_quoted(markup: str) -> bool:
-    """Значение целиком в Android outer double quotes (`\\"…\\"`).
+def _slash_escaped(text: str, index: int) -> bool:
+    """True, если символ под `index` экранирован обратным слэшем.
 
-    Внутри такой обёртки апостроф законен: aapt2 уже считает содержимое
-    quoted-строкой, а не сырым текстом ресурса.
+    Экранирует только нечётное число слэшей: два слэша перед кавычкой — это
+    экранированный слэш и следом «сырая» кавычка. Считать «есть ли слэш
+    перед символом» недостаточно — это и есть ловушка чётности.
     """
-    trimmed = markup.strip()
-    return len(trimmed) > 4 and trimmed.startswith('\\"') and trimmed.endswith('\\"')
+    backslashes = 0
+    position = index - 1
+    while position >= 0 and text[position] == "\\":
+        backslashes += 1
+        position -= 1
+    return backslashes % 2 == 1
+
+
+def _android_outer_span(markup: str) -> tuple[int, int] | None:
+    """Границы Android outer quotes в значении или None.
+
+    Outer quotes — это НЕэкранированные двойные кавычки в начале и в конце
+    значения: <string name="q">"It didn't work"</string>. Внутри такой обёртки
+    aapt2 считает содержимое quoted-строкой, поэтому апостроф законен.
+    Кавычка с обратным слэшем перед ней — буквальная, режим она не
+    переключает, и обёрткой такое значение не считается. Пробелы по краям
+    значения обёртке не мешают.
+    """
+    start = 0
+    end = len(markup)
+    while start < end and markup[start].isspace():
+        start += 1
+    while end > start and markup[end - 1].isspace():
+        end -= 1
+    if end - start < 3:
+        return None
+    if markup[start] != '"' or markup[end - 1] != '"':
+        return None
+    if _slash_escaped(markup, start) or _slash_escaped(markup, end - 1):
+        return None
+    return start, end
 
 
 def strict_android_problems(markup: str) -> list[str]:
@@ -368,10 +403,22 @@ def strict_android_problems(markup: str) -> list[str]:
     `<xliff:g id="…">`) — не текст значения, кавычки там законны. `<` в тексте
     к этому моменту экранирован в `&lt;`, поэтому любой `<…>` в разметке —
     настоящий тег. Пустой список — значение корректно.
+
+    Действительные outer quotes дают quoted-режим: из проверки сырых кавычек
+    исключаются ровно эти две внешние кавычки, а апостроф внутри допустим.
+    Сырая кавычка внутри значения и кавычка с обратным слэшем перед ней
+    (буквальная, режим не переключает) остаются ошибками.
     """
     problems: list[str] = []
-    segments = TAG_SPAN_RE.split(markup)
-    quoted = _android_quoted(markup)
+    outer = _android_outer_span(markup)
+    quoted = outer is not None
+    checked = markup
+    if outer is not None:
+        start, end = outer
+        # Снимаем ровно две внешние кавычки: остальные проверки видят только
+        # содержимое, поэтому одиночная сырая кавычка внутри остаётся ERROR.
+        checked = markup[:start] + markup[start + 1 : end - 1] + markup[end:]
+    segments = TAG_SPAN_RE.split(checked)
     for segment in segments:
         if "\n" in segment or "\r" in segment:
             problems.append("real newline in value, use \\n")
