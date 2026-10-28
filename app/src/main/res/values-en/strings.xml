@@ -1580,6 +1580,7 @@
     <string name="data_recovery_configuration_file_invalid_path">The configuration file path is invalid; the source file was not modified</string>
     <string name="data_recovery_configuration_file_corrupt">The configuration file cannot be read and can be reset after preserving the source</string>
     <string name="data_recovery_configuration_file_check_failed">The configuration file check failed; the source file was not modified</string>
+    <string name="data_recovery_configuration_file_domain_issue">The configuration file content is invalid: %1$s; it can be repaired after preserving the source file</string>
     <string name="data_recovery_configuration_files_ok">Checked %1$d configuration files; all are readable</string>
     <string name="data_recovery_configuration_no_supported_repair">The configuration report has no repair operation that can be executed safely</string>
     <string name="data_recovery_configuration_changed_before_repair">Configuration file %1$s changed before repair, so the operation was stopped</string>
@@ -5575,6 +5576,8 @@
     <string name="backup_format_html_desc">Web format, suitable for viewing in browsers</string>
     <string name="backup_format_txt">Plain Text</string>
     <string name="backup_format_txt_desc">Simple text format, easy to share</string>
+    <string name="backup_format_csv">CSV</string>
+    <string name="backup_format_csv_desc">Table format, suitable for data cleaning and migration</string>
     
     <!-- Import Format Selection -->
     <string name="backup_select_import_format">Select Import Format</string>
@@ -5908,7 +5911,12 @@
     <string name="autoglm_api_key_placeholder">Paste your Zhipu API Key here</string>
     <string name="autoglm_one_click_button">One-Click AutoGLM Config</string>
     <string name="autoglm_status_running">Running one-click configuration, please wait...</string>
-    <string name="autoglm_status_success">AutoGLM one-click configuration completed:\nModel: %1$s\nAPI Key: %2$s\nToolkit: AutoGLM\n\nYou can now use AutoGLM mode in the chat interface.</string>
+    <string name="autoglm_status_success">AutoGLM one-click configuration completed:
+- Created or updated the AutoGLM UI controller model configuration (autoglm-phone, Zhipu)
+- Switched the "UI Controller" function to this configuration
+- Disabled Automatic_ui_base and enabled Automatic_ui_subagent
+
+You can now use AutoGLM mode in the chat interface.</string>
     <string name="autoglm_status_error">One-click configuration failed: %1$s</string>
     <string name="autoglm_error_empty_api_key">Please fill in the Zhipu API Key first.</string>
 
@@ -7372,6 +7380,9 @@
 
     <!-- ToolPermissionSystem -->
     <string name="tool_permission_operation">%1$s Operation</string>
+    <string name="tool_permission_execution_denied">Tool execution permission was denied.</string>
+    <string name="tool_permission_overlay_required_for_confirmation">Overlay permission is required to confirm tool execution.</string>
+    <string name="tool_permission_confirmation_timeout">Tool execution confirmation timed out.</string>
 
     <!-- MessageImageGenerator -->
     <string name="message_image_capture_failed">Image capture failed: %1$s</string>
@@ -7867,7 +7878,7 @@
     <string name="supported_app_versions">Supported app versions</string>
     <string name="supported_app_versions_short">Compatible with %1$s</string>
     <string name="unsupported_artifact_version_title">Current app version may be incompatible</string>
-    <string name="unsupported_artifact_version_message">「%1$s」declares supported app version as %3$s, current app version is %2$s. Continuing to download may still fail or be unusable.</string>
+    <string name="unsupported_artifact_version_message">"%1$s" declares supported app version as %3$s, current app version is %2$s. Continuing to download may still fail or be unusable.</string>
     <string name="continue_download_anyway">Continue download anyway</string>
     <string name="publisher_colon">Publisher: %1$s</string>
     <string name="market_registrar_colon">Registrar %1$s</string>
@@ -7923,8 +7934,8 @@
     <string name="invalid_artifact_metadata">The metadata for this market item is invalid and cannot display details.</string>
     <string name="artifact_publication_pending_review_waiting_schedule">Under review. Please wait for scheduled release.</string>
     <string name="artifact_publication_approved_waiting_schedule">Approved. Please wait for scheduled release.</string>
-    <string name="confirm_remove_script_from_market">Are you sure you want to remove the script「%1$s」from the market? This will close the corresponding Issue but will not delete your publish repository.</string>
-    <string name="confirm_remove_package_from_market">Are you sure you want to remove the package「%1$s」from the market? This will close the corresponding Issue but will not delete your publish repository.</string>
+    <string name="confirm_remove_script_from_market">Are you sure you want to remove the script "%1$s" from the market? This will close the corresponding Issue but will not delete your publish repository.</string>
+    <string name="confirm_remove_package_from_market">Are you sure you want to remove the package "%1$s" from the market? This will close the corresponding Issue but will not delete your publish repository.</string>
     <string name="script_publish_info_description">The script will first be uploaded to your own OperitForge publish repository, then the metadata will be registered to OperitScriptMarket. Please ensure the script content, version, and description are accurate.</string>
     <string name="script_edit_info_description">You are editing the information of a published script. After updating, the metadata of the corresponding Issue in the market repository will be overwritten.</string>
     <string name="package_publish_info_description">The package will first be uploaded to your own OperitForge publish repository, then the metadata will be registered to OperitPackageMarket. Please ensure the package content, version, and description are accurate.</string>
@@ -8292,7 +8303,7 @@
     <string name="workspace_attachment_change_modified">Modified</string>
     <string name="workspace_attachment_change_deleted">Deleted</string>
     <string name="workspace_attachment_change_moved">Moved</string>
-    <string name="artifact_publish_node_updated">Node「%1$s」updated</string>
+    <string name="artifact_publish_node_updated">Node "%1$s" updated</string>
     <string name="artifact_project_node_view_title">Node View</string>
     <string name="artifact_project_nodes_loading">Loading project nodes...</string>
     <string name="artifact_project_node_selection_hint">Click to select a node, click again to deselect.</string>
@@ -8313,11 +8324,11 @@
     <string name="skill_update_login_required">You must log in with GitHub to update a Skill.</string>
     <string name="skill_publish_name_empty">Skill name cannot be empty.</string>
     <string name="skill_publish_check_name_conflict_failed">Failed to check for Skill name conflict: %1$s</string>
-    <string name="skill_publish_name_taken_message">There is already a plugin named「%1$s」in the Skill marketplace. Please choose a different name.</string>
+    <string name="skill_publish_name_taken_message">There is already a plugin named "%1$s" in the Skill marketplace. Please choose a different name.</string>
     <string name="ai_message_image_attached_multimodal_notice">Image content has been attached as multimodal input with this message. Do not call file reading tools to read this path.</string>
     <string name="ai_message_result_prefix">[Result: </string>
     <string name="ai_message_result_suffix">]</string>
-    <string name="ai_message_package_warmup_title">【Activated Packages】</string>
+    <string name="ai_message_package_warmup_title">[Activated Packages]</string>
     <string name="ai_message_package_warmup_empty">No activated packages were detected in this summary window.</string>
     <string name="ai_message_package_warmup_intro">The following activated packages can be used directly.</string>
     <string name="ai_message_use_package_failed">use_package call failed: %1$s</string>
