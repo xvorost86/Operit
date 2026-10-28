@@ -29,7 +29,18 @@ strings_l10n.xml):
      механическую поломку строки, а не «перевод сформулирован иначе».
   5. Иероглифы (U+3400-U+4DBF, U+4E00-U+9FFF, U+3000-U+303F кроме U+3000) в
      значении локали — ошибка. Для локальных проверок самой китайской базы есть
-     флаг --allow-cjk.
+     флаг --allow-cjk. Функциональные иероглифы (реальные значения параметров
+     API, образец символа для метрик шрифта, официальное название документа)
+     вносятся в файл-исключение `l10n/cjk_allowlist.txt` (строки
+     `<file>:<name>  # причина`, `#` — начало комментария); для этих ключей
+     проверка иероглифов пропускается, остальные проверки остаются.
+     Исключение снимает ТОЛЬКО проверку иероглифов: плейсхолдеры, теги,
+     escape-последовательности и наличие ключа проверяются как обычно.
+     По умолчанию берётся `l10n/cjk_allowlist.txt` от корня репозитория;
+     если файла нет — исключений нет. Путь, указанный в `--allowlist` явно,
+     должен существовать, а каждая его строка иметь вид `<file>:<name>`,
+     иначе проверка падает с ошибкой (опечатка в исключении не должна
+     молча превращаться в «исключений нет»).
 
 Содержимое значения сравнивается в виде «внутренней разметки» элемента:
 текст экранируется обратно (& < >), вложенные узлы сериализуются. Поэтому
@@ -40,6 +51,8 @@ strings_l10n.xml):
     python3 tools/l10n/check_locale.py app/src/main/res/values-ru
     python3 tools/l10n/check_locale.py app/src/main/res/values-en \\
         --base app/src/main/res/values --files strings.xml
+    python3 tools/l10n/check_locale.py app/src/main/res/values-en \\
+        --allowlist l10n/cjk_allowlist.txt
     python3 tools/l10n/check_locale.py app/src/main/res/values --allow-cjk
 
 Вывод: строка на проблему `ERROR|WARN <file> <name> <причина>`, затем итог
@@ -57,6 +70,10 @@ from pathlib import Path
 
 DEFAULT_BASE = "app/src/main/res/values"
 DEFAULT_FILES = ("strings.xml", "strings_l10n.xml")
+# Корень репозитория: tools/l10n/check_locale.py -> tools -> <repo>
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_ALLOWLIST_RELATIVE = Path("l10n") / "cjk_allowlist.txt"
+DEFAULT_ALLOWLIST = REPO_ROOT / DEFAULT_ALLOWLIST_RELATIVE
 
 # Иероглифы: CJK Unified Ideographs, Extension A, CJK Symbols and Punctuation.
 # U+3000 (идеографический пробел) — пробельный символ, а не текст, исключён.
@@ -165,6 +182,46 @@ def cjk_chars(markup: str) -> list[str]:
     return found
 
 
+def resolve_allowlist(explicit: str | None) -> tuple[Path | None, str | None]:
+    """Путь к файлу-исключению или причина ошибки.
+
+    Явно указанный путь обязан существовать; путь по умолчанию может
+    отсутствовать — тогда список исключений пуст.
+    """
+    if explicit is not None:
+        path = Path(explicit)
+        if not path.is_file():
+            return None, "allowlist file not found"
+        return path, None
+    if DEFAULT_ALLOWLIST.is_file():
+        return DEFAULT_ALLOWLIST, None
+    return None, None
+
+
+def load_allowlist(path: Path) -> tuple[set[tuple[str, str]], list[tuple[int, str]]]:
+    """Читает исключения CJK: пары (файл ресурсов, имя ресурса) и ошибки формата.
+
+    Формат строки — `<file>:<name>  # причина`. Причина нужна человеку, поэтому
+    после `#` строка не разбирается. Ошибки формата возвращаются вместе с
+    номером строки: опечатка не должна молча отключать исключение.
+    """
+    entries: set[tuple[str, str]] = set()
+    problems: list[tuple[int, str]] = []
+    text = path.read_text(encoding="utf-8")
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        line = raw.split("#", 1)[0].strip()
+        if not line:
+            continue
+        file_name, separator, name = line.partition(":")
+        file_name = file_name.strip()
+        name = name.strip()
+        if not separator or not file_name or not name:
+            problems.append((lineno, f"bad allowlist entry, expected <file>:<name>: {line}"))
+            continue
+        entries.add((file_name, name))
+    return entries, problems
+
+
 def parse_resources(path: Path) -> dict[str, Entry]:
     """Разбирает файл ресурсов в {имя: Entry}, сохраняя порядок объявления."""
     root = ET.parse(path).getroot()
@@ -226,6 +283,7 @@ def compare_entry(
     base: Entry,
     loc: Entry,
     allow_cjk: bool,
+    exempt_cjk: bool,
 ) -> None:
     if base.kind != loc.kind:
         report.error(file_name, name, f"type mismatch: base {base.kind}, locale {loc.kind}")
@@ -284,7 +342,7 @@ def compare_entry(
                 + _diff_tokens(base_tokens["entity"], loc_tokens["entity"]),
             )
 
-        if not allow_cjk:
+        if not allow_cjk and not exempt_cjk:
             chars = cjk_chars(loc_markup)
             if chars:
                 sample = "".join(dict.fromkeys(chars))[:5]
@@ -295,7 +353,14 @@ def compare_entry(
                 )
 
 
-def check_file(base_dir: Path, loc_dir: Path, file_name: str, allow_cjk: bool, report: Report) -> None:
+def check_file(
+    base_dir: Path,
+    loc_dir: Path,
+    file_name: str,
+    allow_cjk: bool,
+    allowlist: set[tuple[str, str]],
+    report: Report,
+) -> None:
     base_path = base_dir / file_name
     loc_path = loc_dir / file_name
 
@@ -324,7 +389,15 @@ def check_file(base_dir: Path, loc_dir: Path, file_name: str, allow_cjk: bool, r
         if loc_entry is None:
             report.error(file_name, name, "missing in locale")
             continue
-        compare_entry(report, file_name, name, base_entry, loc_entry, allow_cjk)
+        compare_entry(
+            report,
+            file_name,
+            name,
+            base_entry,
+            loc_entry,
+            allow_cjk,
+            (file_name, name) in allowlist,
+        )
 
     for name in loc:
         if name in base:
@@ -344,6 +417,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="не считать иероглифы в значениях ошибкой (для проверки самой zh-базы)",
     )
+    parser.add_argument(
+        "--allowlist",
+        default=None,
+        help=(
+            "файл-исключение CJK со строками '<file>:<name>  # причина' "
+            f"(по умолчанию {DEFAULT_ALLOWLIST_RELATIVE}, "
+            "отсутствие файла по умолчанию = нет исключений)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     base_dir = Path(args.base)
@@ -353,9 +435,28 @@ def main(argv: list[str] | None = None) -> int:
         print("FAILED: 1 errors, 0 warnings")
         return 1
 
+    allowlist_path, allowlist_error = resolve_allowlist(args.allowlist)
+    if allowlist_error is not None:
+        print(f"ERROR {args.allowlist} - {allowlist_error}")
+        print("FAILED: 1 errors, 0 warnings")
+        return 1
+
     report = Report()
+    allowlist: set[tuple[str, str]] = set()
+    if allowlist_path is not None:
+        allowlist, problems = load_allowlist(allowlist_path)
+        for lineno, reason in problems:
+            report.error(f"{allowlist_path}:{lineno}", "-", reason)
+        if report.errors:
+            # Ошибка в самом файле-исключении: проверять ресурсы с неполным
+            # набором исключений значило бы выдать ложный результат.
+            for line in report.lines:
+                print(line)
+            print(f"FAILED: {report.errors} errors, 0 warnings")
+            return 1
+
     for file_name in args.files:
-        check_file(base_dir, loc_dir, file_name, args.allow_cjk, report)
+        check_file(base_dir, loc_dir, file_name, args.allow_cjk, allowlist, report)
 
     for line in report.lines:
         print(line)

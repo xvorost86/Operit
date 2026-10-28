@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -225,6 +226,98 @@ class CheckLocaleTest(unittest.TestCase):
         with redirect_stdout(out):
             code = check_locale.main([str(fixture.locale_dir), "--base", str(fixture.base_dir), "--allow-cjk"])
         self.assertEqual(code, 0, out.getvalue())
+
+    # --- --allowlist: исключение снимает только проверку иероглифов ---
+
+    ALLOWLIST_BASE = (
+        '<resources><string name="voice">默认 %1$s</string>'
+        '<string name="other">中文 %1$s</string></resources>'
+    )
+
+    def fixture_with_allowlist(self, locale: str, allowlist_body: str) -> tuple[Fixture, Path]:
+        fixture = Fixture(self.ALLOWLIST_BASE, locale)
+        self.addCleanup(fixture.close)
+        path = fixture.root / "cjk_allowlist.txt"
+        path.write_text(allowlist_body, encoding="utf-8")
+        return fixture, path
+
+    def test_allowlist_exempts_cjk_of_listed_key(self) -> None:
+        locale = (
+            '<resources><string name="voice">Default %1$s, 冰糖</string>'
+            '<string name="other">Other %1$s</string></resources>'
+        )
+        fixture, path = self.fixture_with_allowlist(locale, "strings.xml:voice  # параметр API\n")
+        code, output = fixture.run("--allowlist", str(path))
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_allowlist_keeps_placeholder_check_for_listed_key(self) -> None:
+        locale = (
+            '<resources><string name="voice">Default %1$d, 冰糖</string>'
+            '<string name="other">Other %1$s</string></resources>'
+        )
+        fixture, path = self.fixture_with_allowlist(locale, "strings.xml:voice  # параметр API\n")
+        code, output = fixture.run("--allowlist", str(path))
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml voice placeholder mismatch", output)
+        self.assertNotIn("CJK in locale value", output)
+
+    def test_allowlist_does_not_exempt_unlisted_key(self) -> None:
+        locale = (
+            '<resources><string name="voice">Default %1$s, 冰糖</string>'
+            '<string name="other">中文 %1$s</string></resources>'
+        )
+        fixture, path = self.fixture_with_allowlist(locale, "strings.xml:voice  # параметр API\n")
+        code, output = fixture.run("--allowlist", str(path))
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml other CJK in locale value", output)
+        self.assertNotIn("ERROR strings.xml voice", output)
+
+    def test_explicit_missing_allowlist_is_error(self) -> None:
+        fixture, _ = self.fixture_with_allowlist(
+            '<resources><string name="voice">Default %1$s</string>'
+            '<string name="other">Other %1$s</string></resources>',
+            "",
+        )
+        absent = fixture.root / "absent_allowlist.txt"
+        code, output = fixture.run("--allowlist", str(absent))
+        self.assertEqual(code, 1, output)
+        self.assertIn("allowlist file not found", output)
+        self.assertIn(str(absent), output)
+
+    def test_missing_default_allowlist_is_empty_list(self) -> None:
+        locale = (
+            '<resources><string name="voice">Default %1$s, 冰糖</string>'
+            '<string name="other">Other %1$s</string></resources>'
+        )
+        fixture, _ = self.fixture_with_allowlist(locale, "")
+        absent = fixture.root / "no_such_default.txt"
+        with mock.patch.object(check_locale, "DEFAULT_ALLOWLIST", absent):
+            code, output = fixture.run()
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml voice CJK in locale value", output)
+
+    def test_allowlist_comment_and_blank_lines_are_ignored(self) -> None:
+        locale = (
+            '<resources><string name="voice">Default %1$s, 冰糖</string>'
+            '<string name="other">Other %1$s</string></resources>'
+        )
+        fixture, path = self.fixture_with_allowlist(
+            locale, "# заголовок\n\n   \nstrings.xml:voice   # причина без кавычек\n\n"
+        )
+        code, output = fixture.run("--allowlist", str(path))
+        self.assertEqual(code, 0, output)
+
+    def test_malformed_allowlist_line_is_error(self) -> None:
+        fixture, path = self.fixture_with_allowlist(
+            '<resources><string name="voice">Default %1$s</string>'
+            '<string name="other">Other %1$s</string></resources>',
+            "strings.xml voice  # забыт разделитель\n",
+        )
+        code, output = fixture.run("--allowlist", str(path))
+        self.assertEqual(code, 1, output)
+        self.assertIn("bad allowlist entry", output)
+        self.assertIn(":1", output)
 
 
 if __name__ == "__main__":
