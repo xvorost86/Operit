@@ -320,5 +320,164 @@ class CheckLocaleTest(unittest.TestCase):
         self.assertIn(":1", output)
 
 
+class StrictAndroidTest(unittest.TestCase):
+    """--strict-android: Android-экранирование значений локали (по умолчанию флаг выключен)."""
+
+    BASE = '<resources><string name="q">没有听清</string></resources>'
+    ALLOW_CJK = "--allow-cjk"
+    STRICT = "--strict-android"
+
+    def check_pair(self, base: str, locale: str, *extra: str) -> tuple[int, str]:
+        fixture = Fixture(base, locale)
+        self.addCleanup(fixture.close)
+        return fixture.run(*extra)
+
+    def check(self, locale: str, *extra: str) -> tuple[int, str]:
+        return self.check_pair(self.BASE, locale, *extra)
+
+    @staticmethod
+    def locale(value: str) -> str:
+        return f'<resources><string name="q">{value}</string></resources>'
+
+    # --- кавычки ---
+
+    def test_raw_double_quote_is_error_only_with_flag(self) -> None:
+        locale = self.locale('Скажи "привет"')
+
+        code, output = self.check(locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+
+        code, output = self.check(locale, self.ALLOW_CJK)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_escaped_double_quote_passes(self) -> None:
+        code, output = self.check(self.locale('Скажи \\"привет\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_quot_entity_is_not_android_escaping(self) -> None:
+        # &quot; XML-парсер превращает в кавычку — Android получает ту же «сырую»
+        # кавычку, поэтому это не экранирование.
+        code, output = self.check(self.locale("&quot;привет&quot;"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+
+    # --- чётность обратных слэшей ---
+
+    def test_even_backslashes_do_not_escape_quote(self) -> None:
+        code, output = self.check(self.locale('Путь \\\\"тут'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q raw double quote", output)
+
+    def test_odd_backslashes_do_escape_quote(self) -> None:
+        code, output = self.check(self.locale('Путь \\\\\\"тут'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+
+    def test_even_backslashes_do_not_escape_apostrophe(self) -> None:
+        code, output = self.check(self.locale("Путь \\\\'тут"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q unescaped apostrophe", output)
+
+    # --- апостроф и outer quotes ---
+
+    def test_unescaped_apostrophe_is_error(self) -> None:
+        code, output = self.check(self.locale("It didn't work"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q unescaped apostrophe", output)
+
+    def test_escaped_apostrophe_passes(self) -> None:
+        code, output = self.check(self.locale("It didn\\'t work"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_android_outer_quotes_allow_apostrophe(self) -> None:
+        code, output = self.check(self.locale('\\"It didn\'t work\\"'), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    # --- реальные пробельные символы ---
+
+    def test_real_newline_is_error(self) -> None:
+        code, output = self.check(self.locale("Первая\nвторая"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q real newline", output)
+
+    def test_real_tab_is_error(self) -> None:
+        code, output = self.check(self.locale("Первая\tвторая"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml q real tab", output)
+
+    def test_escaped_newline_passes(self) -> None:
+        code, output = self.check(self.locale("Первая\\nвторая"), self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    # --- атрибуты тегов, CDATA, база ---
+
+    def test_tag_attributes_are_not_text(self) -> None:
+        base = (
+            '<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">'
+            '<string name="t">见 <a href="https://x.y/?q=1&amp;b=2">链接</a>'
+            ' 和 <xliff:g id="count">%1$d</xliff:g></string></resources>'
+        )
+        locale = (
+            '<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">'
+            '<string name="t">см. <a href="https://x.y/?q=1&amp;b=2">ссылку</a>'
+            ' и <xliff:g id="count">%1$d</xliff:g></string></resources>'
+        )
+        code, output = self.check_pair(base, locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_cdata_value_is_not_analyzed(self) -> None:
+        locale = (
+            '<resources><string name="q">'
+            "<![CDATA[Он сказал \"нет\" и didn't вернуться]]></string></resources>"
+        )
+        code, output = self.check(locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+        self.assertEqual(output.strip(), "OK")
+
+    def test_base_is_never_checked(self) -> None:
+        base = '<resources><string name="q">他说 "不"</string></resources>'
+        locale = self.locale('Он сказал \\"нет\\"')
+        code, output = self.check_pair(base, locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 0, output)
+
+    # --- plurals / string-array: каждый item отдельно ---
+
+    def test_plurals_item_checked_individually(self) -> None:
+        base = (
+            '<resources><plurals name="items">'
+            '<item quantity="one">%1$d 个项目</item>'
+            '<item quantity="other">%1$d 个项目</item></plurals></resources>'
+        )
+        locale = (
+            '<resources><plurals name="items">'
+            '<item quantity="one">%1$d "проект"</item>'
+            '<item quantity="other">%1$d проектов</item></plurals></resources>'
+        )
+        code, output = self.check_pair(base, locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml items[one] raw double quote", output)
+        self.assertNotIn("items[other]", output)
+
+    def test_string_array_item_checked_individually(self) -> None:
+        base = (
+            '<resources><string-array name="modes">'
+            "<item>快速</item><item>精确</item></string-array></resources>"
+        )
+        locale = (
+            '<resources><string-array name="modes">'
+            "<item>Быстро</item><item>Точно didn't</item></string-array></resources>"
+        )
+        code, output = self.check_pair(base, locale, self.ALLOW_CJK, self.STRICT)
+        self.assertEqual(code, 1, output)
+        self.assertIn("ERROR strings.xml modes[1] unescaped apostrophe", output)
+        self.assertNotIn("modes[0]", output)
+
+
 if __name__ == "__main__":
     unittest.main()

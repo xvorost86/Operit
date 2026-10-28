@@ -42,6 +42,30 @@ strings_l10n.xml):
      иначе проверка падает с ошибкой (опечатка в исключении не должна
      молча превращаться в «исключений нет»).
 
+  6. Android-экранирование значений локали — режим `--strict-android`, по
+     умолчанию выключен. Это редакционный контроль НОВЫХ строк, а не приговор
+     upstream-файлам, поэтому базовая локаль этим режимом не проверяется
+     никогда: в старых zh/en-строках «сырые» кавычки есть, их не трогаем.
+     При флаге для каждого значения локали (в том числе для каждого item
+     plurals/string-array) выдаётся ERROR на:
+        - «сырую» `"` без обратного слэша (`\"` — правильная форма; `&quot;`
+          Android тоже получает как кавычку, поэтому она ошибка, а не экранирование);
+        - реальный перевод строки или табуляцию в значении (`\n`, `\t` — правильные
+          формы: aapt2 сворачивает реальные пробельные символы и портит строку);
+        - неэкранированный `'` без обратного слэша (`\'`).
+     Чётность обратных слэшей: экранирует только нечётное их число перед
+     символом, поэтому `\\"` — это экранированный слэш и «сырая» кавычка
+     (ERROR), а `\"` — экранированная кавычка (OK). Так же для апострофа.
+     Значение, целиком обёрнутое в Android outer double quotes (`\"…\"`),
+     корректно, и апостроф внутри такой обёртки допустим.
+     Содержимое XML-атрибутов тегов (`<a href="…">`, `<xliff:g id="…">`) —
+     не текст значения, кавычки там законны и не проверяются.
+     Значение с CDATA-секцией не анализируется вообще: ElementTree отдаёт
+     CDATA склеенной с текстом, поэтому различие снимается ДО ET.parse
+     отдельным проходом expat по тому же файлу и не восстанавливается задним
+     числом. Голый `&` и кривые XML-теги ловит сам XML-парсер — второго
+     самописного разбора XML здесь нет.
+
 Содержимое значения сравнивается в виде «внутренней разметки» элемента:
 текст экранируется обратно (& < >), вложенные узлы сериализуются. Поэтому
 &lt; в базе и в переводе выглядят одинаково, а <b>…</b> в переводе пропущен не
@@ -54,6 +78,8 @@ strings_l10n.xml):
     python3 tools/l10n/check_locale.py app/src/main/res/values-en \\
         --allowlist l10n/cjk_allowlist.txt
     python3 tools/l10n/check_locale.py app/src/main/res/values --allow-cjk
+    python3 tools/l10n/check_locale.py app/src/main/res/values-ru \\
+        --strict-android
 
 Вывод: строка на проблему `ERROR|WARN <file> <name> <причина>`, затем итог
 `OK` либо `FAILED: N errors, M warnings`. Код возврата 1 при наличии ошибок.
@@ -67,6 +93,7 @@ import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
+from xml.parsers import expat
 
 DEFAULT_BASE = "app/src/main/res/values"
 DEFAULT_FILES = ("strings.xml", "strings_l10n.xml")
@@ -94,6 +121,9 @@ TOKEN_RE = re.compile(
 
 NONPOSITIONAL_RE = re.compile(r"%[-#+ 0,(]*\d*(?:\.\d+)?[bBhHsScCdoxXeEfgGaAtTn]")
 WS_RE = re.compile(r"\s+")
+# Тег в «внутренней разметке»: текст уже экранирован (&lt;), поэтому любой
+# <...> здесь — настоящий тег, а его атрибуты — не текст значения.
+TAG_SPAN_RE = re.compile(r"<[^<>]*>")
 
 
 @dataclass
@@ -245,6 +275,131 @@ def parse_resources(path: Path) -> dict[str, Entry]:
     return entries
 
 
+@dataclass
+class _ElementFrame:
+    """Открытый XML-элемент при проходе expat (для поиска CDATA-значений)."""
+
+    tag: str
+    name: str | None
+    quantity: str | None
+    items: int = 0
+
+
+def cdata_labels(path: Path) -> set[str]:
+    """Метки значений с CDATA-секцией: `<name>`, `<name>[<quantity>]`, `<name>[<index>]`.
+
+    ElementTree не отличает CDATA от обычного текста — он отдаёт уже склеенное
+    содержимое. Поэтому различие снимается здесь, до ET.parse, отдельным
+    проходом expat по тому же файлу. Метка совпадает с той, что печатается в
+    отчёте, чтобы строгий режим мог пропустить ровно эти значения.
+    """
+    labels: set[str] = set()
+    frames: list[_ElementFrame] = []
+
+    def start_element(tag: str, attrs: dict[str, str]) -> None:
+        if frames:
+            parent = frames[-1]
+            if parent.tag in ("plurals", "string-array") and tag == "item":
+                parent.items += 1
+        frames.append(_ElementFrame(tag, attrs.get("name"), attrs.get("quantity")))
+
+    def end_element(tag: str) -> None:
+        frames.pop()
+
+    def start_cdata() -> None:
+        if not frames:
+            return
+        leaf = frames[-1]
+        if leaf.tag == "string":
+            if leaf.name is not None:
+                labels.add(leaf.name)
+            return
+        if leaf.tag != "item" or len(frames) < 2:
+            return
+        parent = frames[-2]
+        if parent.name is None:
+            return
+        if parent.tag == "plurals":
+            labels.add(f"{parent.name}[{leaf.quantity or ''}]")
+        elif parent.tag == "string-array":
+            labels.add(f"{parent.name}[{parent.items - 1}]")
+
+    scanner = expat.ParserCreate()
+    scanner.StartElementHandler = start_element
+    scanner.EndElementHandler = end_element
+    scanner.StartCdataSectionHandler = start_cdata
+    scanner.Parse(path.read_bytes(), True)
+    return labels
+
+
+def _unescaped_positions(text: str, char: str) -> list[int]:
+    """Позиции `char`, перед которыми ЧЁТНОЕ число обратных слэшей.
+
+    Экранирует только нечётное число слэшей: `\"` — экранированная кавычка,
+    а `\\"` — экранированный слэш и следом «сырая» кавычка. Считать
+    «есть ли слэш перед символом» недостаточно — это и есть ловушка чётности.
+    """
+    found: list[int] = []
+    backslashes = 0
+    for index, current in enumerate(text):
+        if current == "\\":
+            backslashes += 1
+            continue
+        if current == char and backslashes % 2 == 0:
+            found.append(index)
+        backslashes = 0
+    return found
+
+
+def _android_quoted(markup: str) -> bool:
+    """Значение целиком в Android outer double quotes (`\\"…\\"`).
+
+    Внутри такой обёртки апостроф законен: aapt2 уже считает содержимое
+    quoted-строкой, а не сырым текстом ресурса.
+    """
+    trimmed = markup.strip()
+    return len(trimmed) > 4 and trimmed.startswith('\\"') and trimmed.endswith('\\"')
+
+
+def strict_android_problems(markup: str) -> list[str]:
+    """Причины ERROR строгого режима для одного значения локали.
+
+    Проверяется только текст вне тегов: содержимое атрибутов (`<a href="…">`,
+    `<xliff:g id="…">`) — не текст значения, кавычки там законны. `<` в тексте
+    к этому моменту экранирован в `&lt;`, поэтому любой `<…>` в разметке —
+    настоящий тег. Пустой список — значение корректно.
+    """
+    problems: list[str] = []
+    segments = TAG_SPAN_RE.split(markup)
+    quoted = _android_quoted(markup)
+    for segment in segments:
+        if "\n" in segment or "\r" in segment:
+            problems.append("real newline in value, use \\n")
+        if "\t" in segment:
+            problems.append("real tab in value, use \\t")
+        if _unescaped_positions(segment, '"'):
+            problems.append('raw double quote in value (&quot; is a quote too), use \\"')
+        if not quoted and _unescaped_positions(segment, "'"):
+            problems.append("unescaped apostrophe in value, use \\' or Android outer quotes")
+    return list(dict.fromkeys(problems))
+
+
+def check_strict_android(
+    report: Report,
+    file_name: str,
+    entries: dict[str, Entry],
+    cdata: set[str],
+) -> None:
+    """Строгий режим: Android-экранирование каждого значения локали (кроме CDATA)."""
+    for name, entry in entries.items():
+        for key, markup in entry.values.items():
+            label = name if key == "" else f"{name}[{key}]"
+            if label in cdata:
+                continue
+            for problem in strict_android_problems(markup):
+                report.error(file_name, label, problem)
+
+
 class Report:
     def __init__(self) -> None:
         self.errors = 0
@@ -360,6 +515,7 @@ def check_file(
     allow_cjk: bool,
     allowlist: set[tuple[str, str]],
     report: Report,
+    strict_android: bool = False,
 ) -> None:
     base_path = base_dir / file_name
     loc_path = loc_dir / file_name
@@ -381,6 +537,10 @@ def check_file(
     except ET.ParseError as exc:
         report.error(file_name, "-", f"locale XML parse error: {exc}")
         return
+
+    if strict_android:
+        # Только значения локали: база (upstream zh) этим режимом не проверяется.
+        check_strict_android(report, file_name, loc, cdata_labels(loc_path))
 
     for name, base_entry in base.items():
         if base_entry.translatable == "false":
@@ -416,6 +576,15 @@ def main(argv: list[str] | None = None) -> int:
         "--allow-cjk",
         action="store_true",
         help="не считать иероглифы в значениях ошибкой (для проверки самой zh-базы)",
+    )
+    parser.add_argument(
+        "--strict-android",
+        action="store_true",
+        help=(
+            "ERROR на неэкранированные по правилам Android значения локали: "
+            "«сырые» \\\" и ', реальные переводы строки/табуляция; CDATA не проверяется "
+            "(по умолчанию выключен, база не проверяется никогда)"
+        ),
     )
     parser.add_argument(
         "--allowlist",
@@ -456,7 +625,15 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
     for file_name in args.files:
-        check_file(base_dir, loc_dir, file_name, args.allow_cjk, allowlist, report)
+        check_file(
+            base_dir,
+            loc_dir,
+            file_name,
+            args.allow_cjk,
+            allowlist,
+            report,
+            strict_android=args.strict_android,
+        )
 
     for line in report.lines:
         print(line)
