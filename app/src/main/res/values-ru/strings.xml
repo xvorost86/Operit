@@ -18,11 +18,11 @@
     <string name="chat_fullscreen_input">Полноэкранный ввод</string>
     <string name="chat_history_settings">Настройки истории чата</string>
     <string name="chat_display_mode">Режим отображения</string>
-    <string name="chat_autoglm_warning">Использовать autoglm как основную модель беседы запрещено. Модель беседы и модель управления UI разделены, поэтому выберите любую другую толковую большую модель. Если возникнут вопросы, внимательно прочитайте документацию о механизме настройки моделей.</string>
+    <string name="chat_autoglm_warning">Не используйте autoglm как основную модель беседы. Модель беседы и модель управления интерфейсом настраиваются отдельно: выберите для беседы другую подходящую языковую модель. Подробности настройки моделей описаны в документации.</string>
     <string name="chat_model_count">Моделей: %d</string>
     <string name="chat_starting_export">Начинается экспорт…</string>
     <string name="chat_reply_instruction">Пользователь отвечает на ваше предыдущее сообщение:</string>
-    <string name="chat_workspace_status">Состояние рабочей области</string>
+    <string name="chat_workspace_status">Состояние рабочего пространства</string>
     <string name="attach_local_storage_repo">Подключить локальный репозиторий</string>
     <string name="chat_style_bubble_show_avatar">Показывать аватары</string>
     <string name="chat_style_bubble_show_avatar_desc">Показывать аватары пользователя и ИИ в стиле чата с пузырями</string>
@@ -35,7 +35,7 @@
     <string name="chat_style_bubble_rounded_corners">Включить скруглённые пузыри</string>
     <string name="chat_style_bubble_rounded_corners_desc">Если отключено, пузыри сообщений имеют прямые углы</string>
     <string name="chat_style_bubble_rounded_corners_user">Пользователь</string>
-    <string name="chat_style_bubble_rounded_corners_ai">AI</string>
+    <string name="chat_style_bubble_rounded_corners_ai">ИИ</string>
     <string name="chat_style_bubble_advanced_options">Дополнительные параметры</string>
     <string name="chat_style_bubble_padding_left">Отступ слева</string>
     <string name="chat_style_bubble_padding_right">Отступ справа</string>

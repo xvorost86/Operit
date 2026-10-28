@@ -255,6 +255,7 @@
 | Directory | каталог | `skillmgr_detail_directory`, `create_test_dir` «Create Test Directory» → «Создать тестовый каталог» |
 | Path | путь | `copy_path` → «Копировать путь»; `external_packages_path` → «Путь к внешнему хранилищу пакетов» |
 | Archive | архив | `file_type_archive` → «Архив»; как действие (compress) — «упаковать» |
+| Workspace | рабочее пространство | `chat_workspace_status` «Workspace Status» → «Состояние рабочего пространства». Не «рабочая область», не «воркспейс» (решение архитектора при приёмке партии 01) |
 | Screen Content | содержимое экрана | `floating_screen_content`, `screen_content` |
 | Screenshot | снимок экрана | `screen_ocr_capture_failed` «Screenshot capture failed» → «Не удалось сделать снимок экрана» |
 | Attachment | вложение | `add_attachment` → «Добавить вложение» |
