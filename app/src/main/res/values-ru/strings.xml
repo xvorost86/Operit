@@ -811,7 +811,7 @@
     <string name="tools_failed">Не удалось выполнить инструмент: %1$s</string>
     <string name="tool_result">Результат выполнения инструмента</string>
     <string name="disable_tools">Отключить инструменты</string>
-    <string name="disable_tools_desc">Если отключено, ИИ не может использовать встроенные инструменты, включая файловую систему, HTTP и запросы к памяти.</string>
+    <string name="disable_tools_desc">После отключения инструментов ИИ не сможет использовать встроенные инструменты, включая файловую систему, HTTP и запросы к памяти.</string>
     <string name="tools_disabled">Инструменты отключены</string>
     <string name="processing_input">Обработка ввода…</string>
     <string name="references">Источники:</string>
@@ -964,9 +964,9 @@
     <string name="user_configuration_lock">Заблокировать автоматическое обновление профиля</string>
     <string name="user_configuration_auto_update_desc">Если включено, анализ долговременной памяти обновляет user.md по беседам в связанном пространстве. Блокировка запрещает только автоматические обновления; ручное редактирование остаётся доступным.</string>
     <string name="user_configuration_unlock_notice">Эта конфигурация была заблокирована при миграции со старых настроек. Сохранение снимает блокировку со всего документа.</string>
-    <string name="custom_description">Своё представление</string>
-    <string name="preferences_hint">Введите своё представление (не более 100 символов)</string>
-    <string name="enter_preferences">Введите здесь своё представление…</string>
+    <string name="custom_description">О себе</string>
+    <string name="preferences_hint">Расскажите о себе (не более 100 символов)</string>
+    <string name="enter_preferences">Расскажите о себе…</string>
     <string name="edit_preferences">Изменить предпочтения</string>
     <string name="reset_preferences">Сбросить предпочтения</string>
     <string name="set_preferences">Задать предпочтения</string>
