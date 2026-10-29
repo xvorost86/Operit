@@ -5864,7 +5864,7 @@
     <string name="mcp_confirm_and_deploy">Подтвердить и развернуть</string>
     <string name="mcp_uninstall_success">Удаление выполнено успешно!</string>
     <string name="mcp_operation_success">Операция «%1$s» выполнена успешно!</string>
-    <string name="mcp_plugin_installed_to">Плагин: «%1$s», путь:</string>
+    <string name="mcp_plugin_installed_to">Путь плагина (операция «%1$s»):</string>
     <string name="mcp_operation_failed">Операция «%1$s» не выполнена</string>
     <string name="mcp_preparing_operation">Подготовка к операции «%1$s»…</string>
     <string name="mcp_downloading_plugin">Загрузка плагина…</string>
