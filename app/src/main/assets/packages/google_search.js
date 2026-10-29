@@ -4,44 +4,46 @@
 
     "display_name": {
         "zh": "Google 搜索",
-        "en": "Google Search"
+        "en": "Google Search",
+        "ru": "Поиск Google"
     },
     "description": {
         "zh": "提供 Google 普通搜索与 Google Scholar 学术搜索能力，支持设置语言与返回条数。",
-        "en": "Google web search and Google Scholar search, with configurable language and result count."
+        "en": "Google web search and Google Scholar search, with configurable language and result count.",
+        "ru": "Поиск в интернете через Google и поиск в Google Scholar с настройкой языка и количества результатов."
     },
     "enabledByDefault": false,
     "category": "Search",
     "tools": [
         {
             "name": "search_web",
-            "description": { "zh": "执行 Google 普通搜索，返回网页搜索结果。", "en": "Perform a regular Google search and return web results." },
+            "description": { "zh": "执行 Google 普通搜索，返回网页搜索结果。", "en": "Perform a regular Google search and return web results.", "ru": "Выполняет обычный поиск Google и возвращает результаты из интернета." },
             "parameters": [
-                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query" }, "type": "string", "required": true },
-                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)" }, "type": "number", "required": false },
-                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)" }, "type": "string", "required": false },
-                { "name": "region", "description": { "zh": "地区参数，例如 us、cn。默认 us", "en": "Region parameter, e.g. us, cn (default: us)" }, "type": "string", "required": false },
-                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)" }, "type": "boolean", "required": false }
+                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query", "ru": "Поисковый запрос" }, "type": "string", "required": true },
+                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)", "ru": "Количество возвращаемых результатов (по умолчанию: 10, максимум: 20)" }, "type": "number", "required": false },
+                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)", "ru": "Язык интерфейса (по умолчанию: en)" }, "type": "string", "required": false },
+                { "name": "region", "description": { "zh": "地区参数，例如 us、cn。默认 us", "en": "Region parameter, e.g. us, cn (default: us)", "ru": "Параметр региона, например us, cn (по умолчанию: us)" }, "type": "string", "required": false },
+                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)", "ru": "Добавлять ли в результаты список ссылок, по которым можно нажать (по умолчанию: false)" }, "type": "boolean", "required": false }
             ]
         },
         {
             "name": "search_scholar",
-            "description": { "zh": "执行 Google Scholar 学术搜索，返回学术文献结果。", "en": "Perform a Google Scholar search and return academic results." },
+            "description": { "zh": "执行 Google Scholar 学术搜索，返回学术文献结果。", "en": "Perform a Google Scholar search and return academic results.", "ru": "Выполняет поиск в Google Scholar и возвращает научные публикации." },
             "parameters": [
-                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query" }, "type": "string", "required": true },
-                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)" }, "type": "number", "required": false },
-                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)" }, "type": "string", "required": false },
-                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)" }, "type": "boolean", "required": false }
+                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query", "ru": "Поисковый запрос" }, "type": "string", "required": true },
+                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)", "ru": "Количество возвращаемых результатов (по умолчанию: 10, максимум: 20)" }, "type": "number", "required": false },
+                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)", "ru": "Язык интерфейса (по умолчанию: en)" }, "type": "string", "required": false },
+                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)", "ru": "Добавлять ли в результаты список ссылок, по которым можно нажать (по умолчанию: false)" }, "type": "boolean", "required": false }
             ]
         },
         {
             "name": "search_scholar_mirror",
-            "description": { "zh": "通过镜像站执行 Google Scholar 学术搜索，以绕过人机验证。", "en": "Use a mirror site to perform Google Scholar searches to bypass CAPTCHA checks." },
+            "description": { "zh": "通过镜像站执行 Google Scholar 学术搜索，以绕过人机验证。", "en": "Use a mirror site to perform Google Scholar searches to bypass CAPTCHA checks.", "ru": "Использует зеркальный сайт для поиска в Google Scholar, чтобы обойти проверку CAPTCHA." },
             "parameters": [
-                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query" }, "type": "string", "required": true },
-                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)" }, "type": "number", "required": false },
-                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)" }, "type": "string", "required": false },
-                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)" }, "type": "boolean", "required": false }
+                { "name": "query", "description": { "zh": "搜索关键词", "en": "Search query", "ru": "Поисковый запрос" }, "type": "string", "required": true },
+                { "name": "max_results", "description": { "zh": "返回结果数量，默认 10，最大 20", "en": "Number of results to return (default: 10, max: 20)", "ru": "Количество возвращаемых результатов (по умолчанию: 10, максимум: 20)" }, "type": "number", "required": false },
+                { "name": "language", "description": { "zh": "界面语言参数，默认 en", "en": "Interface language (default: en)", "ru": "Язык интерфейса (по умолчанию: en)" }, "type": "string", "required": false },
+                { "name": "includeLinks", "description": { "zh": "是否在结果中包含可点击的链接列表，默认为false。", "en": "Whether to include a clickable link list in results (default: false)", "ru": "Добавлять ли в результаты список ссылок, по которым можно нажать (по умолчанию: false)" }, "type": "boolean", "required": false }
             ]
         }
     ]
