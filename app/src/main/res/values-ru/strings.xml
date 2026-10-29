@@ -4918,7 +4918,7 @@
     <string name="show_message_timestamp">Показывать время сообщения</string>
     <string name="show_message_timestamp_description">Показывать время сообщения ИИ под ним</string>
     <string name="chat_message_token_stats_compact">токены: %1$d ↑ %3$d (кэш: %2$d) ↓ %4$d (попадания: %5$s)</string>
-    <string name="chat_message_timing_stats_compact">итого: %1$s (первый токен %2$s, вывод %3$s)</string>
+    <string name="chat_message_timing_stats_compact">итого: %1$s (первый %2$s, вывод %3$s)</string>
     <string name="chat_message_token_speed_compact">%1$s t/s</string>
     <string name="chat_message_timestamp_compact">время: %1$s</string>
     <string name="global_user_name">Глобальное имя пользователя</string>
