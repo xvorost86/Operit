@@ -632,7 +632,7 @@
     <string name="plugin_complete_with_failures">Запуск завершён, успешно: %1$d%%. Некоторые плагины не удалось загрузить</string>
     <string name="plugin_complete_success">Запуск завершён, успешно: %1$d%%</string>
     <string name="plugin_no_plugins_to_start">Нет плагинов для запуска</string>
-    <string name="plugin_copyright"> 2023 при поддержке ИИ</string>
+    <string name="plugin_copyright"> 2023 AI Assistance</string>
     <string name="plugin_registered">Зарегистрирован</string>
     <string name="plugin_registration_failed">Не удалось зарегистрировать</string>
     <string name="plugin_verification_failed">Не удалось проверить</string>
@@ -670,7 +670,7 @@
     <string name="auto_read_desc">Если включено, ответы ИИ будут автоматически озвучиваться</string>
     <string name="auto_read_active">Авточтение включено</string>
     <string name="disable_stream_output">Отключить потоковый вывод</string>
-    <string name="disable_stream_output_desc">Если отключено, ответы ИИ будут показываться целиком, а не по словам в потоке</string>
+    <string name="disable_stream_output_desc">После отключения потокового вывода ответы ИИ показываются целиком, а не постепенно по словам</string>
     <string name="disable_settings_group">Параметры отключения</string>
     <string name="disable_settings_group_desc">Эта группа управляет переключателями отключения, влияющими на поведение ответов.</string>
     <string name="manage_tools">Управление инструментами</string>
@@ -683,7 +683,7 @@
     <string name="tool_prompt_manager_title">Менеджер промптов инструментов</string>
     <string name="manage_packages">Управление пакетами</string>
     <string name="disable_user_preference_description">Отключить user.md</string>
-    <string name="disable_user_preference_description_desc">Если отключено, user.md не добавляется в системный промпт</string>
+    <string name="disable_user_preference_description_desc">После отключения пользовательских данных файл user.md не добавляется в системный промпт</string>
     <string name="pause_reading">Приостановить чтение</string>
     <string name="resume_reading">Продолжить чтение</string>
     <string name="stop_reading">Остановить чтение</string>
@@ -711,7 +711,7 @@
     <string name="multi_select">Множественный выбор</string>
     <string name="exit_multi_select">Выйти из множественного выбора</string>
     <string name="select_all_messages">Выбрать все</string>
-    <string name="clear_selection">Отмена</string>
+    <string name="clear_selection">Снять выделение</string>
     <string name="multi_select_actions">Действия</string>
     <string name="delete_selected">Удалить выбранное</string>
     <string name="share_selected">Поделиться</string>
