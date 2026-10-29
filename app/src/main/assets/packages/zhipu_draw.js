@@ -3,18 +3,21 @@
   "name": "zhipu_draw",
   "display_name": {
     "zh": "智谱生图",
-    "en": "Zhipu Draw"
+    "en": "Zhipu Draw",
+    "ru": "Генерация изображений Zhipu"
   },
   "description": {
     "zh": "使用智谱AI图像生成API根据提示词画图，将图片保存到本地 /sdcard/Download/Operit/plugins/draw/zhipu_draw/draws/ 目录，并返回 Markdown 图片提示。",
-    "en": "Generate images via Zhipu AI image generation API from a prompt, save to /sdcard/Download/Operit/plugins/draw/zhipu_draw/draws/, and return a Markdown image reference."
+    "en": "Generate images via Zhipu AI image generation API from a prompt, save to /sdcard/Download/Operit/plugins/draw/zhipu_draw/draws/, and return a Markdown image reference.",
+    "ru": "Создаёт изображения по промпту через API генерации изображений Zhipu AI, сохраняет их в /sdcard/Download/Operit/plugins/draw/zhipu_draw/draws/ и возвращает ссылку на изображение в Markdown."
   },
   "env": [
     {
       "name": "ZHIPU_API_KEY",
       "description": {
         "zh": "智谱API Key（必填）",
-        "en": "Zhipu API key (required)"
+        "en": "Zhipu API key (required)",
+        "ru": "Ключ API Zhipu (обязательно)"
       },
       "required": true
     },
@@ -22,7 +25,8 @@
       "name": "ZHIPU_IMAGE_MODEL",
       "description": {
         "zh": "默认绘图模型（可选；当 draw_image 未传 model 时使用）",
-        "en": "Default image model (optional; used when draw_image doesn't pass model)"
+        "en": "Default image model (optional; used when draw_image doesn't pass model)",
+        "ru": "Модель изображений по умолчанию (необязательно; используется, когда draw_image не передаёт model)"
       },
       "required": false
     }
@@ -33,13 +37,14 @@
       "name": "draw_image",
       "description": {
         "zh": "根据提示词调用智谱AI图像生成接口生成图片，保存到本地并返回 Markdown 图片提示。",
-        "en": "Generate an image via Zhipu AI image generation API using a prompt, save it locally, and return a Markdown image reference."
+        "en": "Generate an image via Zhipu AI image generation API using a prompt, save it locally, and return a Markdown image reference.",
+        "ru": "Создаёт изображение по промпту через API генерации изображений Zhipu AI, сохраняет его локально и возвращает ссылку на изображение в Markdown."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "绘图提示词（中文或英文）", "en": "Prompt for image generation (Chinese or English)" }, "type": "string", "required": true },
-        { "name": "size", "description": { "zh": "图片尺寸，例如 '1024x1024' 或 '1280x1280'（可选，默认1024x1024）", "en": "Image size, e.g. '1024x1024' or '1280x1280' (optional, default 1024x1024)" }, "type": "string", "required": false },
-        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)" }, "type": "string", "required": false },
-        { "name": "model", "description": { "zh": "模型名称（可选；不传则使用环境变量 ZHIPU_IMAGE_MODEL，否则默认glm-image）", "en": "Model name (optional; falls back to env ZHIPU_IMAGE_MODEL)" }, "type": "string", "required": false }
+        { "name": "prompt", "description": { "zh": "绘图提示词（中文或英文）", "en": "Prompt for image generation (Chinese or English)", "ru": "Промпт для генерации изображения (на китайском или английском)" }, "type": "string", "required": true },
+        { "name": "size", "description": { "zh": "图片尺寸，例如 '1024x1024' 或 '1280x1280'（可选，默认1024x1024）", "en": "Image size, e.g. '1024x1024' or '1280x1280' (optional, default 1024x1024)", "ru": "Размер изображения, например «1024x1024» или «1280x1280» (необязательно, по умолчанию 1024x1024)" }, "type": "string", "required": false },
+        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)", "ru": "Своё имя выходного файла (без пути и расширения)" }, "type": "string", "required": false },
+        { "name": "model", "description": { "zh": "模型名称（可选；不传则使用环境变量 ZHIPU_IMAGE_MODEL，否则默认glm-image）", "en": "Model name (optional; falls back to env ZHIPU_IMAGE_MODEL)", "ru": "Название модели (необязательно; если не указано, используется переменная окружения ZHIPU_IMAGE_MODEL)" }, "type": "string", "required": false }
       ]
     }
   ]

@@ -5,24 +5,25 @@ METADATA
 
     "display_name": {
         "zh": "DuckDuckGo 搜索",
-        "en": "DuckDuckGo Search"
+        "en": "DuckDuckGo Search",
+        "ru": "Поиск DuckDuckGo"
     },
-    "description": { "zh": "使用DuckDuckGo进行网络搜索和内容抓取。", "en": "Use DuckDuckGo for web search and content extraction." },
+    "description": { "zh": "使用DuckDuckGo进行网络搜索和内容抓取。", "en": "Use DuckDuckGo for web search and content extraction.", "ru": "Поиск в интернете и извлечение содержимого страниц с помощью DuckDuckGo." },
     "category": "Search",
     "tools": [
         {
             "name": "search",
-            "description": { "zh": "执行DuckDuckGo搜索并返回格式化的结果。", "en": "Run a DuckDuckGo search and return formatted results." },
+            "description": { "zh": "执行DuckDuckGo搜索并返回格式化的结果。", "en": "Run a DuckDuckGo search and return formatted results.", "ru": "Выполняет поиск DuckDuckGo и возвращает отформатированные результаты." },
             "parameters": [
                 {
                     "name": "query",
-                    "description": { "zh": "搜索查询字符串", "en": "Search query string." },
+                    "description": { "zh": "搜索查询字符串", "en": "Search query string.", "ru": "Поисковый запрос." },
                     "type": "string",
                     "required": true
                 },
                 {
                     "name": "max_results",
-                    "description": { "zh": "返回的最大结果数 (默认: 10)", "en": "Maximum number of results to return (default: 10)." },
+                    "description": { "zh": "返回的最大结果数 (默认: 10)", "en": "Maximum number of results to return (default: 10).", "ru": "Максимальное количество возвращаемых результатов (по умолчанию: 10)." },
                     "type": "string",
                     "required": false
                 }
@@ -30,11 +31,11 @@ METADATA
         },
         {
             "name": "fetch_content",
-            "description": { "zh": "从网页URL抓取和解析内容。", "en": "Fetch and parse content from a webpage URL." },
+            "description": { "zh": "从网页URL抓取和解析内容。", "en": "Fetch and parse content from a webpage URL.", "ru": "Загружает и разбирает содержимое по URL веб-страницы." },
             "parameters": [
                 {
                     "name": "url",
-                    "description": { "zh": "要抓取内容的网页URL", "en": "Webpage URL to fetch and parse." },
+                    "description": { "zh": "要抓取内容的网页URL", "en": "Webpage URL to fetch and parse.", "ru": "URL веб-страницы для загрузки и разбора." },
                     "type": "string",
                     "required": true
                 }
