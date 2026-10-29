@@ -4221,7 +4221,7 @@
     <string name="character_card_tool_access_search_placeholder">Поиск по имени, описанию или ID</string>
     <string name="character_card_tool_access_empty_search">Подходящие инструменты не найдены</string>
     <string name="character_card_tool_access_requires_use_package">Выбран доступ к пакетам, Skill и MCP, но use_package пока не разрешён. Сначала включите use_package на вкладке «Встроенные».</string>
-    <string name="character_card_tool_access_denied_runtime">Этой карточке роли не разрешено использовать этот инструмент или источник</string>
+    <string name="character_card_tool_access_denied_runtime">Этой карточке персонажа не разрешено использовать этот инструмент или источник</string>
     <string name="character_card_custom_prompt">Свой промпт</string>
     <string name="character_card_custom_prompt_placeholder">Свой расширенный промпт…</string>
     <string name="character_card_marks">Заметки</string>
@@ -4314,7 +4314,7 @@
     <string name="manage_my_plugins">Управление моими плагинами</string>
     <string name="logout">Выйти</string>
     <string name="author_avatar">Аватар автора</string>
-    <string name="sharer_avatar">Аватар поделившегося</string>
+    <string name="sharer_avatar">Аватар пользователя, поделившегося плагином</string>
     <string name="available">Доступен</string>
     <string name="closed">Закрыт</string>
     <string name="github_account">Учётная запись GitHub</string>
