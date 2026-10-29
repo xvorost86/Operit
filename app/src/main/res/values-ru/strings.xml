@@ -7185,8 +7185,8 @@
     <string name="chat_style_bubble_ai_bubble_liquid_glass_desc">Если включено, фон пузыря сообщений ИИ использует эффект матового стекла в стиле iOS</string>
     <string name="chat_style_bubble_ai_bubble_water_glass">Фон пузыря сообщений ИИ с водяным стеклом</string>
     <string name="chat_style_bubble_ai_bubble_water_glass_desc">Если включено, фон пузыря сообщений ИИ использует эффект водяного стекла</string>
-    <string name="chat_style_bubble_user_image_disabled_by_glass">Сейчас включён фон пузыря пользователя с матовым или водяным стеклом, поэтому изображения в пузыре пользователя не применяются</string>
-    <string name="chat_style_bubble_ai_image_disabled_by_glass">Сейчас включён фон пузыря ИИ с матовым или водяным стеклом, поэтому изображения в пузыре ИИ не применяются</string>
+    <string name="chat_style_bubble_user_image_disabled_by_glass">Сейчас включён фон пузыря пользователя с матовым или водяным стеклом, поэтому фоновое изображение пузыря не применяется</string>
+    <string name="chat_style_bubble_ai_image_disabled_by_glass">Сейчас включён фон пузыря ИИ с матовым или водяным стеклом, поэтому фоновое изображение пузыря не применяется</string>
     <string name="login_github_to_manage_scripts">Войдите в GitHub, чтобы публиковать скрипты и управлять ими</string>
     <string name="login_github_to_manage_packages">Войдите в GitHub, чтобы публиковать пакеты и управлять ими</string>
     <string name="market_tab_artifact">Пакеты песочницы</string>
