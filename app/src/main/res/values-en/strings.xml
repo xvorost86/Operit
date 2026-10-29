@@ -1496,7 +1496,7 @@
     <string name="output_tokens">Output: %1$s</string>
     <string name="context_window">Context: %1$s</string>
     <string name="auto_approve">Auto-approve</string>
-    <string name="auto_approve_desc">Safe tools will be executed automatically without prompting. For specific group approvals, please go to Settings - Tool Permission Management.</string>
+    <string name="auto_approve_desc">Controls the global default policy for AI tool calls. With automatic approval, all tool calls run without a confirmation prompt. With confirmation enabled, each call requires approval. Explicit rules configured for individual tools in tool permission settings take precedence over the global default.</string>
     <string name="enabled">Enabled</string>
     <string name="ask">Ask</string>
     <string name="ai_planning_mode">Deep Search</string>
