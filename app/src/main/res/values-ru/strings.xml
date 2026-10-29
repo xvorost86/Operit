@@ -2571,7 +2571,7 @@
     <string name="speech_services_siliconflow_voice_select_icon">Выбрать голос</string>
     <string name="speech_services_siliconflow_voice_custom">Свой голос</string>
     <string name="speech_services_siliconflow_voice_id">ID голоса</string>
-    <string name="speech_services_siliconflow_voice_id_placeholder">Например: charles or speech:kll:32w2b3aj5b:orvmnmpjkqchqalegwvi</string>
+    <string name="speech_services_siliconflow_voice_id_placeholder">Например: charles или speech:kll:32w2b3aj5b:orvmnmpjkqchqalegwvi</string>
     <string name="speech_services_siliconflow_voice_id_hint">Введите название голоса (например, charles) или полный ID голоса (например, свой голос, начинающийся с speech:)</string>
     <string name="speech_services_minimax_config">Конфигурация TTS MiniMax</string>
     <string name="speech_services_minimax_url">URL</string>
