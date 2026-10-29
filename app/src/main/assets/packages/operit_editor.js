@@ -1771,6 +1771,7 @@
       description: {
         zh: '''按 config_id 修改模型配置。'''
         en: '''Update model config by config_id.'''
+        ru: '''Изменяет конфигурацию модели по config_id.'''
       }
       parameters: [
         {
@@ -1778,6 +1779,7 @@
           description: {
             zh: "目标配置ID"
             en: "Target config id"
+            ru: "ID целевой конфигурации"
           }
           type: string
           required: true
@@ -1787,6 +1789,7 @@
           description: {
             zh: "可选，配置名称"
             en: "Optional config name"
+            ru: "Необязательное имя конфигурации"
           }
           type: string
           required: false
@@ -1796,6 +1799,7 @@
           description: {
             zh: "可选，提供商枚举名（如 OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP；其中 LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP 为本地模型链路）"
             en: "Optional provider enum name (e.g. OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP; LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP are local-model providers)"
+            ru: "Необязательное имя перечисления провайдера (например, OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP; LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP — провайдеры локальных моделей)"
           }
           type: string
           required: false
@@ -1805,6 +1809,7 @@
           description: {
             zh: "可选，API端点"
             en: "Optional API endpoint"
+            ru: "Необязательный эндпоинт API"
           }
           type: string
           required: false
@@ -1814,6 +1819,7 @@
           description: {
             zh: "可选，API Key"
             en: "Optional API key"
+            ru: "Необязательный ключ API"
           }
           type: string
           required: false
@@ -1823,6 +1829,7 @@
           description: {
             zh: "可选，模型名（多个可逗号分隔）"
             en: "Optional model name (comma-separated for multiple models)"
+            ru: "Необязательное имя модели (несколько моделей — через запятую)"
           }
           type: string
           required: false
@@ -1832,6 +1839,7 @@
           description: {
             zh: "可选，是否启用 max_tokens 参数"
             en: "Optional switch for max_tokens"
+            ru: "Необязательный переключатель max_tokens"
           }
           type: boolean
           required: false
@@ -1841,6 +1849,7 @@
           description: {
             zh: "可选，max_tokens 数值"
             en: "Optional max_tokens value"
+            ru: "Необязательное значение max_tokens"
           }
           type: integer
           required: false
@@ -1850,6 +1859,7 @@
           description: {
             zh: "可选，是否启用 temperature 参数"
             en: "Optional switch for temperature"
+            ru: "Необязательный переключатель temperature"
           }
           type: boolean
           required: false
@@ -1859,6 +1869,7 @@
           description: {
             zh: "可选，temperature 数值"
             en: "Optional temperature value"
+            ru: "Необязательное значение temperature"
           }
           type: number
           required: false
@@ -1868,6 +1879,7 @@
           description: {
             zh: "可选，是否启用 top_p 参数"
             en: "Optional switch for top_p"
+            ru: "Необязательный переключатель top_p"
           }
           type: boolean
           required: false
@@ -1877,6 +1889,7 @@
           description: {
             zh: "可选，top_p 数值"
             en: "Optional top_p value"
+            ru: "Необязательное значение top_p"
           }
           type: number
           required: false
@@ -1886,6 +1899,7 @@
           description: {
             zh: "可选，是否启用 top_k 参数"
             en: "Optional switch for top_k"
+            ru: "Необязательный переключатель top_k"
           }
           type: boolean
           required: false
@@ -1895,6 +1909,7 @@
           description: {
             zh: "可选，top_k 数值"
             en: "Optional top_k value"
+            ru: "Необязательное значение top_k"
           }
           type: integer
           required: false
@@ -1904,6 +1919,7 @@
           description: {
             zh: "可选，是否启用 presence_penalty 参数"
             en: "Optional switch for presence_penalty"
+            ru: "Необязательный переключатель presence_penalty"
           }
           type: boolean
           required: false
@@ -1913,6 +1929,7 @@
           description: {
             zh: "可选，presence_penalty 数值"
             en: "Optional presence_penalty value"
+            ru: "Необязательное значение presence_penalty"
           }
           type: number
           required: false
@@ -1922,6 +1939,7 @@
           description: {
             zh: "可选，是否启用 frequency_penalty 参数"
             en: "Optional switch for frequency_penalty"
+            ru: "Необязательный переключатель frequency_penalty"
           }
           type: boolean
           required: false
@@ -1931,6 +1949,7 @@
           description: {
             zh: "可选，frequency_penalty 数值"
             en: "Optional frequency_penalty value"
+            ru: "Необязательное значение frequency_penalty"
           }
           type: number
           required: false
@@ -1940,6 +1959,7 @@
           description: {
             zh: "可选，是否启用 repetition_penalty 参数"
             en: "Optional switch for repetition_penalty"
+            ru: "Необязательный переключатель repetition_penalty"
           }
           type: boolean
           required: false
@@ -1949,6 +1969,7 @@
           description: {
             zh: "可选，repetition_penalty 数值"
             en: "Optional repetition_penalty value"
+            ru: "Необязательное значение repetition_penalty"
           }
           type: number
           required: false
@@ -1958,6 +1979,7 @@
           description: {
             zh: "可选，自定义参数 JSON 字符串"
             en: "Optional custom parameters JSON string"
+            ru: "Необязательная строка JSON пользовательских параметров"
           }
           type: string
           required: false
@@ -1967,6 +1989,7 @@
           description: {
             zh: "可选，自定义请求头 JSON 对象字符串"
             en: "Optional custom request headers JSON object string"
+            ru: "Необязательная строка объекта JSON пользовательских заголовков запроса"
           }
           type: string
           required: false
@@ -1976,6 +1999,7 @@
           description: {
             zh: "可选，上下文长度倍率"
             en: "Optional context length multiplier"
+            ru: "Необязательный множитель длины контекста"
           }
           type: number
           required: false
@@ -1985,6 +2009,7 @@
           description: {
             zh: "可选，最大上下文长度倍率"
             en: "Optional max context length multiplier"
+            ru: "Необязательный множитель максимальной длины контекста"
           }
           type: number
           required: false
@@ -1994,6 +2019,7 @@
           description: {
             zh: "可选，是否启用最大上下文模式"
             en: "Optional max-context mode switch"
+            ru: "Необязательный переключатель режима максимального контекста"
           }
           type: boolean
           required: false
@@ -2003,6 +2029,7 @@
           description: {
             zh: "可选，总结触发阈值"
             en: "Optional summary trigger threshold"
+            ru: "Необязательный порог срабатывания сводки"
           }
           type: number
           required: false
@@ -2012,6 +2039,7 @@
           description: {
             zh: "可选，是否启用总结"
             en: "Optional summary switch"
+            ru: "Необязательный переключатель сводки"
           }
           type: boolean
           required: false
@@ -2021,6 +2049,7 @@
           description: {
             zh: "可选，是否按消息数触发总结"
             en: "Optional summary-by-message-count switch"
+            ru: "Необязательный переключатель сводки по количеству сообщений"
           }
           type: boolean
           required: false
@@ -2030,6 +2059,7 @@
           description: {
             zh: "可选，按消息数总结的阈值"
             en: "Optional message-count threshold for summary"
+            ru: "Необязательный порог количества сообщений для сводки"
           }
           type: integer
           required: false
@@ -2039,6 +2069,7 @@
           description: {
             zh: "可选，是否启用直接图片处理"
             en: "Optional direct image processing switch"
+            ru: "Необязательный переключатель прямой обработки изображений"
           }
           type: boolean
           required: false
@@ -2048,6 +2079,7 @@
           description: {
             zh: "可选，是否启用直接音频处理"
             en: "Optional direct audio processing switch"
+            ru: "Необязательный переключатель прямой обработки аудио"
           }
           type: boolean
           required: false
@@ -2057,6 +2089,7 @@
           description: {
             zh: "可选，是否启用直接视频处理"
             en: "Optional direct video processing switch"
+            ru: "Необязательный переключатель прямой обработки видео"
           }
           type: boolean
           required: false
@@ -2066,6 +2099,7 @@
           description: {
             zh: "可选，是否启用 Google Search"
             en: "Optional Google Search switch"
+            ru: "Необязательный переключатель Google Search"
           }
           type: boolean
           required: false
@@ -2075,6 +2109,7 @@
           description: {
             zh: "可选，是否启用 Claude 1h Prompt Cache"
             en: "Optional Claude 1h prompt cache switch"
+            ru: "Необязательный переключатель кэша промптов Claude на 1 ч"
           }
           type: boolean
           required: false
@@ -2084,6 +2119,7 @@
           description: {
             zh: "可选，是否开启Tool Call"
             en: "Optional tool-call switch"
+            ru: "Необязательный переключатель вызова инструментов"
           }
           type: boolean
           required: false
@@ -2093,6 +2129,7 @@
           description: {
             zh: "可选，MNN 前向类型"
             en: "Optional MNN forward type"
+            ru: "Необязательный тип прямого прохода MNN"
           }
           type: integer
           required: false
@@ -2102,6 +2139,7 @@
           description: {
             zh: "可选，MNN 线程数"
             en: "Optional MNN thread count"
+            ru: "Необязательное число потоков MNN"
           }
           type: integer
           required: false
@@ -2111,6 +2149,7 @@
           description: {
             zh: "可选，llama.cpp 线程数"
             en: "Optional llama.cpp thread count"
+            ru: "Необязательное число потоков llama.cpp"
           }
           type: integer
           required: false
@@ -2120,6 +2159,7 @@
           description: {
             zh: "可选，llama.cpp 上下文长度"
             en: "Optional llama.cpp context size"
+            ru: "Необязательный размер контекста llama.cpp"
           }
           type: integer
           required: false
@@ -2129,6 +2169,7 @@
           description: {
             zh: "可选，llama.cpp GPU 层数"
             en: "Optional llama.cpp GPU layer count"
+            ru: "Необязательное число слоёв GPU llama.cpp"
           }
           type: integer
           required: false
@@ -2138,6 +2179,7 @@
           description: {
             zh: "可选，每分钟请求限制"
             en: "Optional request-per-minute limit"
+            ru: "Необязательный лимит запросов в минуту"
           }
           type: integer
           required: false
@@ -2147,6 +2189,7 @@
           description: {
             zh: "可选，最大并发请求数"
             en: "Optional max concurrent requests"
+            ru: "Необязательное максимальное число одновременных запросов"
           }
           type: integer
           required: false
@@ -2158,6 +2201,7 @@
       description: {
         zh: '''按 config_id 删除模型配置（默认配置不可删）。'''
         en: '''Delete model config by config_id (default cannot be deleted).'''
+        ru: '''Удаляет конфигурацию модели по config_id (конфигурацию по умолчанию удалить нельзя).'''
       }
       parameters: [
         {
@@ -2165,6 +2209,7 @@
           description: {
             zh: "目标配置ID"
             en: "Target config id"
+            ru: "ID целевой конфигурации"
           }
           type: string
           required: true
@@ -2176,6 +2221,7 @@
       description: {
         zh: '''仅列出功能模型绑定关系（功能 -> 配置 + 模型索引）。'''
         en: '''List function model bindings only (function -> config + model index).'''
+        ru: '''Выводит только привязки функциональных моделей (функция → конфигурация + индекс модели).'''
       }
       parameters: []
     },
@@ -2184,6 +2230,7 @@
       description: {
         zh: '''查看某个功能当前绑定的单个模型配置详情。'''
         en: '''Get one function's currently bound model config detail.'''
+        ru: '''Возвращает подробности конфигурации модели, привязанной сейчас к функции.'''
       }
       parameters: [
         {
@@ -2191,6 +2238,7 @@
           description: {
             zh: "功能类型枚举名"
             en: "Function type enum name"
+            ru: "Имя перечисления типа функции"
           }
           type: string
           required: true
@@ -2202,6 +2250,7 @@
       description: {
         zh: '''获取某个功能当前绑定模型配置中的上下文总结参数。'''
         en: '''Get context-summary settings from the model config bound to a function.'''
+        ru: '''Возвращает параметры сводки контекста из конфигурации модели, привязанной к функции.'''
       }
       parameters: [
         {
@@ -2209,6 +2258,7 @@
           description: {
             zh: "可选，功能类型；默认 CHAT"
             en: "Optional function type; default CHAT"
+            ru: "Необязательно: тип функции; по умолчанию CHAT"
           }
           type: string
           required: false
@@ -2220,6 +2270,7 @@
       description: {
         zh: '''为某个功能绑定配置设置上下文总结参数（可选覆盖默认值）。'''
         en: '''Set context-summary settings for a function binding (optional overrides supported).'''
+        ru: '''Задаёт параметры сводки контекста для привязки функции (переопределение значений по умолчанию поддерживается).'''
       }
       parameters: [
         {
@@ -2227,6 +2278,7 @@
           description: {
             zh: "可选，功能类型；默认 CHAT"
             en: "Optional function type; default CHAT"
+            ru: "Необязательно: тип функции; по умолчанию CHAT"
           }
           type: string
           required: false
@@ -2236,6 +2288,7 @@
           description: {
             zh: "可选，基础上下文长度"
             en: "Optional base context length"
+            ru: "Необязательная базовая длина контекста"
           }
           type: number
           required: false
@@ -2245,6 +2298,7 @@
           description: {
             zh: "可选，最大上下文长度"
             en: "Optional max context length"
+            ru: "Необязательная максимальная длина контекста"
           }
           type: number
           required: false
@@ -2254,6 +2308,7 @@
           description: {
             zh: "可选，是否启用最大上下文模式"
             en: "Optional max-context-mode switch"
+            ru: "Необязательный переключатель режима максимального контекста"
           }
           type: boolean
           required: false
@@ -2263,6 +2318,7 @@
           description: {
             zh: "可选，总结触发 token 阈值（0~1）"
             en: "Optional token-ratio threshold for summary trigger (0~1)"
+            ru: "Необязательный порог доли токенов для срабатывания сводки (0–1)"
           }
           type: number
           required: false
@@ -2272,6 +2328,7 @@
           description: {
             zh: "可选，是否启用上下文总结"
             en: "Optional context-summary switch"
+            ru: "Необязательный переключатель сводки контекста"
           }
           type: boolean
           required: false
@@ -2281,6 +2338,7 @@
           description: {
             zh: "可选，是否启用按消息条数触发总结"
             en: "Optional message-count summary trigger switch"
+            ru: "Необязательный переключатель срабатывания сводки по количеству сообщений"
           }
           type: boolean
           required: false
@@ -2290,6 +2348,7 @@
           description: {
             zh: "可选，按消息条数触发总结阈值"
             en: "Optional message-count threshold for summary trigger"
+            ru: "Необязательный порог количества сообщений для срабатывания сводки"
           }
           type: integer
           required: false
@@ -2301,6 +2360,7 @@
       description: {
         zh: '''为功能指定模型配置与模型索引。'''
         en: '''Set model config and model index for a function.'''
+        ru: '''Задаёт конфигурацию модели и индекс модели для функции.'''
       }
       parameters: [
         {
@@ -2308,6 +2368,7 @@
           description: {
             zh: "功能类型枚举名"
             en: "Function type enum name"
+            ru: "Имя перечисления типа функции"
           }
           type: string
           required: true
@@ -2317,6 +2378,7 @@
           description: {
             zh: "模型配置ID"
             en: "Model config id"
+            ru: "ID конфигурации модели"
           }
           type: string
           required: true
@@ -2326,6 +2388,7 @@
           description: {
             zh: "可选，模型索引"
             en: "Optional model index"
+            ru: "Необязательный индекс модели"
           }
           type: integer
           required: false
@@ -2337,6 +2400,7 @@
       description: {
         zh: '''按设置页同等逻辑测试某个模型配置。'''
         en: '''Run settings-UI-equivalent tests for one model config.'''
+        ru: '''Выполняет для конфигурации модели проверки, эквивалентные экрану настроек.'''
       }
       parameters: [
         {
@@ -2344,6 +2408,7 @@
           description: {
             zh: "目标配置ID"
             en: "Target config id"
+            ru: "ID целевой конфигурации"
           }
           type: string
           required: true
@@ -2353,6 +2418,7 @@
           description: {
             zh: "可选，模型索引"
             en: "Optional model index"
+            ru: "Необязательный индекс модели"
           }
           type: integer
           required: false
@@ -2364,6 +2430,7 @@
       description: {
         zh: '''列出完整角色卡配置及当前活跃角色卡。'''
         en: '''List full character-card settings and the active character card.'''
+        ru: '''Выводит полную конфигурацию карточек персонажей и активную карточку персонажа.'''
       }
       parameters: []
     },
@@ -2372,11 +2439,12 @@
       description: {
         zh: '''按角色卡 ID 获取完整配置。'''
         en: '''Get one full character-card configuration by id.'''
+        ru: '''Возвращает полную конфигурацию одной карточки персонажа по ID.'''
       }
       parameters: [
         {
           name: "character_card_id"
-          description: { zh: "角色卡 ID" en: "Character card id" }
+          description: { zh: "角色卡 ID" en: "Character card id" ru: "ID карточки персонажа" }
           type: string
           required: true
         }
@@ -2387,119 +2455,120 @@
       description: {
         zh: '''创建角色卡。name 必填；列表字段传 JSON 字符串数组。'''
         en: '''Create a character card. name is required; list fields use JSON string arrays.'''
+        ru: '''Создаёт карточку персонажа. Поле name обязательно; поля-списки передаются как строковые массивы JSON.'''
       }
       parameters: [
         {
           name: "name"
-          description: { zh: "角色卡名称" en: "Character card name" }
+          description: { zh: "角色卡名称" en: "Character card name" ru: "Название карточки персонажа" }
           type: string
           required: true
         },
         {
           name: "description"
-          description: { zh: "可选，简介" en: "Optional description" }
+          description: { zh: "可选，简介" en: "Optional description" ru: "Необязательное описание" }
           type: string
           required: false
         },
         {
           name: "character_setting"
-          description: { zh: "可选，角色设定提示词" en: "Optional character-setting prompt" }
+          description: { zh: "可选，角色设定提示词" en: "Optional character-setting prompt" ru: "Необязательный промпт настройки персонажа" }
           type: string
           required: false
         },
         {
           name: "opening_statement"
-          description: { zh: "可选，开场白" en: "Optional opening statement" }
+          description: { zh: "可选，开场白" en: "Optional opening statement" ru: "Необязательная вступительная фраза" }
           type: string
           required: false
         },
         {
           name: "other_content_chat"
-          description: { zh: "可选，聊天附加内容" en: "Optional chat content" }
+          description: { zh: "可选，聊天附加内容" en: "Optional chat content" ru: "Необязательное содержимое чата" }
           type: string
           required: false
         },
         {
           name: "other_content_voice"
-          description: { zh: "可选，语音附加内容" en: "Optional voice content" }
+          description: { zh: "可选，语音附加内容" en: "Optional voice content" ru: "Необязательное содержимое для голоса" }
           type: string
           required: false
         },
         {
           name: "attached_tag_ids"
-          description: { zh: "可选，标签 ID 的 JSON 字符串数组" en: "Optional JSON string array of tag ids" }
+          description: { zh: "可选，标签 ID 的 JSON 字符串数组" en: "Optional JSON string array of tag ids" ru: "Необязательный строковый массив JSON с ID тегов" }
           type: string
           required: false
         },
         {
           name: "advanced_custom_prompt"
-          description: { zh: "可选，高级自定义提示词" en: "Optional advanced custom prompt" }
+          description: { zh: "可选，高级自定义提示词" en: "Optional advanced custom prompt" ru: "Необязательный расширенный пользовательский промпт" }
           type: string
           required: false
         },
         {
           name: "marks"
-          description: { zh: "可选，备注" en: "Optional marks" }
+          description: { zh: "可选，备注" en: "Optional marks" ru: "Необязательные пометки" }
           type: string
           required: false
         },
         {
           name: "chat_model_binding_mode"
-          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_CONFIG" en: "Optional FOLLOW_GLOBAL or FIXED_CONFIG" }
+          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_CONFIG" en: "Optional FOLLOW_GLOBAL or FIXED_CONFIG" ru: "Необязательно: FOLLOW_GLOBAL или FIXED_CONFIG" }
           type: string
           required: false
         },
         {
           name: "chat_model_config_id"
-          description: { zh: "可选，固定对话模型配置 ID；空字符串清除" en: "Optional fixed chat-model config id; empty string clears" }
+          description: { zh: "可选，固定对话模型配置 ID；空字符串清除" en: "Optional fixed chat-model config id; empty string clears" ru: "Необязательно: ID конфигурации фиксированной модели чата; пустая строка очищает" }
           type: string
           required: false
         },
         {
           name: "chat_model_index"
-          description: { zh: "可选，固定对话模型索引" en: "Optional fixed chat-model index" }
+          description: { zh: "可选，固定对话模型索引" en: "Optional fixed chat-model index" ru: "Необязательный индекс фиксированной модели чата" }
           type: integer
           required: false
         },
         {
           name: "memory_profile_binding_mode"
-          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_PROFILE" en: "Optional FOLLOW_GLOBAL or FIXED_PROFILE" }
+          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_PROFILE" en: "Optional FOLLOW_GLOBAL or FIXED_PROFILE" ru: "Необязательно: FOLLOW_GLOBAL или FIXED_PROFILE" }
           type: string
           required: false
         },
         {
           name: "memory_profile_id"
-          description: { zh: "可选，固定记忆配置 ID；空字符串清除" en: "Optional fixed memory-profile id; empty string clears" }
+          description: { zh: "可选，固定记忆配置 ID；空字符串清除" en: "Optional fixed memory-profile id; empty string clears" ru: "Необязательно: ID фиксированного профиля памяти; пустая строка очищает" }
           type: string
           required: false
         },
         {
           name: "tool_access_enabled"
-          description: { zh: "可选，启用角色卡工具白名单" en: "Optional switch for the card tool allowlist" }
+          description: { zh: "可选，启用角色卡工具白名单" en: "Optional switch for the card tool allowlist" ru: "Необязательный переключатель белого списка инструментов карточки" }
           type: boolean
           required: false
         },
         {
           name: "allowed_builtin_tools"
-          description: { zh: "可选，内置工具名的 JSON 字符串数组" en: "Optional JSON string array of built-in tool names" }
+          description: { zh: "可选，内置工具名的 JSON 字符串数组" en: "Optional JSON string array of built-in tool names" ru: "Необязательный строковый массив JSON с именами встроенных инструментов" }
           type: string
           required: false
         },
         {
           name: "allowed_packages"
-          description: { zh: "可选，包名的 JSON 字符串数组" en: "Optional JSON string array of package names" }
+          description: { zh: "可选，包名的 JSON 字符串数组" en: "Optional JSON string array of package names" ru: "Необязательный строковый массив JSON с именами пакетов" }
           type: string
           required: false
         },
         {
           name: "allowed_skills"
-          description: { zh: "可选，Skill 名称的 JSON 字符串数组" en: "Optional JSON string array of skill names" }
+          description: { zh: "可选，Skill 名称的 JSON 字符串数组" en: "Optional JSON string array of skill names" ru: "Необязательный строковый массив JSON с именами Skill" }
           type: string
           required: false
         },
         {
           name: "allowed_mcp_servers"
-          description: { zh: "可选，MCP 服务名的 JSON 字符串数组" en: "Optional JSON string array of MCP server names" }
+          description: { zh: "可选，MCP 服务名的 JSON 字符串数组" en: "Optional JSON string array of MCP server names" ru: "Необязательный строковый массив JSON с именами серверов MCP" }
           type: string
           required: false
         }
@@ -2510,125 +2579,126 @@
       description: {
         zh: '''按角色卡 ID 更新提供的字段。除 ID 外的字段定义与 create_character_card 一致。'''
         en: '''Update supplied fields by character-card id. The editable fields match create_character_card.'''
+        ru: '''Обновляет переданные поля по ID карточки персонажа. Редактируемые поля совпадают с create_character_card.'''
       }
       parameters: [
         {
           name: "character_card_id"
-          description: { zh: "角色卡 ID" en: "Character card id" }
+          description: { zh: "角色卡 ID" en: "Character card id" ru: "ID карточки персонажа" }
           type: string
           required: true
         },
         {
           name: "name"
-          description: { zh: "可选，角色卡名称" en: "Optional character card name" }
+          description: { zh: "可选，角色卡名称" en: "Optional character card name" ru: "Необязательное название карточки персонажа" }
           type: string
           required: false
         },
         {
           name: "description"
-          description: { zh: "可选，简介" en: "Optional description" }
+          description: { zh: "可选，简介" en: "Optional description" ru: "Необязательное описание" }
           type: string
           required: false
         },
         {
           name: "character_setting"
-          description: { zh: "可选，角色设定提示词" en: "Optional character-setting prompt" }
+          description: { zh: "可选，角色设定提示词" en: "Optional character-setting prompt" ru: "Необязательный промпт настройки персонажа" }
           type: string
           required: false
         },
         {
           name: "opening_statement"
-          description: { zh: "可选，开场白" en: "Optional opening statement" }
+          description: { zh: "可选，开场白" en: "Optional opening statement" ru: "Необязательная вступительная фраза" }
           type: string
           required: false
         },
         {
           name: "other_content_chat"
-          description: { zh: "可选，聊天附加内容" en: "Optional chat content" }
+          description: { zh: "可选，聊天附加内容" en: "Optional chat content" ru: "Необязательное содержимое чата" }
           type: string
           required: false
         },
         {
           name: "other_content_voice"
-          description: { zh: "可选，语音附加内容" en: "Optional voice content" }
+          description: { zh: "可选，语音附加内容" en: "Optional voice content" ru: "Необязательное содержимое для голоса" }
           type: string
           required: false
         },
         {
           name: "attached_tag_ids"
-          description: { zh: "可选，标签 ID 的 JSON 字符串数组" en: "Optional JSON string array of tag ids" }
+          description: { zh: "可选，标签 ID 的 JSON 字符串数组" en: "Optional JSON string array of tag ids" ru: "Необязательный строковый массив JSON с ID тегов" }
           type: string
           required: false
         },
         {
           name: "advanced_custom_prompt"
-          description: { zh: "可选，高级自定义提示词" en: "Optional advanced custom prompt" }
+          description: { zh: "可选，高级自定义提示词" en: "Optional advanced custom prompt" ru: "Необязательный расширенный пользовательский промпт" }
           type: string
           required: false
         },
         {
           name: "marks"
-          description: { zh: "可选，备注" en: "Optional marks" }
+          description: { zh: "可选，备注" en: "Optional marks" ru: "Необязательные пометки" }
           type: string
           required: false
         },
         {
           name: "chat_model_binding_mode"
-          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_CONFIG" en: "Optional FOLLOW_GLOBAL or FIXED_CONFIG" }
+          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_CONFIG" en: "Optional FOLLOW_GLOBAL or FIXED_CONFIG" ru: "Необязательно: FOLLOW_GLOBAL или FIXED_CONFIG" }
           type: string
           required: false
         },
         {
           name: "chat_model_config_id"
-          description: { zh: "可选，固定对话模型配置 ID；空字符串清除" en: "Optional fixed chat-model config id; empty string clears" }
+          description: { zh: "可选，固定对话模型配置 ID；空字符串清除" en: "Optional fixed chat-model config id; empty string clears" ru: "Необязательно: ID конфигурации фиксированной модели чата; пустая строка очищает" }
           type: string
           required: false
         },
         {
           name: "chat_model_index"
-          description: { zh: "可选，固定对话模型索引" en: "Optional fixed chat-model index" }
+          description: { zh: "可选，固定对话模型索引" en: "Optional fixed chat-model index" ru: "Необязательный индекс фиксированной модели чата" }
           type: integer
           required: false
         },
         {
           name: "memory_profile_binding_mode"
-          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_PROFILE" en: "Optional FOLLOW_GLOBAL or FIXED_PROFILE" }
+          description: { zh: "可选，FOLLOW_GLOBAL 或 FIXED_PROFILE" en: "Optional FOLLOW_GLOBAL or FIXED_PROFILE" ru: "Необязательно: FOLLOW_GLOBAL или FIXED_PROFILE" }
           type: string
           required: false
         },
         {
           name: "memory_profile_id"
-          description: { zh: "可选，固定记忆配置 ID；空字符串清除" en: "Optional fixed memory-profile id; empty string clears" }
+          description: { zh: "可选，固定记忆配置 ID；空字符串清除" en: "Optional fixed memory-profile id; empty string clears" ru: "Необязательно: ID фиксированного профиля памяти; пустая строка очищает" }
           type: string
           required: false
         },
         {
           name: "tool_access_enabled"
-          description: { zh: "可选，启用角色卡工具白名单" en: "Optional switch for the card tool allowlist" }
+          description: { zh: "可选，启用角色卡工具白名单" en: "Optional switch for the card tool allowlist" ru: "Необязательный переключатель белого списка инструментов карточки" }
           type: boolean
           required: false
         },
         {
           name: "allowed_builtin_tools"
-          description: { zh: "可选，内置工具名的 JSON 字符串数组" en: "Optional JSON string array of built-in tool names" }
+          description: { zh: "可选，内置工具名的 JSON 字符串数组" en: "Optional JSON string array of built-in tool names" ru: "Необязательный строковый массив JSON с именами встроенных инструментов" }
           type: string
           required: false
         },
         {
           name: "allowed_packages"
-          description: { zh: "可选，包名的 JSON 字符串数组" en: "Optional JSON string array of package names" }
+          description: { zh: "可选，包名的 JSON 字符串数组" en: "Optional JSON string array of package names" ru: "Необязательный строковый массив JSON с именами пакетов" }
           type: string
           required: false
         },
         {
           name: "allowed_skills"
-          description: { zh: "可选，Skill 名称的 JSON 字符串数组" en: "Optional JSON string array of skill names" }
+          description: { zh: "可选，Skill 名称的 JSON 字符串数组" en: "Optional JSON string array of skill names" ru: "Необязательный строковый массив JSON с именами Skill" }
           type: string
           required: false
         },
         {
           name: "allowed_mcp_servers"
-          description: { zh: "可选，MCP 服务名的 JSON 字符串数组" en: "Optional JSON string array of MCP server names" }
+          description: { zh: "可选，MCP 服务名的 JSON 字符串数组" en: "Optional JSON string array of MCP server names" ru: "Необязательный строковый массив JSON с именами серверов MCP" }
           type: string
           required: false
         }
@@ -2639,11 +2709,12 @@
       description: {
         zh: '''删除非默认角色卡。'''
         en: '''Delete a non-default character card.'''
+        ru: '''Удаляет карточку персонажа, не являющуюся карточкой по умолчанию.'''
       }
       parameters: [
         {
           name: "character_card_id"
-          description: { zh: "角色卡 ID" en: "Character card id" }
+          description: { zh: "角色卡 ID" en: "Character card id" ru: "ID карточки персонажа" }
           type: string
           required: true
         }
@@ -2654,11 +2725,12 @@
       description: {
         zh: '''将指定角色卡设为活跃角色卡。'''
         en: '''Set an existing character card as active.'''
+        ru: '''Назначает существующую карточку персонажа активной.'''
       }
       parameters: [
         {
           name: "character_card_id"
-          description: { zh: "角色卡 ID" en: "Character card id" }
+          description: { zh: "角色卡 ID" en: "Character card id" ru: "ID карточки персонажа" }
           type: string
           required: true
         }
@@ -2669,6 +2741,7 @@
       description: {
         zh: '''清除当前活跃角色卡。'''
         en: '''Clear the current active character card.'''
+        ru: '''Очищает текущую активную карточку персонажа.'''
       }
       parameters: []
     },
@@ -2677,11 +2750,12 @@
       description: {
         zh: '''从 Tavern JSON 导入一张角色卡。'''
         en: '''Import one character card from Tavern JSON.'''
+        ru: '''Импортирует одну карточку персонажа из Tavern JSON.'''
       }
       parameters: [
         {
           name: "tavern_json"
-          description: { zh: "Tavern 角色卡 JSON 内容" en: "Tavern character-card JSON content" }
+          description: { zh: "Tavern 角色卡 JSON 内容" en: "Tavern character-card JSON content" ru: "Содержимое JSON карточки персонажа Tavern" }
           type: string
           required: true
         }
@@ -2692,11 +2766,12 @@
       description: {
         zh: '''将一张角色卡导出为 Tavern JSON。'''
         en: '''Export one character card as Tavern JSON.'''
+        ru: '''Экспортирует одну карточку персонажа в Tavern JSON.'''
       }
       parameters: [
         {
           name: "character_card_id"
-          description: { zh: "角色卡 ID" en: "Character card id" }
+          description: { zh: "角色卡 ID" en: "Character card id" ru: "ID карточки персонажа" }
           type: string
           required: true
         }
@@ -2707,6 +2782,7 @@
       description: {
         zh: '''直通 use_package 的探测工具：用于快速测试某个 package 是否可被加载（MCP/Skill/Sandbox 三兼容）。'''
         en: '''A pass-through probe for use_package: quickly test whether a package can be loaded (tri-compatible across MCP/Skill/Sandbox).'''
+        ru: '''Сквозная проверка для use_package: быстро определяет, можно ли загрузить пакет (совместимо с MCP/Skill/Sandbox).'''
       }
       parameters: [
         {
@@ -2714,6 +2790,7 @@
           description: {
             zh: "要探测的包名"
             en: "Package name to probe"
+            ru: "Имя проверяемого пакета"
           }
           type: string
           required: true
