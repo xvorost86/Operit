@@ -6315,7 +6315,7 @@
     <string name="model_config_unit_items">сообщ.</string>
     <string name="global_display_automation_behavior">Отображение и поведение автоматизации</string>
     <string name="root_execution_mode_title">Режим выполнения под root</string>
-    <string name="root_execution_mode_description">Авто выбирается по окружению; ручной режим переопределяет автоматический выбор.</string>
+    <string name="root_execution_mode_description">В автоматическом режиме способ выполнения выбирается с учётом окружения; ручной режим переопределяет автоматический выбор.</string>
     <string name="root_execution_mode_auto">Авто</string>
     <string name="root_execution_mode_force_libsu">Magisk SU вручную</string>
     <string name="root_execution_mode_force_exec">KernelSU вручную</string>
