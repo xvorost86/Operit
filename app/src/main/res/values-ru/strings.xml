@@ -2325,8 +2325,8 @@
     <string name="file_manager_create_file">Создать файл</string>
     <string name="file_manager_create_folder">Создать папку</string>
     <string name="file_manager_cancel">Отмена</string>
-    <string name="file_manager_hide_dot_files">Скрыть файлы с точкой</string>
-    <string name="file_manager_show_dot_files">Показать файлы с точкой</string>
+    <string name="file_manager_hide_dot_files">Скрыть файлы, начинающиеся с точки</string>
+    <string name="file_manager_show_dot_files">Показать файлы, начинающиеся с точки</string>
     <string name="file_manager_sort">Сортировка</string>
     <string name="file_manager_sort_by_modified">По времени изменения</string>
     <string name="file_manager_new">Создать</string>
