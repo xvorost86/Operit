@@ -5,10 +5,12 @@
   display_name: {
     zh: "时间"
     en: "Time"
+    ru: "Время"
   }
   description: {
     zh: "提供时间相关功能。实际上，激活本包的同时已经能够获取时间了。"
     en: "Provides time-related utilities. In practice, current time is already available once this package is enabled."
+    ru: "Предоставляет средства работы со временем. На практике текущее время доступно сразу после включения этого пакета."
   }
   enabledByDefault: true
   category: "Utility"
@@ -18,6 +20,7 @@
       description: {
         zh: "获取当前时间。当使用此包时，AI已经自动获取了当前的时间信息。"
         en: "Get the current time. When using this package, the AI may already have the current time context."
+        ru: "Получает текущее время. При использовании этого пакета у ИИ уже может быть контекст текущего времени."
       }
       parameters: []
     },
@@ -26,6 +29,7 @@
       description: {
         zh: "格式化时间。提供各种时间格式化选项。"
         en: "Format time. Provides various time formatting options."
+        ru: "Форматирует время. Предоставляет различные варианты форматирования времени."
       }
       parameters: []
     }

@@ -5,10 +5,12 @@
   display_name: {
     zh: "工作流管理"
     en: "Workflow Management"
+    ru: "Управление воркфлоу"
   }
   description: {
     zh: '''工作流管理工具：创建/查询/更新/启用/禁用/删除/触发执行；支持 on_success/on_error 分支；支持语音触发（speech）。'''
     en: '''Workflow management tools for creating/querying/updating/enabling/disabling/deleting workflows, triggering execution, and branching via on_success/on_error. Supports speech trigger (speech).'''
+    ru: '''Инструменты управления воркфлоу: создание, запрос, обновление, включение, отключение и удаление воркфлоу, запуск выполнения и ветвление через on_success/on_error. Поддерживает голосовой триггер (speech).'''
   }
   "category": "Workflow",
   enabledByDefault: true
@@ -153,21 +155,89 @@ Workflow tool usage advice (for the AI):
     - require_final: "true"/"false" (optional, default true; if true, only final results trigger)
     - cooldown_ms: "3000" (optional, default 3000; per-node cooldown)
 '''
+        ru: '''
+Советы по использованию инструментов воркфлоу (для ИИ):
+
+- Ключевые понятия (сверяйте свои рассуждения с этой семантикой):
+- Типы узлов: trigger/execute/condition/logic/extract
+- Типы узлов-триггеров: manual/schedule/tasker/intent/speech
+- Ссылки на параметры (ParameterValue): статические значения или ссылки на вывод другого узла
+- Смысл condition у связи: on_success/on_error/true/false/regex
+
+- Важно: в create_workflow/update_workflow параметры nodes/connections на уровне API — строки (строки с JSON-массивом).
+- Эта обёртка из примера позволяет передавать массивы объектов напрямую; она сама вызовет JSON.stringify.
+
+- Рекомендуемый порядок действий:
+1) Вызовите get_all_workflows, чтобы найти подходящий workflow_id.
+2) Вызовите get_workflow, чтобы получить полную структуру nodes/connections.
+-  3) Если нужно заменить nodes/connections целиком: соберите полные новые массивы и один раз вызовите update_workflow, чтобы перезаписать.
+-  4) Если нужны только инкрементальные изменения: предпочтите patch_workflow (node_patches/connection_patches).
+
+- ID узлов и связей:
+- id узла можно не указывать (сервер сгенерирует его сам), но если нужно создавать связи, настоятельно рекомендуется явно задать id узлов в nodes.
+- В connections source/target можно задавать так:
+- sourceNodeId/targetNodeId (рекомендуется)
+- или source/target/from/to
+- или sourceIndex/targetIndex (индекс в массиве nodes)
+- или sourceNodeName/targetNodeName (не рекомендуется: одинаковые имена неоднозначны)
+
+- condition связи (главное):
+- Общие ключевые слова (работают для любого типа узла):
+- condition = "on_success" | "success" | "ok": срабатывание, когда исходный узел завершился успешно
+- condition = "on_error" | "error" | "failed": срабатывание, когда исходный узел завершился ошибкой (ветка ошибки / восстановление)
+- Для ConditionNode / LogicNode:
+- пустой condition: по умолчанию ветка true (эквивалентно "true")
+- condition = "false": ветка false
+- другая строка: рассматривается как Regex для сопоставления со строкой вывода исходного узла
+- Для узлов, не являющихся Condition/Logic:
+- пустой condition: эквивалентно on_success (продолжать, если исходный узел завершился успешно)
+- condition = on_error: продолжать, если исходный узел завершился ошибкой (ветка ошибки)
+
+- Ссылки на параметры (ParameterValue):
+- Статическое значение: пишите строку/число/логическое значение напрямую (будет воспринято как StaticValue)
+- Ссылка на вывод узла: пишите объект { nodeId: "<node-id>" }
+- совместимые поля: nodeId / ref / refNodeId
+
+- Типы узлов-триггеров (TriggerNode.triggerType):
+- manual: ручной запуск (нажатие «Запустить воркфлоу» в интерфейсе)
+- schedule: запуск по расписанию (планировщик WorkManager)
+- tasker: запуск по событиям Tasker
+- intent: запуск по широковещательным Intent Android
+- speech: запуск по событиям распознавания речи (срабатывает, когда распознанный текст совпадает с регулярным выражением; могут сработать несколько воркфлоу одновременно)
+
+Конфигурация триггера TriggerNode.triggerConfig (внимание: все значения — строки):
+- schedule:
+- schedule_type: interval | specific_time | cron
+- interval_ms: "900000" (15 минут)
+- specific_time: "2026-01-04 10:30" (формат зависит от реализации)
+- cron_expression: "15 * * * *" (упрощённый cron)
+- repeat: "true"/"false"
+- enabled: "true"/"false"
+- tasker:
+- command: "start_meeting" (срабатывает, когда params Tasker содержат эту строку)
+- intent:
+- action: "com.example.MY_ACTION" (срабатывает при получении этого action)
+- speech:
+- pattern: ".*(open|start).*(chat|floating).*" (регулярное выражение; сопоставляется с распознанным текстом)
+- ignore_case: "true"/"false" (необязательно, по умолчанию true)
+- require_final: "true"/"false" (необязательно, по умолчанию true; true — срабатывать только по финальным результатам)
+- cooldown_ms: "3000" (необязательно, по умолчанию 3000; задержка между срабатываниями для каждого узла)
+'''
       }
       parameters: []
     }
 
     {
       name: "get_all_workflows"
-      description: { zh: "获取所有工作流列表（只含概要信息：ID/名称/启用/统计等）。", en: "List all workflows (summary only: id/name/enabled/stats, etc.)." }
+      description: { zh: "获取所有工作流列表（只含概要信息：ID/名称/启用/统计等）。", en: "List all workflows (summary only: id/name/enabled/stats, etc.).", ru: "Выводит список всех воркфлоу (только сводка: id/название/включён/статистика и т. п.)." }
       parameters: []
     }
 
     {
       name: "get_workflow"
-      description: { zh: "获取指定工作流完整详情（nodes + connections）。", en: "Get full details of a specific workflow (nodes + connections)." }
+      description: { zh: "获取指定工作流完整详情（nodes + connections）。", en: "Get full details of a specific workflow (nodes + connections).", ru: "Выводит полные сведения о выбранном воркфлоу (nodes + connections)." }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
       ]
     }
 
@@ -268,13 +338,60 @@ Extract (operator) node:
     - useFixed: whether to use a fixed value (optional)
     - fixedValue: fixed string (optional, only effective when useFixed=true)
 '''
+        ru: '''
+Создаёт воркфлоу.
+
+Пояснения к параметрам:
+- nodes: строка с JSON-массивом (рекомендуется передавать массив объектов — обёртка сама приведёт его к строке)
+- connections: строка с JSON-массивом (то же самое)
+
+Типы узлов (node.type):
+- trigger / execute / condition / logic / extract
+
+Узел Execute:
+- actionType: имя инструмента (например, "visit_web" / "list_files" / "get_system_setting" ...)
+- actionConfig: объект параметров инструмента, поддерживает ParameterValue (статическое значение / ссылка на узел)
+
+Узел Condition:
+- left/right: ParameterValue
+- operator: EQ/NE/GT/GTE/LT/LTE/CONTAINS/NOT_CONTAINS/IN/NOT_IN
+
+Узел Logic:
+- operator: AND/OR
+
+Узел Extract (оператор):
+- Примечание: node.type по-прежнему "extract" ради совместимости со старыми данными, но по семантике это ближе к узлу-оператору.
+- source: ParameterValue (для некоторых режимов, например RANDOM_INT, не требуется)
+- mode:
+- REGEX: извлечение по регулярному выражению
+- expression: регулярное выражение
+- group/defaultValue необязательны
+- JSON: извлечение по пути JSON
+- expression: путь JSON (упрощённая реализация)
+- defaultValue необязателен
+- SUB: подстрока
+- startIndex: начальный индекс
+- length: длина (-1 — до конца)
+- defaultValue необязателен
+- CONCAT: конкатенация строк
+- others: ParameterValue[]
+- RANDOM_INT: случайное целое число
+- randomMin/randomMax
+- useFixed: использовать фиксированное значение (необязательно)
+- fixedValue: фиксированное целое число (необязательно, действует только при useFixed=true; вывод всё равно остаётся числовой строкой)
+- RANDOM_STRING: случайная строка
+- randomStringLength: длина
+- randomStringCharset: набор символов (необязательно, по умолчанию буквы и цифры)
+- useFixed: использовать фиксированное значение (необязательно)
+- fixedValue: фиксированная строка (необязательно, действует только при useFixed=true)
+'''
       }
       parameters: [
-        { name: "name", description: { zh: "工作流名称", en: "Workflow name" }, type: "string", required: true }
-        { name: "description", description: { zh: "工作流描述（可选）", en: "Workflow description (optional)" }, type: "string", required: false }
-        { name: "nodes", description: { zh: "可选，节点 JSON 数组字符串（或直接传节点数组，由封装 stringify）", en: "Optional. Nodes JSON array string (or pass an array and the wrapper will stringify)." }, type: "string", required: false }
-        { name: "connections", description: { zh: "可选，连线 JSON 数组字符串（或直接传连线数组，由封装 stringify）", en: "Optional. Connections JSON array string (or pass an array and the wrapper will stringify)." }, type: "string", required: false }
-        { name: "enabled", description: { zh: "可选，是否启用（默认 true）", en: "Optional. Whether to enable (default: true)." }, type: "boolean", required: false }
+        { name: "name", description: { zh: "工作流名称", en: "Workflow name", ru: "Название воркфлоу" }, type: "string", required: true }
+        { name: "description", description: { zh: "工作流描述（可选）", en: "Workflow description (optional)", ru: "Описание воркфлоу (необязательно)" }, type: "string", required: false }
+        { name: "nodes", description: { zh: "可选，节点 JSON 数组字符串（或直接传节点数组，由封装 stringify）", en: "Optional. Nodes JSON array string (or pass an array and the wrapper will stringify).", ru: "Необязательно. Строка с JSON-массивом узлов (или передайте массив — обёртка приведёт его к строке)." }, type: "string", required: false }
+        { name: "connections", description: { zh: "可选，连线 JSON 数组字符串（或直接传连线数组，由封装 stringify）", en: "Optional. Connections JSON array string (or pass an array and the wrapper will stringify).", ru: "Необязательно. Строка с JSON-массивом связей (или передайте массив — обёртка приведёт его к строке)." }, type: "string", required: false }
+        { name: "enabled", description: { zh: "可选，是否启用（默认 true）", en: "Optional. Whether to enable (default: true).", ru: "Необязательно. Включить ли воркфлоу (по умолчанию true)." }, type: "boolean", required: false }
       ]
     }
 
@@ -295,14 +412,21 @@ Note: nodes/connections in update_workflow are full overwrites.
 - If you only change part of them, prefer patch_workflow.
 - Or: call get_workflow to fetch the old structure -> build new arrays locally (keeping unchanged parts) -> call update_workflow once.
 '''
+        ru: '''
+Обновляет воркфлоу.
+
+Примечание: nodes/connections в update_workflow заменяются целиком.
+- Если меняется только часть из них, предпочтите patch_workflow.
+- Либо: вызовите get_workflow, получите старую структуру -> соберите новые массивы локально (сохранив неизменённые части) -> один раз вызовите update_workflow.
+'''
       }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
-        { name: "name", description: { zh: "可选，新名称", en: "Optional. New name." }, type: "string", required: false }
-        { name: "description", description: { zh: "可选，新描述", en: "Optional. New description." }, type: "string", required: false }
-        { name: "nodes", description: { zh: "可选，节点 JSON 数组字符串（整体覆盖）", en: "Optional. Nodes JSON array string (full overwrite)." }, type: "string", required: false }
-        { name: "connections", description: { zh: "可选，连线 JSON 数组字符串（整体覆盖）", en: "Optional. Connections JSON array string (full overwrite)." }, type: "string", required: false }
-        { name: "enabled", description: { zh: "可选，是否启用", en: "Optional. Whether to enable." }, type: "boolean", required: false }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
+        { name: "name", description: { zh: "可选，新名称", en: "Optional. New name.", ru: "Необязательно. Новое название." }, type: "string", required: false }
+        { name: "description", description: { zh: "可选，新描述", en: "Optional. New description.", ru: "Необязательно. Новое описание." }, type: "string", required: false }
+        { name: "nodes", description: { zh: "可选，节点 JSON 数组字符串（整体覆盖）", en: "Optional. Nodes JSON array string (full overwrite).", ru: "Необязательно. Строка с JSON-массивом узлов (полная замена)." }, type: "string", required: false }
+        { name: "connections", description: { zh: "可选，连线 JSON 数组字符串（整体覆盖）", en: "Optional. Connections JSON array string (full overwrite).", ru: "Необязательно. Строка с JSON-массивом связей (полная замена)." }, type: "string", required: false }
+        { name: "enabled", description: { zh: "可选，是否启用", en: "Optional. Whether to enable.", ru: "Необязательно. Включить ли воркфлоу." }, type: "boolean", required: false }
       ]
     }
 
@@ -335,46 +459,59 @@ Notes:
 - update: must provide id OR node.id/connection.id
 - remove: must provide id
 '''
+        ru: '''
+Точечно изменяет воркфлоу (инкрементальное обновление).
+
+Передайте node_patches / connection_patches строками с JSON-массивом:
+- op: add | update | remove
+- id: необязательно
+- node / connection: объект
+
+Примечания:
+- add: нужно передать node/connection
+- update: нужно передать id ИЛИ node.id/connection.id
+- remove: нужно передать id
+'''
       }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
-        { name: "name", description: { zh: "可选，新名称", en: "Optional. New name." }, type: "string", required: false }
-        { name: "description", description: { zh: "可选，新描述", en: "Optional. New description." }, type: "string", required: false }
-        { name: "enabled", description: { zh: "可选，是否启用", en: "Optional. Whether to enable." }, type: "boolean", required: false }
-        { name: "node_patches", description: { zh: "可选，节点 patch JSON 数组字符串", en: "Optional. Node patch JSON array string." }, type: "string", required: false }
-        { name: "connection_patches", description: { zh: "可选，连线 patch JSON 数组字符串", en: "Optional. Connection patch JSON array string." }, type: "string", required: false }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
+        { name: "name", description: { zh: "可选，新名称", en: "Optional. New name.", ru: "Необязательно. Новое название." }, type: "string", required: false }
+        { name: "description", description: { zh: "可选，新描述", en: "Optional. New description.", ru: "Необязательно. Новое описание." }, type: "string", required: false }
+        { name: "enabled", description: { zh: "可选，是否启用", en: "Optional. Whether to enable.", ru: "Необязательно. Включить ли воркфлоу." }, type: "boolean", required: false }
+        { name: "node_patches", description: { zh: "可选，节点 patch JSON 数组字符串", en: "Optional. Node patch JSON array string.", ru: "Необязательно. Строка с JSON-массивом патчей узлов." }, type: "string", required: false }
+        { name: "connection_patches", description: { zh: "可选，连线 patch JSON 数组字符串", en: "Optional. Connection patch JSON array string.", ru: "Необязательно. Строка с JSON-массивом патчей связей." }, type: "string", required: false }
       ]
     }
 
     {
       name: "enable_workflow"
-      description: { zh: "启用指定工作流。", en: "Enable a specific workflow." }
+      description: { zh: "启用指定工作流。", en: "Enable a specific workflow.", ru: "Включает указанный воркфлоу." }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
       ]
     }
 
     {
       name: "disable_workflow"
-      description: { zh: "禁用指定工作流。", en: "Disable a specific workflow." }
+      description: { zh: "禁用指定工作流。", en: "Disable a specific workflow.", ru: "Отключает указанный воркфлоу." }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
       ]
     }
 
     {
       name: "delete_workflow"
-      description: { zh: "删除指定工作流。", en: "Delete a specific workflow." }
+      description: { zh: "删除指定工作流。", en: "Delete a specific workflow.", ru: "Удаляет указанный воркфлоу." }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
       ]
     }
 
     {
       name: "trigger_workflow"
-      description: { zh: "触发指定工作流执行（相当于 UI 手动触发）。", en: "Trigger execution of a workflow (equivalent to manual trigger in UI)." }
+      description: { zh: "触发指定工作流执行（相当于 UI 手动触发）。", en: "Trigger execution of a workflow (equivalent to manual trigger in UI).", ru: "Запускает выполнение воркфлоу (эквивалент ручного запуска в интерфейсе)." }
       parameters: [
-        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID" }, type: "string", required: true }
+        { name: "workflow_id", description: { zh: "工作流 ID", en: "Workflow ID", ru: "ID воркфлоу" }, type: "string", required: true }
       ]
     }
   ]
