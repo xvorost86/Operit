@@ -3668,7 +3668,7 @@
     <string name="chat_history_batch_management">Batch management</string>
     <string name="chat_history_selected_actions">Actions for selected chats (%1$d)</string>
     <string name="chat_history_selected_actions_title">Selected chat actions</string>
-    <string name="chat_memory_rebuild_title">Build Memory Library in Windows</string>
+    <string name="chat_memory_rebuild_title">Build Memory Library from Message Windows</string>
     <string name="chat_memory_rebuild_subtitle">Choose a time range and extract memories from bounded windows of original user and assistant messages</string>
     <string name="chat_memory_rebuild_window_size">Messages per window</string>
     <string name="chat_memory_rebuild_window_size_value">%1$d messages</string>
