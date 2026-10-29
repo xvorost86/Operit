@@ -4691,9 +4691,9 @@
     <string name="tool_permissions_description">По умолчанию для всех инструментов действует режим «Спрашивать». Исключения можно добавить ниже.</string>
     <string name="global_permission_switch">Общий переключатель разрешений</string>
     <string name="global_permission_switch_description">Этот параметр работает как главный переключатель и может переопределять разрешения отдельных инструментов.</string>
-    <string name="permission_level_allow">Разрешать</string>
+    <string name="permission_level_allow">Разрешено</string>
     <string name="permission_level_allow_description">Эти инструменты будут выполняться автоматически.</string>
-    <string name="permission_level_forbid">Запрещать</string>
+    <string name="permission_level_forbid">Запрещено</string>
     <string name="permission_level_forbid_description">Эти инструменты никогда не будут выполняться.</string>
     <string name="permission_level_ask">Спрашивать</string>
     <string name="permission_level_ask_description">Поведение по умолчанию для всех инструментов.</string>
@@ -4703,7 +4703,7 @@
     <string name="select_tools">Выбрать инструменты</string>
     <string name="search_tools">Поиск</string>
     <string name="done">Готово</string>
-    <string name="forbid">Запрещать</string>
+    <string name="forbid">Запрещено</string>
     <string name="dialog_title_orientation_change">Изменение ориентации экрана</string>
     <string name="dialog_message_orientation_change">Ориентация экрана изменилась. Перезагрузить страницу?</string>
     <string name="dialog_button_confirm">Перезагрузить</string>
