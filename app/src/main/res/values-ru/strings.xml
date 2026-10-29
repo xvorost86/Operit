@@ -4088,7 +4088,7 @@
     <string name="tag_export_no_custom_tags">Нет тегов, доступных для экспорта</string>
     <string name="tag_export_select_title">Выберите теги для экспорта</string>
     <string name="tag_export_select_all">Выбрать все</string>
-    <string name="tag_export_clear_all">Очистить все</string>
+    <string name="tag_export_clear_all">Снять выделение</string>
     <string name="tag_export_select_at_least_one">Выберите хотя бы один тег</string>
     <string name="tag_import_invalid_format">Недопустимый формат файла тегов</string>
     <string name="tag_import_summary">Импорт тегов завершён: создано %1$d, обновлено %2$d, пропущено %3$d</string>
@@ -4190,7 +4190,7 @@
     <string name="delete_character_group_confirm">Удалить группу «%1$s»?</string>
     <string name="role_response_planner_planning">Планирование порядка выступлений в группе…</string>
     <string name="role_response_planner_member_replying">Формирование ответа от «%1$s»…</string>
-    <string name="role_response_planner_failed">Не удалось спланировать группу</string>
+    <string name="role_response_planner_failed">Не удалось спланировать ответы группы</string>
     <string name="group_members">Участники</string>
     <string name="group_add_member">Добавить участника</string>
     <string name="group_member_empty_hint">Добавьте хотя бы одного участника-персонажа</string>
@@ -4205,7 +4205,7 @@
     <string name="character_card_memory_profile_specify_fixed_profile">Указать фиксированную конфигурацию памяти</string>
     <string name="character_card_memory_profile_select">Выбрать конфигурацию памяти</string>
     <string name="character_card_tool_access_title">Свои разрешённые инструменты</string>
-    <string name="character_card_tool_access_enable">Включить белый список инструментов для карточки роли</string>
+    <string name="character_card_tool_access_enable">Включить белый список инструментов для карточки персонажа</string>
     <string name="character_card_tool_access_follow_global">Сейчас используются глобальные настройки</string>
     <string name="character_card_tool_access_configure">Настроить разрешённые элементы</string>
 </resources>
