@@ -5492,7 +5492,7 @@
     <string name="workflow_execution_failed">Не удалось выполнить</string>
     <string name="workflow_execution_running">Выполнение…</string>
     <string name="workflow_execution_success">Выполнено успешно</string>
-    <string name="workflow_node_failed">Не удалось</string>
+    <string name="workflow_node_failed">Сбой</string>
     <string name="workflow_node_pending">Ожидает выполнения</string>
     <string name="workflow_node_running">Выполняется</string>
     <string name="workflow_node_success">Успешно</string>
