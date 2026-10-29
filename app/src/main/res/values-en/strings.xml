@@ -4333,7 +4333,7 @@
     <string name="parameter_name">Parameter Name</string>
     <string name="parameter_name_placeholder">e.g., My Parameter</string>
     <string name="api_name">API Name</string>
-    <string name="api_name_placeholder">e.g., my_parameter</string>
+    <string name="api_name_placeholder">Leave blank to derive from the parameter name</string>
     <string name="parameter_description">Description</string>
     <string name="parameter_description_placeholder">Enter parameter description</string>
     <string name="parameter_type">Parameter Type</string>

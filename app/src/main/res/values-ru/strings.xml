@@ -3864,7 +3864,7 @@
     <string name="enable_codex_web_search_desc">После входа в Codex разрешает модели применять серверный веб-поиск.</string>
     <string name="enable_claude_1h_prompt_cache">Включить часовой кэш промптов Claude</string>
     <string name="enable_claude_1h_prompt_cache_desc">Когда включено, Claude и совместимые провайдеры используют время жизни кэша промптов 1 час</string>
-    <string name="enable_tool_call">Модель поддерживает ToolCall</string>
+    <string name="enable_tool_call">Модель поддерживает нативные вызовы инструментов</string>
     <string name="enable_tool_call_desc">Когда отключено, используется встроенный механизм вызова инструментов — он тоже позволяет вызывать инструменты. Когда включено, применяется собственный нативный интерфейс API (требуется поддержка модели)</string>
     <string name="enable_deepseek_reasoning">Включить режим рассуждений DeepSeek</string>
     <string name="enable_deepseek_reasoning_desc">Когда включено, содержимое тегов &lt;think&gt; отправляется моделям DeepSeek как reasoning_content; это позволяет вызывать инструменты в моделях рассуждений вроде DeepSeek-R1</string>
@@ -3988,7 +3988,7 @@
     <string name="parameter_name">Имя параметра</string>
     <string name="parameter_name_placeholder">например, мой параметр</string>
     <string name="api_name">Имя API</string>
-    <string name="api_name_placeholder">например, my_parameter</string>
+    <string name="api_name_placeholder">Оставьте пустым, чтобы сформировать из имени параметра</string>
     <string name="parameter_description">Описание</string>
     <string name="parameter_description_placeholder">Введите описание параметра</string>
     <string name="parameter_type">Тип параметра</string>
