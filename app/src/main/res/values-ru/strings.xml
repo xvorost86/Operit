@@ -514,7 +514,7 @@
     <string name="operation_failed">Не удалось выполнить операцию</string>
     <string name="danger_zone">Опасная зона</string>
     <string name="chat_statistics">Статистика чата</string>
-    <string name="current_chats">Сейчас записей чата: %1$d</string>
+    <string name="current_chats">Чатов: %1$d</string>
     <string name="backup_location">Резервные копии сохраняются в папку «Download/Operit»</string>
     <string name="faq_backup">Частые вопросы</string>
     <string name="termux_not_installed">Termux не установлен</string>
@@ -539,7 +539,7 @@
     <string name="star_on_github">Поставить звезду на GitHub</string>
     <string name="update_log">Журнал обновлений</string>
     <string name="app_logo_description">Логотип приложения</string>
-    <string name="github_star_description">GitHub Star</string>
+    <string name="github_star_description">Звезда GitHub</string>
     <string name="configure_ai">Настроить API ИИ</string>
     <string name="api_endpoint">Эндпоинт API</string>
     <string name="api_key">Ключ API</string>
@@ -561,7 +561,7 @@
     <string name="config_get_token">Получить ключ API DeepSeek</string>
     <string name="config_saving">Сохранение…</string>
     <string name="config_api_key_invalid_format">Неправильный формат ключа API DeepSeek. Используйте только ASCII-буквы, цифры и символы, без пробелов и невидимых символов.</string>
-    <string name="config_use_free">За счёт вкладчиков</string>
+    <string name="config_use_free">За счёт сообщества</string>
     <string name="config_custom">Настроить другую модель</string>
     <string name="config_free_usage_exceeded">Дневной лимит бесплатного использования исчерпан</string>
     <string name="onboarding_config_not_found">Выбранная конфигурация модели больше не существует. Выберите другую.</string>
@@ -588,7 +588,7 @@
     <string name="token_info_confirm">Получить токен</string>
     <string name="free_usage_title">Подтверждение использования бесплатных ресурсов</string>
     <string name="free_usage_message_1">Пожалуйста, расходуйте экономно — наши ресурсы ограничены</string>
-    <string name="free_usage_message_2">Пожалуйста, не злоупотребляйте ключами вкладчиков — у автора тоже есть расходы T_T</string>
+    <string name="free_usage_message_2">Пожалуйста, не злоупотребляйте ключами участников сообщества — у автора тоже есть расходы T_T</string>
     <string name="free_usage_message_3">Наши ресурсы ограничены — отнеситесь с пониманием</string>
     <string name="free_usage_message_4">Каждое бесплатное использование на счету — цените каждую возможность</string>
     <string name="free_usage_message_5">Наш бюджет плачет — будьте помягче</string>
