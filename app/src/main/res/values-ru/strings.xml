@@ -3793,7 +3793,7 @@
     <string name="chat_style_preview_ai_source_title">Предпросмотр разметки 9-slice для ИИ</string>
     <string name="chat_style_bubble_image_saved">Изображение пузыря сохранено</string>
     <string name="display_options_title">Параметры отображения</string>
-    <string name="show_thinking_process">Показывать процесс размышления</string>
+    <string name="show_thinking_process">Показывать процесс рассуждений</string>
     <string name="show_thinking_process_desc">Переключить видимость тегов &lt;think&gt; в ответах ИИ</string>
     <string name="show_status_tags">Показывать теги состояния</string>
     <string name="show_status_tags_desc">Переключить видимость тегов завершения задачи и ожидания</string>
