@@ -3,18 +3,21 @@
   "name": "xai_draw",
   "display_name": {
     "zh": "xAI 图片与视频",
-    "en": "xAI Images and Video"
+    "en": "xAI Images and Video",
+    "ru": "Изображения и видео xAI"
   },
   "description": {
     "zh": "使用 xAI 官方接口生成图片和视频，并保存到本地。",
-    "en": "Generate images and videos with the official xAI APIs and save them locally."
+    "en": "Generate images and videos with the official xAI APIs and save them locally.",
+    "ru": "Генерирует изображения и видео через официальные API xAI и сохраняет их локально."
   },
   "env": [
     {
       "name": "XAI_API_KEY",
       "description": {
         "zh": "xAI API Key（必填）",
-        "en": "xAI API key (required)"
+        "en": "xAI API key (required)",
+        "ru": "Ключ API xAI (обязательно)"
       },
       "required": true
     },
@@ -22,7 +25,8 @@
       "name": "XAI_API_BASE_URL",
       "description": {
         "zh": "xAI API 基地址（可选；默认 https://api.x.ai/v1）",
-        "en": "xAI API base URL (optional; default https://api.x.ai/v1)"
+        "en": "xAI API base URL (optional; default https://api.x.ai/v1)",
+        "ru": "Базовый URL API xAI (необязательно; по умолчанию https://api.x.ai/v1)"
       },
       "required": false
     },
@@ -30,7 +34,8 @@
       "name": "XAI_IMAGE_MODEL",
       "description": {
         "zh": "默认图片模型（可选；未传 model 时使用，默认 grok-2-image-1212）",
-        "en": "Default image model (optional; used when model is omitted, default grok-2-image-1212)"
+        "en": "Default image model (optional; used when model is omitted, default grok-2-image-1212)",
+        "ru": "Модель изображений по умолчанию (необязательно; используется, когда model не передан, по умолчанию grok-2-image-1212)"
       },
       "required": false
     },
@@ -38,7 +43,8 @@
       "name": "XAI_VIDEO_MODEL",
       "description": {
         "zh": "默认视频模型（可选；未传 model 时使用，默认 grok-imagine-video）",
-        "en": "Default video model (optional; used when model is omitted, default grok-imagine-video)"
+        "en": "Default video model (optional; used when model is omitted, default grok-imagine-video)",
+        "ru": "Модель видео по умолчанию (необязательно; используется, когда model не передан, по умолчанию grok-imagine-video)"
       },
       "required": false
     }
@@ -49,33 +55,35 @@
       "name": "draw_image",
       "description": {
         "zh": "根据提示词调用 xAI 图像生成 API 生成图片，保存到本地并返回 Markdown 图片提示。",
-        "en": "Generate an image via the xAI image generation API using a prompt, save it locally, and return a Markdown image reference."
+        "en": "Generate an image via the xAI image generation API using a prompt, save it locally, and return a Markdown image reference.",
+        "ru": "Генерирует изображение по промпту через API генерации изображений xAI, сохраняет его локально и возвращает ссылку на изображение в Markdown."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "绘图提示词（英文或中文皆可）", "en": "Prompt for image generation (Chinese or English)" }, "type": "string", "required": true },
-        { "name": "model", "description": { "zh": "xAI 图像模型名称；不传则优先取 XAI_IMAGE_MODEL，再用默认值 grok-2-image-1212", "en": "xAI image model name; falls back to XAI_IMAGE_MODEL, then grok-2-image-1212" }, "type": "string", "required": false },
-        { "name": "size", "description": { "zh": "图片尺寸，例如 1024x1024（可选）", "en": "Image size, e.g. 1024x1024 (optional)" }, "type": "string", "required": false },
-        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)" }, "type": "string", "required": false }
+        { "name": "prompt", "description": { "zh": "绘图提示词（英文或中文皆可）", "en": "Prompt for image generation (Chinese or English)", "ru": "Промпт для генерации изображения (на китайском или английском)" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "xAI 图像模型名称；不传则优先取 XAI_IMAGE_MODEL，再用默认值 grok-2-image-1212", "en": "xAI image model name; falls back to XAI_IMAGE_MODEL, then grok-2-image-1212", "ru": "Название модели изображений xAI; если не указано, берётся XAI_IMAGE_MODEL, затем grok-2-image-1212" }, "type": "string", "required": false },
+        { "name": "size", "description": { "zh": "图片尺寸，例如 1024x1024（可选）", "en": "Image size, e.g. 1024x1024 (optional)", "ru": "Размер изображения, например 1024x1024 (необязательно)" }, "type": "string", "required": false },
+        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)", "ru": "Своё имя выходного файла (без пути и расширения)" }, "type": "string", "required": false }
       ]
     },
     {
       "name": "draw_video",
       "description": {
         "zh": "根据提示词调用 xAI 官方视频生成 API 生成视频，支持文生视频、图生视频和视频编辑，轮询完成后下载到本地并返回本地视频链接提示。",
-        "en": "Generate a video with the official xAI video API. Supports text-to-video, image-to-video, and video editing. Polls until completion, downloads locally, and returns local video link hints."
+        "en": "Generate a video with the official xAI video API. Supports text-to-video, image-to-video, and video editing. Polls until completion, downloads locally, and returns local video link hints.",
+        "ru": "Генерирует видео через официальный API видео xAI. Поддерживает генерацию по тексту, по изображению и редактирование видео. Опрашивает статус до завершения, скачивает результат локально и возвращает подсказки со ссылкой на локальное видео."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "视频提示词", "en": "Video prompt" }, "type": "string", "required": true },
-        { "name": "model", "description": { "zh": "视频模型；不传则优先取 XAI_VIDEO_MODEL，再用默认值 grok-imagine-video", "en": "Video model; falls back to XAI_VIDEO_MODEL, then grok-imagine-video" }, "type": "string", "required": false },
-        { "name": "aspect_ratio", "description": { "zh": "输出比例，可选 1:1、16:9、9:16、4:3、3:4、3:2、2:3；默认 16:9；视频编辑模式不支持", "en": "Output aspect ratio. Supported: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3. Defaults to 16:9; not supported for video editing." }, "type": "string", "required": false },
-        { "name": "resolution", "description": { "zh": "输出分辨率，仅支持 480p 或 720p；默认 480p；视频编辑模式不支持", "en": "Output resolution, only 480p or 720p. Defaults to 480p; not supported for video editing." }, "type": "string", "required": false },
-        { "name": "duration", "description": { "zh": "输出时长，支持 1-15 秒；默认 5；视频编辑模式不支持", "en": "Output duration from 1 to 15 seconds. Defaults to 5; not supported for video editing." }, "type": "number", "required": false },
-        { "name": "image_url", "description": { "zh": "图生视频输入图 URL（可选）", "en": "Input image URL for image-to-video (optional)" }, "type": "string", "required": false },
-        { "name": "image_path", "description": { "zh": "图生视频输入图本地路径（可选，会转成 data URL）", "en": "Local input image path for image-to-video (optional; converted to a data URL)" }, "type": "string", "required": false },
-        { "name": "video_url", "description": { "zh": "视频编辑输入视频 URL（可选）", "en": "Input video URL for video editing (optional)" }, "type": "string", "required": false },
-        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)" }, "type": "string", "required": false },
-        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔毫秒数，默认 5000", "en": "Polling interval in milliseconds, default 5000" }, "type": "number", "required": false },
-        { "name": "max_wait_time_ms", "description": { "zh": "最大等待毫秒数，默认 600000", "en": "Maximum wait time in milliseconds, default 600000" }, "type": "number", "required": false }
+        { "name": "prompt", "description": { "zh": "视频提示词", "en": "Video prompt", "ru": "Промпт для видео" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "视频模型；不传则优先取 XAI_VIDEO_MODEL，再用默认值 grok-imagine-video", "en": "Video model; falls back to XAI_VIDEO_MODEL, then grok-imagine-video", "ru": "Модель видео; если не указана, берётся XAI_VIDEO_MODEL, затем grok-imagine-video" }, "type": "string", "required": false },
+        { "name": "aspect_ratio", "description": { "zh": "输出比例，可选 1:1、16:9、9:16、4:3、3:4、3:2、2:3；默认 16:9；视频编辑模式不支持", "en": "Output aspect ratio. Supported: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3. Defaults to 16:9; not supported for video editing.", "ru": "Соотношение сторон результата. Поддерживаются: 1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3. По умолчанию 16:9; в режиме редактирования видео не поддерживается." }, "type": "string", "required": false },
+        { "name": "resolution", "description": { "zh": "输出分辨率，仅支持 480p 或 720p；默认 480p；视频编辑模式不支持", "en": "Output resolution, only 480p or 720p. Defaults to 480p; not supported for video editing.", "ru": "Разрешение результата: только 480p или 720p. По умолчанию 480p; в режиме редактирования видео не поддерживается." }, "type": "string", "required": false },
+        { "name": "duration", "description": { "zh": "输出时长，支持 1-15 秒；默认 5；视频编辑模式不支持", "en": "Output duration from 1 to 15 seconds. Defaults to 5; not supported for video editing.", "ru": "Длительность результата от 1 до 15 секунд. По умолчанию 5; в режиме редактирования видео не поддерживается." }, "type": "number", "required": false },
+        { "name": "image_url", "description": { "zh": "图生视频输入图 URL（可选）", "en": "Input image URL for image-to-video (optional)", "ru": "URL входного изображения для генерации видео по изображению (необязательно)" }, "type": "string", "required": false },
+        { "name": "image_path", "description": { "zh": "图生视频输入图本地路径（可选，会转成 data URL）", "en": "Local input image path for image-to-video (optional; converted to a data URL)", "ru": "Локальный путь к входному изображению для генерации видео по изображению (необязательно; преобразуется в data URL)" }, "type": "string", "required": false },
+        { "name": "video_url", "description": { "zh": "视频编辑输入视频 URL（可选）", "en": "Input video URL for video editing (optional)", "ru": "URL входного видео для редактирования видео (необязательно)" }, "type": "string", "required": false },
+        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)", "ru": "Своё имя выходного файла (без пути и расширения)" }, "type": "string", "required": false },
+        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔毫秒数，默认 5000", "en": "Polling interval in milliseconds, default 5000", "ru": "Интервал опроса в миллисекундах, по умолчанию 5000" }, "type": "number", "required": false },
+        { "name": "max_wait_time_ms", "description": { "zh": "最大等待毫秒数，默认 600000", "en": "Maximum wait time in milliseconds, default 600000", "ru": "Максимальное время ожидания в миллисекундах, по умолчанию 600000" }, "type": "number", "required": false }
       ]
     }
   ]

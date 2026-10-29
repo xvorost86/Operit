@@ -3,11 +3,13 @@
   "name": "siliconflow_draw",
   "display_name": {
     "zh": "硅基流动绘图",
-    "en": "SiliconFlow Draw"
+    "en": "SiliconFlow Draw",
+    "ru": "Рисование SiliconFlow"
   },
   "description": {
     "zh": "使用 SiliconFlow 官方图像与视频接口生成图片和视频。图片走 /v1/images/generations，视频走 /v1/video/submit + /v1/video/status；生成结果会立即下载到本地，避免官方临时链接过期。",
-    "en": "Generate images and videos with SiliconFlow official image and video APIs. Images use /v1/images/generations; videos use /v1/video/submit + /v1/video/status. Generated assets are downloaded locally immediately before temporary URLs expire."
+    "en": "Generate images and videos with SiliconFlow official image and video APIs. Images use /v1/images/generations; videos use /v1/video/submit + /v1/video/status. Generated assets are downloaded locally immediately before temporary URLs expire.",
+    "ru": "Генерирует изображения и видео через официальные API изображений и видео SiliconFlow. Изображения — /v1/images/generations, видео — /v1/video/submit + /v1/video/status. Результаты сразу скачиваются локально, пока временные ссылки не истекли."
   },
   "category": "Draw",
   "env": [
@@ -15,7 +17,8 @@
       "name": "SILICONFLOW_API_KEY",
       "description": {
         "zh": "SiliconFlow API Key（必填）",
-        "en": "SiliconFlow API key (required)"
+        "en": "SiliconFlow API key (required)",
+        "ru": "Ключ API SiliconFlow (обязательно)"
       },
       "required": true
     },
@@ -23,7 +26,8 @@
       "name": "SILICONFLOW_API_BASE_URL",
       "description": {
         "zh": "SiliconFlow API Base URL（可选，不填默认 https://api.siliconflow.cn ）",
-        "en": "SiliconFlow API base URL (optional; defaults to https://api.siliconflow.cn)"
+        "en": "SiliconFlow API base URL (optional; defaults to https://api.siliconflow.cn)",
+        "ru": "Базовый URL API SiliconFlow (необязательно; по умолчанию https://api.siliconflow.cn)"
       },
       "required": false
     },
@@ -31,7 +35,8 @@
       "name": "SILICONFLOW_IMAGE_MODEL",
       "description": {
         "zh": "默认生图模型（可选；例如 Kwai-Kolors/Kolors、Qwen/Qwen-Image）",
-        "en": "Default image model (optional), e.g. Kwai-Kolors/Kolors or Qwen/Qwen-Image"
+        "en": "Default image model (optional), e.g. Kwai-Kolors/Kolors or Qwen/Qwen-Image",
+        "ru": "Модель изображений по умолчанию (необязательно), например Kwai-Kolors/Kolors или Qwen/Qwen-Image"
       },
       "required": false
     },
@@ -39,7 +44,8 @@
       "name": "SILICONFLOW_VIDEO_MODEL",
       "description": {
         "zh": "默认生视频模型（可选；例如 Wan-AI/Wan2.2-T2V-A14B 或 Wan-AI/Wan2.2-I2V-A14B）",
-        "en": "Default video model (optional), e.g. Wan-AI/Wan2.2-T2V-A14B or Wan-AI/Wan2.2-I2V-A14B"
+        "en": "Default video model (optional), e.g. Wan-AI/Wan2.2-T2V-A14B or Wan-AI/Wan2.2-I2V-A14B",
+        "ru": "Модель видео по умолчанию (необязательно), например Wan-AI/Wan2.2-T2V-A14B или Wan-AI/Wan2.2-I2V-A14B"
       },
       "required": false
     }
@@ -49,39 +55,41 @@
       "name": "draw_image",
       "description": {
         "zh": "调用 SiliconFlow 官方图片生成接口生图，下载到本地并返回 Markdown 图片提示。",
-        "en": "Generate images with SiliconFlow official image API, download locally, and return Markdown image hints."
+        "en": "Generate images with SiliconFlow official image API, download locally, and return Markdown image hints.",
+        "ru": "Генерирует изображения через официальный API изображений SiliconFlow, скачивает их локально и возвращает подсказки изображений в Markdown."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "生图提示词", "en": "Image prompt" }, "type": "string", "required": true },
-        { "name": "model", "description": { "zh": "模型名；不传则优先取 SILICONFLOW_IMAGE_MODEL，再取默认值 Kwai-Kolors/Kolors", "en": "Model name; falls back to SILICONFLOW_IMAGE_MODEL, then Kwai-Kolors/Kolors" }, "type": "string", "required": false },
-        { "name": "image_size", "description": { "zh": "图片尺寸，例如 1024x1024；未传时默认 1024x1024", "en": "Image size, e.g. 1024x1024; defaults to 1024x1024" }, "type": "string", "required": false },
-        { "name": "negative_prompt", "description": { "zh": "负面提示词（可选）", "en": "Negative prompt (optional)" }, "type": "string", "required": false },
-        { "name": "batch_size", "description": { "zh": "一次生成多少张图（可选）", "en": "Number of images to generate (optional)" }, "type": "number", "required": false },
-        { "name": "num_inference_steps", "description": { "zh": "推理步数（可选）", "en": "Inference steps (optional)" }, "type": "number", "required": false },
-        { "name": "guidance_scale", "description": { "zh": "提示词引导强度（可选）", "en": "Guidance scale (optional)" }, "type": "number", "required": false },
-        { "name": "seed", "description": { "zh": "随机种子（可选）", "en": "Seed (optional)" }, "type": "number", "required": false },
-        { "name": "file_name", "description": { "zh": "本地保存文件名（不含扩展名）", "en": "Local output filename without extension" }, "type": "string", "required": false },
-        { "name": "api_base_url", "description": { "zh": "自定义 API Base URL（可选）", "en": "Custom API base URL (optional)" }, "type": "string", "required": false }
+        { "name": "prompt", "description": { "zh": "生图提示词", "en": "Image prompt", "ru": "Промпт для генерации изображения" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "模型名；不传则优先取 SILICONFLOW_IMAGE_MODEL，再取默认值 Kwai-Kolors/Kolors", "en": "Model name; falls back to SILICONFLOW_IMAGE_MODEL, then Kwai-Kolors/Kolors", "ru": "Название модели; если не указано, берётся SILICONFLOW_IMAGE_MODEL, затем Kwai-Kolors/Kolors" }, "type": "string", "required": false },
+        { "name": "image_size", "description": { "zh": "图片尺寸，例如 1024x1024；未传时默认 1024x1024", "en": "Image size, e.g. 1024x1024; defaults to 1024x1024", "ru": "Размер изображения, например 1024x1024; по умолчанию 1024x1024" }, "type": "string", "required": false },
+        { "name": "negative_prompt", "description": { "zh": "负面提示词（可选）", "en": "Negative prompt (optional)", "ru": "Негативный промпт (необязательно)" }, "type": "string", "required": false },
+        { "name": "batch_size", "description": { "zh": "一次生成多少张图（可选）", "en": "Number of images to generate (optional)", "ru": "Сколько изображений генерировать (необязательно)" }, "type": "number", "required": false },
+        { "name": "num_inference_steps", "description": { "zh": "推理步数（可选）", "en": "Inference steps (optional)", "ru": "Количество шагов инференса (необязательно)" }, "type": "number", "required": false },
+        { "name": "guidance_scale", "description": { "zh": "提示词引导强度（可选）", "en": "Guidance scale (optional)", "ru": "Сила следования промпту (необязательно)" }, "type": "number", "required": false },
+        { "name": "seed", "description": { "zh": "随机种子（可选）", "en": "Seed (optional)", "ru": "Сид (необязательно)" }, "type": "number", "required": false },
+        { "name": "file_name", "description": { "zh": "本地保存文件名（不含扩展名）", "en": "Local output filename without extension", "ru": "Имя локального выходного файла без расширения" }, "type": "string", "required": false },
+        { "name": "api_base_url", "description": { "zh": "自定义 API Base URL（可选）", "en": "Custom API base URL (optional)", "ru": "Свой базовый URL API (необязательно)" }, "type": "string", "required": false }
       ]
     },
     {
       "name": "draw_video",
       "description": {
         "zh": "调用 SiliconFlow 官方视频生成接口生视频，轮询状态，下载到本地并返回本地视频链接提示。",
-        "en": "Generate videos with SiliconFlow official video API, poll status, download locally, and return local video link hints."
+        "en": "Generate videos with SiliconFlow official video API, poll status, download locally, and return local video link hints.",
+        "ru": "Генерирует видео через официальный API видео SiliconFlow, опрашивает статус, скачивает результат локально и возвращает подсказки со ссылкой на локальное видео."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "生视频提示词", "en": "Video prompt" }, "type": "string", "required": true },
-        { "name": "model", "description": { "zh": "模型名；不传则优先取 SILICONFLOW_VIDEO_MODEL，若传了 image_url/image_path 默认走 Wan-AI/Wan2.2-I2V-A14B，否则默认 Wan-AI/Wan2.2-T2V-A14B", "en": "Model name; falls back to SILICONFLOW_VIDEO_MODEL. If image_url/image_path is provided, defaults to Wan-AI/Wan2.2-I2V-A14B; otherwise Wan-AI/Wan2.2-T2V-A14B" }, "type": "string", "required": false },
-        { "name": "image_size", "description": { "zh": "视频尺寸，可选 1280x720、720x1280、960x960；默认 1280x720", "en": "Video size: 1280x720, 720x1280, or 960x960; defaults to 1280x720" }, "type": "string", "required": false },
-        { "name": "negative_prompt", "description": { "zh": "负面提示词（可选）", "en": "Negative prompt (optional)" }, "type": "string", "required": false },
-        { "name": "image_url", "description": { "zh": "图生视频输入图 URL（可选）", "en": "Input image URL for image-to-video (optional)" }, "type": "string", "required": false },
-        { "name": "image_path", "description": { "zh": "图生视频输入图本地路径（可选，会转成 data URL 上传）", "en": "Local input image path for image-to-video (optional; converted to data URL)" }, "type": "string", "required": false },
-        { "name": "seed", "description": { "zh": "随机种子（可选）", "en": "Seed (optional)" }, "type": "number", "required": false },
-        { "name": "file_name", "description": { "zh": "本地保存文件名（不含扩展名）", "en": "Local output filename without extension" }, "type": "string", "required": false },
-        { "name": "api_base_url", "description": { "zh": "自定义 API Base URL（可选）", "en": "Custom API base URL (optional)" }, "type": "string", "required": false },
-        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔毫秒数，默认 5000", "en": "Polling interval in ms, default 5000" }, "type": "number", "required": false },
-        { "name": "max_wait_time_ms", "description": { "zh": "最大等待毫秒数，默认 600000", "en": "Maximum wait time in ms, default 600000" }, "type": "number", "required": false }
+        { "name": "prompt", "description": { "zh": "生视频提示词", "en": "Video prompt", "ru": "Промпт для генерации видео" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "模型名；不传则优先取 SILICONFLOW_VIDEO_MODEL，若传了 image_url/image_path 默认走 Wan-AI/Wan2.2-I2V-A14B，否则默认 Wan-AI/Wan2.2-T2V-A14B", "en": "Model name; falls back to SILICONFLOW_VIDEO_MODEL. If image_url/image_path is provided, defaults to Wan-AI/Wan2.2-I2V-A14B; otherwise Wan-AI/Wan2.2-T2V-A14B", "ru": "Название модели; если не указано, берётся SILICONFLOW_VIDEO_MODEL. Если передан image_url/image_path, по умолчанию используется Wan-AI/Wan2.2-I2V-A14B, иначе Wan-AI/Wan2.2-T2V-A14B" }, "type": "string", "required": false },
+        { "name": "image_size", "description": { "zh": "视频尺寸，可选 1280x720、720x1280、960x960；默认 1280x720", "en": "Video size: 1280x720, 720x1280, or 960x960; defaults to 1280x720", "ru": "Размер видео: 1280x720, 720x1280 или 960x960; по умолчанию 1280x720" }, "type": "string", "required": false },
+        { "name": "negative_prompt", "description": { "zh": "负面提示词（可选）", "en": "Negative prompt (optional)", "ru": "Негативный промпт (необязательно)" }, "type": "string", "required": false },
+        { "name": "image_url", "description": { "zh": "图生视频输入图 URL（可选）", "en": "Input image URL for image-to-video (optional)", "ru": "URL входного изображения для генерации видео по изображению (необязательно)" }, "type": "string", "required": false },
+        { "name": "image_path", "description": { "zh": "图生视频输入图本地路径（可选，会转成 data URL 上传）", "en": "Local input image path for image-to-video (optional; converted to data URL)", "ru": "Локальный путь к входному изображению для генерации видео по изображению (необязательно; преобразуется в data URL)" }, "type": "string", "required": false },
+        { "name": "seed", "description": { "zh": "随机种子（可选）", "en": "Seed (optional)", "ru": "Сид (необязательно)" }, "type": "number", "required": false },
+        { "name": "file_name", "description": { "zh": "本地保存文件名（不含扩展名）", "en": "Local output filename without extension", "ru": "Имя локального выходного файла без расширения" }, "type": "string", "required": false },
+        { "name": "api_base_url", "description": { "zh": "自定义 API Base URL（可选）", "en": "Custom API base URL (optional)", "ru": "Свой базовый URL API (необязательно)" }, "type": "string", "required": false },
+        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔毫秒数，默认 5000", "en": "Polling interval in ms, default 5000", "ru": "Интервал опроса в миллисекундах, по умолчанию 5000" }, "type": "number", "required": false },
+        { "name": "max_wait_time_ms", "description": { "zh": "最大等待毫秒数，默认 600000", "en": "Maximum wait time in ms, default 600000", "ru": "Максимальное время ожидания в миллисекундах, по умолчанию 600000" }, "type": "number", "required": false }
       ]
     }
   ]

@@ -4,11 +4,13 @@
 
   "display_name": {
       "zh": "Nanobanana 绘图",
-      "en": "Nanobanana Draw"
+      "en": "Nanobanana Draw",
+      "ru": "Рисование Nanobanana"
   },
   "description": {
     "zh": "使用 Nano Banana API (基于Grsai的api服务/https://grsai.com/) 根据提示词画图，支持文生图和图生图（可传入参考图片URL或本地图片路径；本地图片会先上传到图床以获得公网URL），将图片保存到本地 /sdcard/Download/Operit/plugins/draw/nanobanana_draw/draws/ 目录，并返回 Markdown 图片提示。",
-    "en": "Generate images using the Nano Banana API (via Grsai service / https://grsai.com/). Supports text-to-image and image-to-image (you can provide reference image URLs or local image paths; local images will be uploaded first to get public URLs). Saves images to /sdcard/Download/Operit/plugins/draw/nanobanana_draw/draws/ and returns a Markdown image reference."
+    "en": "Generate images using the Nano Banana API (via Grsai service / https://grsai.com/). Supports text-to-image and image-to-image (you can provide reference image URLs or local image paths; local images will be uploaded first to get public URLs). Saves images to /sdcard/Download/Operit/plugins/draw/nanobanana_draw/draws/ and returns a Markdown image reference.",
+    "ru": "Генерирует изображения через API Nano Banana (сервис Grsai / https://grsai.com/). Поддерживает генерацию по тексту и по изображению (можно передать URL референсных изображений или локальные пути к изображениям; локальные изображения сначала загружаются, чтобы получить публичные URL). Сохраняет изображения в /sdcard/Download/Operit/plugins/draw/nanobanana_draw/draws/ и возвращает ссылку на изображение в Markdown."
   },
   "env": [
     "NANOBANANA_API_KEY",
@@ -21,19 +23,20 @@
       "name": "draw_image",
       "description": {
         "zh": "根据提示词调用 Nano Banana API 生成图片（支持文生图和图生图），保存到本地并返回 Markdown 图片提示。",
-        "en": "Generate an image via the Nano Banana API using a prompt (supports text-to-image and image-to-image), save locally, and return a Markdown image reference."
+        "en": "Generate an image via the Nano Banana API using a prompt (supports text-to-image and image-to-image), save locally, and return a Markdown image reference.",
+        "ru": "Генерирует изображение по промпту через API Nano Banana (поддерживает генерацию по тексту и по изображению), сохраняет его локально и возвращает ссылку на изображение в Markdown."
       },
       "parameters": [
-        { "name": "prompt", "description": { "zh": "绘图提示词（英文或中文皆可）", "en": "Image prompt (Chinese or English)" }, "type": "string", "required": true },
-        { "name": "model", "description": { "zh": "Nano Banana 模型名称（优先级最高）。可填 nano-banana-pro（约1800积分）或 nano-banana（约400积分）", "en": "Nano Banana model name (highest priority). e.g. nano-banana-pro (~1800 credits) or nano-banana (~400 credits)." }, "type": "string", "required": false },
-        { "name": "model_variant", "description": { "zh": "模型档位（二选一，可选）：pro（约1800积分）或 nano（约400积分）。未传时默认 pro", "en": "Model tier (optional): pro (~1800 credits) or nano (~400 credits). Defaults to pro." }, "type": "string", "required": false },
-        { "name": "aspect_ratio", "description": { "zh": "输出图像比例，如 '1:1', '16:9', 'auto' 等，可选", "en": "Output aspect ratio, e.g. '1:1', '16:9', 'auto' (optional)" }, "type": "string", "required": false },
-        { "name": "image_size", "description": { "zh": "输出图像大小，仅 nano-banana-pro 支持，如 '1K', '2K', '4K'，可选", "en": "Output image size (only supported by nano-banana-pro), e.g. '1K', '2K', '4K' (optional)" }, "type": "string", "required": false },
-        { "name": "image_urls", "description": { "zh": "参考图URL数组（图生图），支持格式：字符串数组['https://...'] 或 JSON字符串'[\"https://...\"]' 或逗号分隔'url1,url2'，可选", "en": "Reference image URL list for img2img. Accepts: string array ['https://...'], or JSON string '[\"https://...\"]', or comma-separated 'url1,url2' (optional)." }, "type": "array", "required": false },
-        { "name": "image_paths", "description": { "zh": "参考图本地路径数组（图生图，会先上传图床再进行生成），支持格式：字符串数组['/sdcard/...'] 或 JSON字符串 或 逗号分隔，可选", "en": "Reference local image path list for img2img (will be uploaded first). Accepts: string array ['/sdcard/...'], or JSON string, or comma-separated list (optional)." }, "type": "array", "required": false },
-        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)" }, "type": "string", "required": false },
-        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔（毫秒），默认 5000", "en": "Polling interval (milliseconds), default 5000" }, "type": "number", "required": false },
-        { "name": "max_wait_time_ms", "description": { "zh": "最长等待时间（毫秒）。默认 10 分钟", "en": "Max wait time (milliseconds). Default 10 minutes." }, "type": "number", "required": false }
+        { "name": "prompt", "description": { "zh": "绘图提示词（英文或中文皆可）", "en": "Image prompt (Chinese or English)", "ru": "Промпт для генерации изображения (на китайском или английском)" }, "type": "string", "required": true },
+        { "name": "model", "description": { "zh": "Nano Banana 模型名称（优先级最高）。可填 nano-banana-pro（约1800积分）或 nano-banana（约400积分）", "en": "Nano Banana model name (highest priority). e.g. nano-banana-pro (~1800 credits) or nano-banana (~400 credits).", "ru": "Название модели Nano Banana (наивысший приоритет). Например, nano-banana-pro (около 1800 кредитов) или nano-banana (около 400 кредитов)." }, "type": "string", "required": false },
+        { "name": "model_variant", "description": { "zh": "模型档位（二选一，可选）：pro（约1800积分）或 nano（约400积分）。未传时默认 pro", "en": "Model tier (optional): pro (~1800 credits) or nano (~400 credits). Defaults to pro.", "ru": "Уровень модели (необязательно): pro (около 1800 кредитов) или nano (около 400 кредитов). По умолчанию pro." }, "type": "string", "required": false },
+        { "name": "aspect_ratio", "description": { "zh": "输出图像比例，如 '1:1', '16:9', 'auto' 等，可选", "en": "Output aspect ratio, e.g. '1:1', '16:9', 'auto' (optional)", "ru": "Соотношение сторон результата, например '1:1', '16:9', 'auto' (необязательно)" }, "type": "string", "required": false },
+        { "name": "image_size", "description": { "zh": "输出图像大小，仅 nano-banana-pro 支持，如 '1K', '2K', '4K'，可选", "en": "Output image size (only supported by nano-banana-pro), e.g. '1K', '2K', '4K' (optional)", "ru": "Размер изображения результата (поддерживается только nano-banana-pro), например '1K', '2K', '4K' (необязательно)" }, "type": "string", "required": false },
+        { "name": "image_urls", "description": { "zh": "参考图URL数组（图生图），支持格式：字符串数组['https://...'] 或 JSON字符串'[\"https://...\"]' 或逗号分隔'url1,url2'，可选", "en": "Reference image URL list for img2img. Accepts: string array ['https://...'], or JSON string '[\"https://...\"]', or comma-separated 'url1,url2' (optional).", "ru": "Список URL референсных изображений для img2img. Принимает: массив строк ['https://...'], JSON-строку '[\"https://...\"]' или список через запятую 'url1,url2' (необязательно)." }, "type": "array", "required": false },
+        { "name": "image_paths", "description": { "zh": "参考图本地路径数组（图生图，会先上传图床再进行生成），支持格式：字符串数组['/sdcard/...'] 或 JSON字符串 或 逗号分隔，可选", "en": "Reference local image path list for img2img (will be uploaded first). Accepts: string array ['/sdcard/...'], or JSON string, or comma-separated list (optional).", "ru": "Список локальных путей к референсным изображениям для img2img (сначала загружаются). Принимает: массив строк ['/sdcard/...'], JSON-строку или список через запятую (необязательно)." }, "type": "array", "required": false },
+        { "name": "file_name", "description": { "zh": "自定义保存到本地的文件名（不含路径和扩展名）", "en": "Custom output file name (without path or extension)", "ru": "Своё имя выходного файла (без пути и расширения)" }, "type": "string", "required": false },
+        { "name": "poll_interval_ms", "description": { "zh": "轮询间隔（毫秒），默认 5000", "en": "Polling interval (milliseconds), default 5000", "ru": "Интервал опроса (в миллисекундах), по умолчанию 5000" }, "type": "number", "required": false },
+        { "name": "max_wait_time_ms", "description": { "zh": "最长等待时间（毫秒）。默认 10 分钟", "en": "Max wait time (milliseconds). Default 10 minutes.", "ru": "Максимальное время ожидания (в миллисекундах). По умолчанию 10 минут." }, "type": "number", "required": false }
       ]
     }
   ]
