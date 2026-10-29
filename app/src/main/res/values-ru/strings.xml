@@ -3055,7 +3055,7 @@
     <string name="message_list_empty">Список сообщений не может быть пустым</string>
     <string name="image_capture_failed">Не удалось захватить изображение: %1$s</string>
     <string name="stream_markdown_demo">Хорошо, если у вас есть вопросы или нужна помощь, обращайтесь в любое время.\n\n\n<status type="complete"></status></string>
-    <string name="stream_markdown_rendering">Потоковая передача</string>
+    <string name="stream_markdown_rendering">Потоковое отображение</string>
     <string name="graph_start_node_not_exist">Начальный узел \'%1$s\' не существует</string>
     <string name="graph_end_node_not_exist">Конечный узел \'%1$s\' не существует</string>
     <string name="stream_tag_required">Тег должен быть задан</string>
@@ -3082,7 +3082,7 @@
     <string name="filelist_go_back">Перейти в родительский каталог</string>
     <string name="memory_auto_update_active">Автосохранение долговременной памяти включено</string>
     <string name="thinking_mode_active">Режим рассуждений активирован</string>
-    <string name="ai_planning_active">Режим планирования ИИ активирован</string>
+    <string name="ai_planning_active">Глубокий поиск активирован</string>
     <string name="auto_approve_active">Автоподтверждение активировано</string>
     <string name="settings_options">Параметры настроек</string>
     <string name="thinking_settings">Рассуждения</string>
@@ -3101,7 +3101,7 @@
     <string name="memory_space_select">Выбрать пространство памяти</string>
     <string name="memory_auto_update">Автосохранение памяти</string>
     <string name="memory_auto_update_desc">Когда включено, после завершения ответа материалы из текущей беседы ставятся в очередь, а затем записываются в библиотеку памяти периодической фоновой обработкой, пока процесс приложения жив.</string>
-    <string name="memory_auto_update_runtime_status">Ожидают извлечения из памяти: %1$d, следующее сохранение через %2$d мин</string>
+    <string name="memory_auto_update_runtime_status">В очереди обработки памяти: %1$d, следующее сохранение через %2$d мин</string>
     <string name="chat_summarizing_memory">Формирование сводки памяти…</string>
     <string name="chat_input_processing_collect_failed">Не удалось получить состояние обработки ввода: %1$s</string>
     <string name="chat_input_hint">Введите сообщение…</string>
