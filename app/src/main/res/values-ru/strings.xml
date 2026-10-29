@@ -7237,7 +7237,7 @@
     <string name="market_allow_public_updates_title">Разрешить всем обновлять этот плагин</string>
     <string name="market_allow_public_updates_desc">Если включено, другие вошедшие пользователи могут отправлять новые версии этого плагина. Изменить этот переключатель может только исходный публикатор.</string>
     <string name="artifact_publish_encrypt_title">Шифровать опубликованный ресурс</string>
-    <string name="artifact_publish_encrypt_desc">Если включено, скрипты минифицируются на уровне AST, а ресурсы пакета загружаются в защищённом формате Operit. Установка и кэш остаются зашифрованными, а при выполнении чтение расшифровывается автоматически.</string>
+    <string name="artifact_publish_encrypt_desc">Если включено, скрипты минифицируются на уровне AST, а ресурсы пакета загружаются в защищённом формате Operit. После установки и в кэше данные остаются зашифрованными, а при выполнении чтение автоматически расшифровывает их.</string>
     <string name="artifact_publish_encrypt_confirmation">Шифрованная публикация: %1$s</string>
     <string name="market_login_required_hint">Войдите в GitHub, чтобы управлять содержимым маркета и публиковать его</string>
     <string name="available_scripts_market">Доступные скрипты</string>
