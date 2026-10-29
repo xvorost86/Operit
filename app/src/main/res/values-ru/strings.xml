@@ -2770,7 +2770,7 @@
     <string name="functional_config_warning_audio_unsupported">Предупреждение: у выбранной модели не отмечена поддержка аудио, поэтому распознавание и транскрипция аудио могут не работать. Выберите модель с поддержкой аудио и включите «Модель поддерживает аудио».</string>
     <string name="functional_config_warning_video_unsupported">Предупреждение: у выбранной модели не отмечена поддержка видео, поэтому понимание видео может не работать. Выберите модель с поддержкой видео и включите «Модель поддерживает видео».</string>
     <string name="function_type_chat">Функция чата</string>
-    <string name="function_type_title_generation">ИИ-сводка заголовка</string>
+    <string name="function_type_title_generation">Генерация заголовка</string>
     <string name="function_type_summary">Сводка беседы</string>
     <string name="function_type_memory">Управление памятью</string>
     <string name="function_type_file_binding">Обработка привязки файлов</string>
