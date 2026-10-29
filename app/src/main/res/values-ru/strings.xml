@@ -7440,7 +7440,7 @@
     <string name="artifact_market_remove_request_submitted_title">Запрос на удаление отправлен</string>
     <string name="artifact_market_reopen_request_submitted_title">Запрос на возврат в маркет отправлен</string>
     <string name="artifact_market_registration_completed">Регистрация в маркете выполнена</string>
-    <string name="artifact_market_schedule_notice">\n\nПримечание: публичный маркет требует публикации по расписанию и не обновится сразу. Дождитесь завершения расписания, прежде чем проверять.</string>
+    <string name="artifact_market_schedule_notice">\n\nПримечание: в публичном маркете публикация выполняется по расписанию, поэтому изменения появятся не сразу. Дождитесь публикации по расписанию, прежде чем проверять.</string>
     <string name="artifact_publish_updating_published_node">Обновление опубликованного узла</string>
     <string name="artifact_publish_checking_identity_conflicts">Проверка конфликтов имён и ID</string>
     <string name="artifact_publish_author_count_insufficient">Текущий элемент объявляет авторов, но их количество недостаточно. У текущего прямого предшествующего узла %1$d публикаторов GitHub; либо не указывайте авторов, либо укажите не менее %2$d позиций.</string>
