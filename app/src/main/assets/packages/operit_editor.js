@@ -4,10 +4,12 @@
   display_name: {
     zh: "Operit平台编辑器"
     en: "Operit Platform Editor"
+    ru: "Редактор платформы Operit"
   }
   description: {
     zh: '''Operit 平台配置直改工具包：提供一组可直接读取与修改 Operit 平台设置的工具，覆盖 MCP、Skill、Sandbox Package、角色卡、功能模型绑定、模型参数、上下文总结与 TTS/STT 语音服务配置。'''
     en: '''Direct Operit platform configuration toolkit: a collection of tools for reading and directly modifying Operit platform settings, covering MCP, Skill, Sandbox Package, character cards, function-model bindings, model parameters, context-summary settings, and TTS/STT speech-service configuration.'''
+    ru: '''Инструментарий прямого изменения конфигурации платформы Operit: набор инструментов для чтения и непосредственного изменения настроек платформы Operit, охватывающий MCP, Skill, Sandbox Package, карточки персонажей, привязки функциональных моделей, параметры моделей, настройки сводки контекста и конфигурацию голосовых служб TTS/STT.'''
   }
 
   enabledByDefault: true
@@ -526,6 +528,254 @@
 - Any configuration-changing action (toggle/import/delete/write env/model config CRUD/restart) requires explicit user confirmation first.
 - If the user did not explicitly ask to execute a specific tool, do not proactively run write-type tools.
 - Answer with concrete paths/rules from this guide and avoid generic assumptions.'''
+        ru: '''Руководство по устранению проблем с конфигурацией.
+
+[Условия срабатывания]
+- Пользователь упоминает сбой установки MCP/Skill, сбой запуска, непоявление инструментов, сбой импорта, конфликт одинаковых имён или правку конфигурации
+- Пользователь упоминает переключатели пакетов песочницы, список встроенных пакетов, пути импорта и удаления или неисправное состояние включения пакета
+- Пользователь просит разобраться с путями конфигурации плагинов, каталогами развёртывания, переключателями включения или переменными среды
+- Пользователь упоминает привязки функциональных моделей, добавление, удаление и изменение конфигураций моделей или проверку связи с моделью
+- Пользователь говорит, что настройка TTS/STT непонятна, полей слишком много или воспроизведение и распознавание речи не работают
+- Суть вопроса — поток конфигурации и развёртывания, а не обычные вопросы и ответы
+
+[MCP: установка и поиск неисправностей]
+1) Каталог конфигурации: /sdcard/Download/Operit/mcp_plugins/
+- Основная конфигурация: mcp_config.json
+- Кэш состояния выполнения: server_status.json (снимок не в реальном времени, только для статуса и кэша инструментов; не источник истины при поиске неисправностей)
+2) Пути на стороне Android и на стороне Linux строго разделяются:
+- Сторона Android — место хранения и импорта, а не конечное место выполнения
+- Каталог выполнения на стороне Linux: ~/mcp_plugins/<последний-сегмент-pluginId>
+- Реальный запуск MCP всегда идёт со стороны Linux
+3) Фактическое поведение развёртывания (по реализации):
+- Создать целевой каталог
+- Скопировать файлы плагина со стороны Android на сторону Linux
+- Выполнить автоматически сформированные команды установки и сборки (команды запуска пропускаются)
+3.1) Правило распознавания локального плагина:
+- Оно существует, чтобы обрабатывать вложенные схемы хранения (например, `<pluginId>/<repo>-main/...`): каталог плагина на стороне Android должен содержать хотя бы один файл-маркер, такой как `README.md`, `package.json`, `mcp.config.json`, `main.js`, `main.py`, `index.js` или `index.py`; иначе он может считаться неустановленным и никогда не попадёт в список запуска.
+4) Работа с командными плагинами:
+- Для командных плагинов на npx/uvx/uv система считает их развёрнутыми и выполняет только минимальную подготовку каталога.
+- Для Node-подобных командных MCP оставляйте конфигурацию в mcp_config.json такой же, как в примерах вышестоящего проекта, и по-прежнему пишите `command: "npx"`; не переписывайте это на `pnpm` или `npm` самостоятельно.
+- Когда приложение запускает такой `npx` MCP, оно внутри подменяет `npx` на `pnpm dlx` и убирает флаги подтверждения вроде `-y` / `--yes`.
+- Значит, реальная зависимость времени выполнения для такого MCP — `pnpm`; `pnpm` должен быть в терминале Linux, одного `npm` недостаточно.
+- Не меняйте команду на `npm`; известно, что это вызывает ошибки `double free`. Текущее соглашение: настраивать как `npx`, а приложение запустит это внутри как `pnpm dlx`.
+5) Поведение запуска в системе (критично):
+- Локальные плагины: приложение читает command/args/env из mcp_config.json и запускает процесс с cwd=~/mcp_plugins/<shortName>; о доступности следует судить по реальному вызову инструмента и ответу
+- Удалённые плагины: приложение подключается по endpoint + connectionType (необязательные bearerToken/headers) и проверяет связность
+6) Фактическое место выполнения команды (понимать именно так):
+- Для локальных плагинов процесс запускается в окружении терминала Linux с фиксированным рабочим каталогом: ~/mcp_plugins/<shortName>
+- Команда из mcp_config.json выполняется в контексте этого рабочего каталога Linux, а не в исходном каталоге Android
+- Любые относительные пути в args разрешаются относительно этого cwd
+6.1) Пример команды node (по ID плагина):
+- Пример: pluginId=owner/my-plugin, значит shortName=my-plugin и cwd=~/mcp_plugins/my-plugin
+- Если входной файл — ~/mcp_plugins/my-plugin/dist/index.js, пишите:
+  "command": "node"
+  "args": ["dist/index.js"]
+- args должны быть относительными к cwd; не используйте пути Android вроде /sdcard/...
+7) Правила полей mcp_config.json:
+- На верхнем уровне должен быть mcpServers (объект)
+- Каждый ключ в mcpServers — это serverId (обычно держите его в соответствии с ID плагина)
+- pluginId (ключ mcpServers) допускает только буквы a-zA-Z, подчёркивание (_) и пробелы
+- Общие поля сервера:
+  - command (обязательно, команда запуска)
+  - args (необязательно, массив строк)
+  - env (необязательно, карта ключ-значение)
+  - autoApprove (необязательно, массив)
+  - disabled (необязательно, true означает отключено)
+- Переменные среды MCP должны задаваться в mcpServers.<id>.env; `read_environment_variable` / `write_environment_variable` не читают и не пишут эти записи env MCP.
+8) Правила записи путей в mcp_config.json:
+- Не помещайте абсолютные пути Android (например, /sdcard/...) в параметры запуска локального плагина
+- Пишите command/args локального плагина для работы в Linux; предпочитайте относительные пути, так как cwd фиксирован на ~/mcp_plugins/<shortName>
+- Если абсолютный путь необходим, он должен быть путём Linux, а не путём Android
+9) Переключатель включения:
+- Локальный плагин использует mcpServers.<id>.disabled
+- Удалённый плагин использует pluginMetadata.<id>.disabled
+10) Порядок поиска неисправностей MCP:
+- Проверить переключатель включения
+- Проверить, что локальный каталог развёртывания существует и не пуст
+- Проверить, полны ли command/args/env в mcp_config.json
+- Проверить, не используют ли args ошибочно пути Android
+- Проверить нужный key/token в env
+- Не считайте `active` в server_status.json единственным источником истины; в первую очередь смотрите, удаётся ли получить и вызвать инструменты
+- Проверить зависимости терминала (node/pnpm/python/uv) и состояние службы MCP; Node-подобные `npx` MCP фактически зависят от `pnpm`, поэтому без `pnpm` запуск не состоится
+
+[Skill: установка и поиск неисправностей]
+1) Каталог: /sdcard/Download/Operit/skills/
+2) Правило распознавания: каждый Skill должен быть папкой с файлом SKILL.md (skill.md также принимается).
+3) Как добавить skill (используйте этот порядок):
+- Скачайте skill из доверенного источника (zip или исходный код репозитория).
+- Распакуйте его, затем поместите папку непосредственно в /sdcard/Download/Operit/skills/
+- Итоговая структура должна быть /sdcard/Download/Operit/skills/<skill_name>/, и в этой папке должен быть SKILL.md
+4) Разбор метаданных:
+- Предпочтительно name/description из frontmatter
+- Иначе — name:/description: в первых 40 строках
+5) Видимость для ИИ:
+- Если переключатель списка выключен, Skill остаётся локальным, но скрыт от использования ИИ
+6) Порядок поиска неисправностей Skill:
+- Проверить путь и SKILL.md
+- Проверить конфликт одинаковых имён
+- Проверить переключатель включения
+- Проверить, полны ли инструкции SKILL.md (шаги, ограничения, результаты)
+
+[Sandbox Package: установка и поиск неисправностей]
+1) Каталог внешних пакетов песочницы:
+- Android/data/com.ai.assistance.operit/files/packages
+2) Встроенные пакеты:
+- Встроенные пакеты берутся из ресурсов, поставляемых с приложением, а не из внешнего каталога выше; обычно ими управляют включением и отключением, а не удалением файлов.
+3) Импорт и удаление:
+- Импорт: поместите или импортируйте `.js` либо `.toolpkg` во внешний каталог packages.
+- Удаление: для внешних пакетов удаляйте по пути к файлу, предварительно убедившись во влиянии на зависимости.
+4) Управление переключателями (предпочитайте инструменты):
+- Сначала вызовите list_sandbox_packages, чтобы получить список встроенных и внешних пакетов и текущее состояние включения.
+- Затем вызовите set_sandbox_package_enabled(package_name, enabled), чтобы применить изменения.
+5) Руководство по созданию пакетов:
+- https://cdn.jsdelivr.net/gh/AAswordman/Operit@main/docs/SCRIPT_DEV_SKILL.md
+- Этот URL можно открыть напрямую запросом HTTP GET, чтобы получить исходный документ Markdown.
+6) Отладочная установка в приложении:
+- Для обычных `.js` пакетов песочницы предпочитайте `debug_install_js_package`.
+- Для `ToolPkg` предпочитайте `debug_install_toolpkg`; он выполняет поток упаковки и установки для источников в виде папки, manifest и .toolpkg и запускает путь обновления ToolPkg.
+
+[Модель совместимости пакетов (важно)]
+- Список пакетов, который видит ИИ, — это единая абстракция, и каждый элемент может происходить из MCP, Skill или Sandbox Package.
+- Для доступных записей пакетов единый тип не гарантируется; смешанные типы ожидаемы.
+- `use_package` совместим со всеми тремя и может вызываться единообразно для MCP/Skill/Sandbox Package.
+- `ping_mcp` — тонкая обёртка над `use_package` для быстрой проверки доступности пакета.
+
+[API агента маркета (HTTP, только чтение)]
+- Базовый префикс: `https://api.operit.app/market-stats`
+- Поиск: `/agent/search?q=<query>&type=mcp|skill|package|script&limit=10`
+- Подробности: `/agent/items/<type>/<id>`
+- План установки: `/agent/items/<type>/<id>/install-plan`
+- install_plan для `package` / `script` обычно возвращает `download_url`, `tracked_download_url`, `sha256` и `runtime_package_id`.
+- install_plan для `skill` обычно возвращает `repository_url`.
+- install_plan для `mcp` может возвращать `config` (годится как ссылка installConfig) или `repository_url`.
+- Сейчас приложение не предоставляет JS единый API установки из маркета в один клик; когда установка нужна, скачивайте, распаковывайте и импортируйте по типу записи и используйте `debug_install_js_package`, `debug_install_toolpkg` или `use_package`, когда это уместно.
+
+[Функциональные модели и конфигурация моделей]
+1) Конфигурация модели:
+- Каждая конфигурация модели — это полный профиль подключения (provider / endpoint / api key / model_name / custom_headers / переключатели возможностей).
+- Конфигурации можно создавать, изменять и удалять; удаление конфигурации `default` по умолчанию запрещено.
+2) Привязка функциональной модели:
+- Каждый тип функции (например, CHAT/SUMMARY/TRANSLATION) привязан к одной конфигурации модели.
+- Если `model_name` содержит несколько моделей (через запятую), `model_index` выбирает, какую использовать.
+3) Ключевые инструменты (предпочитайте их):
+- `list_model_configs`: список всех конфигураций моделей и текущих привязок функций.
+- `create_model_config`: создать новую конфигурацию модели (с необязательными исходными provider/endpoint/key/model_name/custom_headers).
+- `update_model_config`: изменить существующую конфигурацию по config_id.
+- `delete_model_config`: удалить конфигурацию (по умолчанию удалить нельзя).
+- `list_function_model_configs`: вывести только привязки функция → конфигурация (облегчённо).
+- `get_function_model_config`: получить подробности одной привязанной конфигурации по типу функции.
+- `set_function_model_config`: назначить конфигурацию и индекс модели для функции.
+- `test_model_config_connection`: выполнить эквивалентные экрану настроек проверки связности и возможностей для конфигурации.
+4) После изменения конфигураций:
+- Если конфигурация используется функциями, соответствующие службы функций обновляются; обновление привязок также обновляет службу целевой функции.
+5) Когда пользователь жалуется на обрезанный вывод:
+- Используйте `get_function_model_config`, чтобы посмотреть `max_tokens` в конфигурации, привязанной к этой функции.
+- Для DeepSeek обычное значение по умолчанию — 4096; включите `max_tokens_enabled` и попробуйте задать `max_tokens` 8192.
+- Для других моделей перед изменением значений проверьте в интернете поддерживаемый предел выходных токенов.
+
+[Модуль сводки контекста]
+1) Назначение:
+- Управляет поведением окна контекста и условиями срабатывания сводки, чтобы уменьшить раздувание контекста, его уход в сторону и нестабильные ответы в долгом чате.
+- В реальном диалоге действуют только настройки сводки контекста в конфигурации, привязанной сейчас к CHAT.
+2) Основной механизм:
+- В приложении есть переключатель максимума: `enable_max_context_mode`.
+- При включении используется `max_context_length`; при выключении используется `context_length`, поэтому длину контекста можно выбирать динамически ради экономии токенов.
+- `enable_summary` управляет автоматическим суммированием. Когда контекст превышает `summary_token_threshold * текущая доступная длина контекста`, запускается суммирование.
+3) Рекомендуемый порядок поиска неисправностей:
+- Используйте `get_context_summary_config`, чтобы посмотреть текущие поля сводки контекста для функции.
+- Используйте `set_context_summary_config`, чтобы задать поля сводки контекста (значения по умолчанию можно переопределить через параметры).
+- Если проблемы остаются, тонко настройте по реальным возможностям модели и нагрузке.
+
+[TTS/STT: конфигурация голосовых служб]
+1) Где настраивать:
+- Настраивается на странице Speech Services в настройках приложения.
+- Страница сохраняет изменения автоматически; после изменений экземпляры голосовых служб пересоздаются автоматически.
+2) Движки TTS (синтез речи):
+- `SIMPLE_TTS`: системный TTS, обычно сетевые поля не нужны.
+- `HTTP_TTS`: в основном заполните `url_template`, `headers`, `http_method`, `content_type`, `request_body`; если служба сначала возвращает JSON, поля или ссылку на скачивание, дополнительно заполните `response_pipeline`.
+- `OPENAI_WS_TTS`: заполните `url_template`, `api_key`, `model_name`, `voice_id`. `url_template` должен быть эндпоинтом Realtime WebSocket, например `wss://api.openai.com/v1/realtime`.
+- `SILICONFLOW_TTS`: заполните `api_key`, `model_name`, `voice_id`.
+- `MINIMAX_TTS`: заполните `api_key`; при необходимости задайте `url_template`, `model_name` и `voice_id`. Эндпоинт по умолчанию — `https://api.minimaxi.com/v1/t2a_v2`, звук автоматически берётся из `data.audio`.
+- `MIMO_TTS`: заполните `api_key`; при необходимости задайте `url_template`, `model_name` и `voice_id`. Для готовых голосов используйте `mimo-v2.5-tts` с коротким `voice_id`. Для клонирования голоса используйте `mimo-v2.5-tts-voiceclone` с полным аудиообразцом `data:audio/...;base64,...` в `voice_id`. Эндпоинт по умолчанию — `https://api.xiaomimimo.com/v1/chat/completions`, звук берётся из `choices[0].message.audio.data` с декодированием Base64.
+- `DOUBAO_TTS`: Doubao TTS. Заполните `url_template`, `api_key` (token), `model_name` (App ID) и `voice_id` (voice_type). Эндпоинт по умолчанию — `https://openspeech.bytedance.com/api/v1/tts`; он наследует очередь и конвейер ответа HTTP TTS и берёт звук из `data` с декодированием Base64.
+- `OPENAI_TTS`: заполните `url_template`, `api_key`, `model_name`, `voice_id`.
+- `VITS_TTS`: локальный TTS VITS/Piper. Задайте `tts_vits_package_path` — локальный пакет модели `.zip` или распакованный каталог пакета, при необходимости `tts_vits_speaker_id` — числовой id говорящего, а `tts_vits_options` — локальные параметры вроде `sample_rate`, `threads`, `noise_scale`, `length_scale`, `noise_w`, `frontend`, `text_mode`, `speaker_count`, имён входов и настроек токенов blank/bos/eos.
+3) Движки STT (распознавание речи):
+- `SHERPA_NCNN`: локальное распознавание, обычно ключ API не нужен.
+- `OPENAI_STT`: заполните `endpoint_url`, `api_key`, `model_name`.
+- `DEEPGRAM_STT`: заполните `endpoint_url`, `api_key`, `model_name`.
+4) Самые частые ошибки (проверяйте в первую очередь):
+- `headers` в `HTTP_TTS` — не корректный JSON (должен быть объектом).
+- В шаблоне HTTP TTS нет заполнителя `{text}` (обычно в URL для GET, в теле для POST).
+- `response_pipeline` в `HTTP_TTS` — не корректный массив JSON, либо неверны имя шага или `path`.
+- `OPENAI_WS_TTS` настроен с URL HTTP вместо URL WebSocket или наоборот.
+- `tts_vits_package_path` в `VITS_TTS` — не локальный пакет модели `.zip` и не распакованный каталог пакета, либо такого пути нет.
+- В пакете `VITS_TTS` нет распознаваемых `.onnx`, config JSON или лексикона, либо в конфигурации отсутствуют `sample_rate` или отображения токенов.
+- `tts_vits_options` в `VITS_TTS` — не корректный JSON, либо имена локальных параметров или числовые значения неверны.
+- Неверный путь эндпоинта TTS/STT (например, используется chat/completions вместо аудиоэндпоинтов).
+- `model_name` не существует или не соответствует API.
+- После сохранения конфигурации не проведена реальная повторная проверка.
+5) Правила заполнителей HTTP_TTS (по реализации):
+- Обязательный заполнитель: `{text}`.
+  - При `http_method=GET` заполнитель `{text}` должен присутствовать в `url_template`.
+  - При `http_method=POST` заполнитель `{text}` должен присутствовать в `request_body`.
+- Необязательные заполнители: `{rate}`, `{pitch}`, `{voice}`.
+- Стабильные заполнители для внешней конфигурации: `{text}`, `{rate}`, `{pitch}`, `{voice}`, `{apiKey}`, `{model}`, `{locale}`, `{uuid}`.
+6) Примечания по обработке ответа HTTP_TTS (совместимо с выпущенными конфигурациями):
+- Оставьте `response_pipeline` пустым или используйте `[]`, чтобы сохранить прежнее поведение: первое тело ответа сразу считается звуком.
+- Заполняйте `response_pipeline` только когда служба возвращает JSON, вложенные поля или ссылку на скачивание до появления звука.
+- Сейчас поддерживаются шаги: `parse_json`, `pick`, `parse_json_string`, `http_get`, `http_request_from_object`, `base64_decode`.
+- Частый случай со ссылкой на скачивание в JSON:
+  - `response_pipeline`: `[{"type":"parse_json"},{"type":"pick","path":"audio_uri"},{"type":"http_get"}]`
+- Если выбранное поле само является строкой JSON:
+  - `response_pipeline`: `[{"type":"parse_json"},{"type":"pick","path":"data.payload"},{"type":"parse_json_string"},{"type":"pick","path":"audio.url"},{"type":"http_get"}]`
+7) Минимальные шаблоны для копирования:
+- HTTP TTS (GET):
+  - `url_template`: `https://example.com/tts?text={text}`
+  - `headers`: `{}`
+  - `http_method`: `GET`
+  - `content_type`: `application/json`
+- HTTP TTS (POST):
+  - `url_template`: `https://example.com/tts`
+  - `headers`: `{"Authorization":"Bearer <API_KEY>"}`
+  - `http_method`: `POST`
+  - `content_type`: `application/json`
+  - `request_body`: `{"text":"{text}"}`
+- OpenAI STT (частый вариант по умолчанию):
+  - `endpoint_url`: `https://api.openai.com/v1/audio/transcriptions`
+  - `model_name`: `whisper-1`
+8) Рекомендуемый порядок поиска неисправностей:
+- Сначала подтвердите выбранный тип движка (TTS и STT отдельно).
+- Проверьте эндпоинт, ключ и модель в связке.
+- Затем проверьте поля шаблона HTTP (headers JSON, method, body, заполнитель, response_pipeline).
+- Выполните хотя бы одну реальную проверку воспроизведения TTS; если нужно искать неисправности и в STT, проверьте распознавание отдельным голосовым потоком.
+9) Связанные инструменты:
+- `get_speech_services_config`: получить текущий снимок конфигурации TTS/STT (типы движков и ключевые поля).
+- `set_speech_services_config`: обновить поля конфигурации TTS/STT (поддерживается частичное обновление).
+- `test_tts_playback`: воспроизвести одну тестовую фразу с текущей конфигурацией TTS (поддерживает временное переопределение скорости и высоты тона).
+
+[Правила мультимодального ввода]
+1) Смысл переключателей возможностей:
+- Переключатели Tool Call, изображения, аудио и видео в конфигурации модели — это маркеры возможностей на стороне программы, а не доказательство реальных возможностей модели.
+- Настраивайте эти переключатели по фактической поддержке модели; не включайте их вслепую.
+2) Основной путь понимания изображений в приложении:
+- Если конфигурация модели функции чата включает понимание изображений и модель действительно это поддерживает, приложенные изображения отправляются прямо этой модели чата.
+- Если модель чата не поддерживает понимание изображений, приложение попробует OCR или использует отдельную функциональную модель распознавания изображений как посредника.
+3) Условия, при которых пользователю доступно понимание изображений:
+- Условие A: модель чата поддерживает понимание изображений.
+- Условие B: модель чата не поддерживает понимание изображений, но функциональная модель распознавания изображений поддерживает.
+- Если модель распознавания изображений тоже не поддерживает, в итоге используется OCR.
+
+[Примечание о выводе рисунков]
+- Рисование реализовано через инструменты пакетов.
+- В приложении есть несколько встроенных пакетов рисования; посмотрите их через list_sandbox_packages.
+- Обычно достаточно включить один доступный пакет рисования; включать все не нужно.
+
+[Принципы выполнения]
+- Строго следуйте явным указаниям пользователя; не определяйте собственную «проблему» и не добавляйте не запрошенные цели.
+- Любое действие, меняющее конфигурацию (переключатель, импорт, удаление, запись переменной среды, CRUD конфигурации модели, перезапуск), требует предварительного явного подтверждения пользователя.
+- Если пользователь явно не просил выполнить конкретный инструмент, не запускайте инициативно инструменты записи.
+- Отвечайте конкретными путями и правилами из этого руководства, избегая общих предположений.'''
       }
       parameters: []
       advice: true
@@ -535,6 +785,7 @@
       description: {
         zh: '''返回如何制作 skill 的双语说明。'''
         en: '''Return a bilingual guide for creating a skill.'''
+        ru: '''Возвращает двуязычное руководство по созданию skill.'''
       }
       parameters: []
     },
@@ -543,6 +794,7 @@
       description: {
         zh: '''获取沙盒包列表（内置+外部）及当前启用状态、管理路径。'''
         en: '''Get sandbox package list (built-in + external), current enabled states, and management paths.'''
+        ru: '''Возвращает список пакетов песочницы (встроенных и внешних), текущие состояния включения и пути управления.'''
       }
       parameters: []
     },
@@ -551,6 +803,7 @@
       description: {
         zh: '''设置沙盒包开关状态。'''
         en: '''Set sandbox package enabled state.'''
+        ru: '''Задаёт состояние включения пакета песочницы.'''
       }
       parameters: [
         {
@@ -558,6 +811,7 @@
           description: {
             zh: "沙盒包名称"
             en: "Sandbox package name"
+            ru: "Имя пакета песочницы"
           }
           type: string
           required: true
@@ -567,6 +821,7 @@
           description: {
             zh: "是否启用（true/false）"
             en: "Enable state (true/false)"
+            ru: "Состояние включения (true/false)"
           }
           type: boolean
           required: true
@@ -578,6 +833,7 @@
       description: {
         zh: '''将 Android 侧的普通 `.js` 沙盒包直接烧录到外部 packages 目录，并刷新、启用、重新加载，便于在软件内调试。'''
         en: '''Install an Android-side plain `.js` sandbox package into the external packages directory, refresh it, enable it, and reload it for in-app debugging.'''
+        ru: '''Устанавливает обычный `.js` пакет песочницы со стороны Android во внешний каталог packages, обновляет его, включает и перезагружает для отладки внутри приложения.'''
       }
       parameters: [
         {
@@ -585,6 +841,7 @@
           description: {
             zh: "Android 侧 `.js` 源文件路径"
             en: "Android-side `.js` source file path"
+            ru: "Путь к исходному файлу `.js` на стороне Android"
           }
           type: string
           required: true
@@ -594,6 +851,7 @@
           description: {
             zh: "安装后是否自动启用，默认 true"
             en: "Whether to enable it automatically after install, default true"
+            ru: "Включать ли автоматически после установки, по умолчанию true"
           }
           type: boolean
           required: false
@@ -603,6 +861,7 @@
           description: {
             zh: "安装后是否自动 use_package 重新加载，默认 true"
             en: "Whether to automatically call use_package after install, default true"
+            ru: "Вызывать ли автоматически use_package после установки, по умолчанию true"
           }
           type: boolean
           required: false
@@ -614,6 +873,7 @@
       description: {
         zh: '''根据 Android 侧的 ToolPkg 目录、manifest 或现成 `.toolpkg`，直接打包/烧录到外部 packages 目录，并触发 ToolPkg 安装与刷新链路。'''
         en: '''Package or install an Android-side ToolPkg folder, manifest, or existing `.toolpkg` into the external packages directory and trigger the ToolPkg install/refresh flow.'''
+        ru: '''Упаковывает или устанавливает папку ToolPkg, manifest или готовый `.toolpkg` со стороны Android во внешний каталог packages и запускает поток установки и обновления ToolPkg.'''
       }
       parameters: [
         {
@@ -621,6 +881,7 @@
           description: {
             zh: "Android 侧 ToolPkg 目录、manifest.json/manifest.hjson 或 `.toolpkg` 路径"
             en: "Android-side ToolPkg folder, manifest.json/manifest.hjson, or `.toolpkg` path"
+            ru: "Путь к папке ToolPkg, manifest.json/manifest.hjson или `.toolpkg` на стороне Android"
           }
           type: string
           required: true
@@ -630,6 +891,7 @@
           description: {
             zh: "是否按 manifest 默认值重置子包启用状态，默认 true"
             en: "Whether to reset subpackage enable states from manifest defaults, default true"
+            ru: "Сбрасывать ли состояния включения подпакетов по значениям по умолчанию из manifest, по умолчанию true"
           }
           type: boolean
           required: false
@@ -639,6 +901,7 @@
           description: {
             zh: "可选，逗号或换行分隔的子包 ID；安装后会自动启用并 use_package"
             en: "Optional comma/newline separated subpackage IDs; they will be enabled and activated after install"
+            ru: "Необязательно: ID подпакетов через запятую или перевод строки; после установки они будут включены и активированы"
           }
           type: string
           required: false
@@ -648,6 +911,7 @@
           description: {
             zh: "安装广播后等待并轮询刷新的毫秒数，默认 1500"
             en: "Milliseconds to wait and poll for refresh after sending the install broadcast, default 1500"
+            ru: "Сколько миллисекунд ждать и опрашивать обновление после отправки широковещательного сообщения об установке, по умолчанию 1500"
           }
           type: integer
           required: false
@@ -659,6 +923,7 @@
       description: {
         zh: '''直接运行一段 sandbox script。可传 Android 侧 `source_path`，也可直接传 `source_code` 内联代码；会返回结构化执行结果与日志事件。'''
         en: '''Run a sandbox script directly. Accepts either an Android-side `source_path` or inline `source_code`, and returns structured execution results with log events.'''
+        ru: '''Запускает скрипт песочницы напрямую. Принимает либо `source_path` на стороне Android, либо встроенный `source_code` и возвращает структурированные результаты выполнения с событиями журнала.'''
       }
       parameters: [
         {
@@ -666,6 +931,7 @@
           description: {
             zh: "Android 侧脚本文件路径；与 source_code 二选一"
             en: "Android-side script file path; use either this or source_code"
+            ru: "Путь к файлу скрипта на стороне Android; используйте либо его, либо source_code"
           }
           type: string
           required: false
@@ -675,6 +941,7 @@
           description: {
             zh: "直接执行的内联 JavaScript 代码；与 source_path 二选一"
             en: "Inline JavaScript code to execute directly; use either this or source_path"
+            ru: "Встроенный код JavaScript для непосредственного выполнения; используйте либо его, либо source_path"
           }
           type: string
           required: false
@@ -684,6 +951,7 @@
           description: {
             zh: "传给脚本运行时的 JSON 参数字符串，默认 {}"
             en: "JSON parameter string passed to the script runtime, default {}"
+            ru: "Строка параметров JSON, передаваемая среде выполнения скрипта, по умолчанию {}"
           }
           type: string
           required: false
@@ -693,6 +961,7 @@
           description: {
             zh: "可选，Android 侧 env 文件路径"
             en: "Optional Android-side env file path"
+            ru: "Необязательный путь к файлу env на стороне Android"
           }
           type: string
           required: false
@@ -702,6 +971,7 @@
           description: {
             zh: "可选，仅用于内联代码模式下生成结果文件名和显示标识"
             en: "Optional label used only for inline-code mode to name the result file and display path"
+            ru: "Необязательная метка, используемая только в режиме встроенного кода для имени файла результата и отображаемого пути"
           }
           type: string
           required: false
@@ -711,6 +981,7 @@
           description: {
             zh: "等待结构化结果文件的毫秒数，默认 15000"
             en: "Milliseconds to wait for the structured result file, default 15000"
+            ru: "Сколько миллисекунд ждать файл структурированного результата, по умолчанию 15000"
           }
           type: integer
           required: false
@@ -722,6 +993,7 @@
       description: {
         zh: '''读取指定环境变量当前值（仅用于沙盒包脚本环境变量排查，不用于 MCP 配置）。'''
         en: '''Read current value of a specified environment variable (sandbox-package script env troubleshooting only, not MCP config env).'''
+        ru: '''Читает текущее значение указанной переменной среды (только для поиска неисправностей переменных среды скриптов пакетов песочницы, не для env конфигурации MCP).'''
       }
       parameters: [
         {
@@ -729,6 +1001,7 @@
           description: {
             zh: "环境变量名"
             en: "Environment variable key"
+            ru: "Имя переменной среды"
           }
           type: string
           required: true
@@ -740,6 +1013,7 @@
       description: {
         zh: '''写入指定环境变量；value 为空时会清除该变量（仅用于沙盒包脚本环境变量，不用于 MCP 配置 env）。'''
         en: '''Write a specified environment variable; empty value clears it (sandbox-package script env only, not MCP config env).'''
+        ru: '''Записывает указанную переменную среды; пустое значение очищает её (только для env скриптов пакетов песочницы, не для env конфигурации MCP).'''
       }
       parameters: [
         {
@@ -747,6 +1021,7 @@
           description: {
             zh: "环境变量名"
             en: "Environment variable key"
+            ru: "Имя переменной среды"
           }
           type: string
           required: true
@@ -756,6 +1031,7 @@
           description: {
             zh: "变量值；为空时清除该变量"
             en: "Variable value; empty clears the variable"
+            ru: "Значение переменной; пустое значение очищает переменную"
           }
           type: string
           required: false
@@ -767,6 +1043,7 @@
       description: {
         zh: '''触发一次 MCP 重启流程，返回每个插件的启动日志与状态摘要。'''
         en: '''Trigger one MCP restart flow and return per-plugin startup logs with status summary.'''
+        ru: '''Запускает один поток перезапуска MCP и возвращает журналы запуска по каждому плагину со сводкой состояния.'''
       }
       parameters: [
         {
@@ -774,6 +1051,7 @@
           description: {
             zh: "可选，最大等待时长（毫秒）"
             en: "Optional max wait time in milliseconds"
+            ru: "Необязательное максимальное время ожидания в миллисекундах"
           }
           type: integer
           required: false
@@ -785,6 +1063,7 @@
       description: {
         zh: '''获取当前 TTS/STT 语音服务配置快照。'''
         en: '''Get current TTS/STT speech services config snapshot.'''
+        ru: '''Возвращает текущий снимок конфигурации голосовых служб TTS/STT.'''
       }
       parameters: []
     },
@@ -793,6 +1072,7 @@
       description: {
         zh: '''按字段更新 TTS/STT 语音服务配置（支持部分字段更新）。'''
         en: '''Update TTS/STT speech services config by fields (partial update supported).'''
+        ru: '''Обновляет конфигурацию голосовых служб TTS/STT по полям (поддерживается частичное обновление).'''
       }
       parameters: [
         {
@@ -800,6 +1080,7 @@
           description: {
             zh: "可选，SIMPLE_TTS/HTTP_TTS/OPENAI_WS_TTS/SILICONFLOW_TTS/MINIMAX_TTS/MIMO_TTS/DOUBAO_TTS/OPENAI_TTS/VITS_TTS"
             en: "Optional, SIMPLE_TTS/HTTP_TTS/OPENAI_WS_TTS/SILICONFLOW_TTS/MINIMAX_TTS/MIMO_TTS/DOUBAO_TTS/OPENAI_TTS/VITS_TTS"
+            ru: "Необязательно, SIMPLE_TTS/HTTP_TTS/OPENAI_WS_TTS/SILICONFLOW_TTS/MINIMAX_TTS/MIMO_TTS/DOUBAO_TTS/OPENAI_TTS/VITS_TTS"
           }
           type: string
           required: false
@@ -809,6 +1090,7 @@
           description: {
             zh: "可选，HTTP 类 TTS 的 URL 模板。HTTP 系列仅支持 `{text}`、`{rate}`、`{pitch}`、`{voice}`"
             en: "Optional URL template for HTTP-style TTS providers. HTTP-style providers support only `{text}`, `{rate}`, `{pitch}`, `{voice}`"
+            ru: "Необязательный шаблон URL для TTS-провайдеров HTTP-типа. Провайдеры HTTP-типа поддерживают только `{text}`, `{rate}`, `{pitch}`, `{voice}`"
           }
           type: string
           required: false
@@ -818,6 +1100,7 @@
           description: {
             zh: "可选，TTS API Key"
             en: "Optional TTS API key"
+            ru: "Необязательный ключ API TTS"
           }
           type: string
           required: false
@@ -827,6 +1110,7 @@
           description: {
             zh: "可选，HTTP 类 TTS headers 的 JSON 对象字符串"
             en: "Optional JSON object string for HTTP-style TTS headers"
+            ru: "Необязательная строка объекта JSON для заголовков TTS HTTP-типа"
           }
           type: string
           required: false
@@ -836,6 +1120,7 @@
           description: {
             zh: "可选，GET/POST"
             en: "Optional, GET/POST"
+            ru: "Необязательно, GET/POST"
           }
           type: string
           required: false
@@ -845,6 +1130,7 @@
           description: {
             zh: "可选，HTTP 类 TTS 的 POST body 模板。仅支持 `{text}`、`{rate}`、`{pitch}`、`{voice}`"
             en: "Optional POST body template for HTTP-style TTS providers. Supports only `{text}`, `{rate}`, `{pitch}`, `{voice}`"
+            ru: "Необязательный шаблон тела POST для TTS-провайдеров HTTP-типа. Поддерживаются только `{text}`, `{rate}`, `{pitch}`, `{voice}`"
           }
           type: string
           required: false
@@ -854,6 +1140,7 @@
           description: {
             zh: "可选，TTS Content-Type"
             en: "Optional TTS content type"
+            ru: "Необязательный тип содержимого TTS"
           }
           type: string
           required: false
@@ -863,6 +1150,7 @@
           description: {
             zh: "可选，TTS 语言标签，例如 zh-CN 或 en-US"
             en: "Optional TTS locale tag, for example zh-CN or en-US"
+            ru: "Необязательный тег локали TTS, например zh-CN или en-US"
           }
           type: string
           required: false
@@ -872,6 +1160,7 @@
           description: {
             zh: "可选，TTS 音色 ID。MIMO voiceclone 可填写完整 data:audio/...;base64,... 音频样本"
             en: "Optional TTS voice id. For MIMO voiceclone, this may be the full data:audio/...;base64,... audio sample"
+            ru: "Необязательный ID голоса TTS. Для клонирования голоса MIMO здесь может быть полный аудиообразец data:audio/...;base64,..."
           }
           type: string
           required: false
@@ -881,6 +1170,7 @@
           description: {
             zh: "可选，TTS 模型名"
             en: "Optional TTS model name"
+            ru: "Необязательное имя модели TTS"
           }
           type: string
           required: false
@@ -890,6 +1180,7 @@
           description: {
             zh: "可选，本地 VITS/Piper TTS 模型包路径，支持 .zip 文件或已解压目录"
             en: "Optional local VITS/Piper TTS package path, supporting a .zip file or extracted package directory"
+            ru: "Необязательный путь к локальному пакету TTS VITS/Piper: файл .zip или распакованный каталог пакета"
           }
           type: string
           required: false
@@ -899,6 +1190,7 @@
           description: {
             zh: "可选，VITS/Piper TTS 模型包需要的数字 speaker id"
             en: "Optional numeric speaker id required by the VITS/Piper TTS package"
+            ru: "Необязательный числовой id говорящего, требуемый пакетом TTS VITS/Piper"
           }
           type: string
           required: false
@@ -908,6 +1200,7 @@
           description: {
             zh: "可选，VITS/Piper TTS 模型包参数 JSON 对象字符串"
             en: "Optional JSON object string for VITS/Piper TTS package options"
+            ru: "Необязательная строка объекта JSON для параметров пакета TTS VITS/Piper"
           }
           type: string
           required: false
@@ -917,6 +1210,7 @@
           description: {
             zh: "可选，HTTP TTS 响应处理管线 JSON 数组字符串。留空或 `[]` 时保持旧行为，直接把响应体当音频"
             en: "Optional HTTP TTS response pipeline JSON array string. Leave empty or use `[]` to keep the old direct-audio behavior"
+            ru: "Необязательная строка массива JSON конвейера обработки ответа HTTP TTS. Оставьте пустой или укажите `[]`, чтобы сохранить прежнее поведение с прямым аудио"
           }
           type: string
           required: false
@@ -926,6 +1220,7 @@
           description: {
             zh: "可选，TTS 清理正则列表 JSON 数组字符串"
             en: "Optional JSON array string for TTS cleaner regex list"
+            ru: "Необязательная строка массива JSON со списком regex для очистки TTS"
           }
           type: string
           required: false
@@ -935,6 +1230,7 @@
           description: {
             zh: "可选，TTS 语速"
             en: "Optional TTS speech rate"
+            ru: "Необязательная скорость речи TTS"
           }
           type: number
           required: false
@@ -944,6 +1240,7 @@
           description: {
             zh: "可选，TTS 音调"
             en: "Optional TTS pitch"
+            ru: "Необязательная высота тона TTS"
           }
           type: number
           required: false
@@ -953,6 +1250,7 @@
           description: {
             zh: "可选，SHERPA_NCNN/OPENAI_STT/DEEPGRAM_STT"
             en: "Optional, SHERPA_NCNN/OPENAI_STT/DEEPGRAM_STT"
+            ru: "Необязательно, SHERPA_NCNN/OPENAI_STT/DEEPGRAM_STT"
           }
           type: string
           required: false
@@ -962,6 +1260,7 @@
           description: {
             zh: "可选，STT endpoint URL"
             en: "Optional STT endpoint URL"
+            ru: "Необязательный URL эндпоинта STT"
           }
           type: string
           required: false
@@ -971,6 +1270,7 @@
           description: {
             zh: "可选，STT API Key"
             en: "Optional STT API key"
+            ru: "Необязательный ключ API STT"
           }
           type: string
           required: false
@@ -980,6 +1280,7 @@
           description: {
             zh: "可选，STT 模型名"
             en: "Optional STT model name"
+            ru: "Необязательное имя модели STT"
           }
           type: string
           required: false
@@ -991,6 +1292,7 @@
       description: {
         zh: '''按当前 TTS 配置播放一次测试文本。'''
         en: '''Play one TTS test utterance with the current configuration.'''
+        ru: '''Воспроизводит одну тестовую фразу TTS с текущей конфигурацией.'''
       }
       parameters: [
         {
@@ -998,6 +1300,7 @@
           description: {
             zh: "必填，要播放的测试文本"
             en: "Required test text to play"
+            ru: "Обязательный тестовый текст для воспроизведения"
           }
           type: string
           required: true
@@ -1007,6 +1310,7 @@
           description: {
             zh: "可选，播放前是否先中断当前播报"
             en: "Optional, interrupt current playback before this test"
+            ru: "Необязательно, прерывать ли текущее воспроизведение перед этой проверкой"
           }
           type: boolean
           required: false
@@ -1016,6 +1320,7 @@
           description: {
             zh: "可选，仅本次测试生效的语速覆盖值"
             en: "Optional speech-rate override for this test only"
+            ru: "Необязательное переопределение скорости речи только для этой проверки"
           }
           type: number
           required: false
@@ -1025,6 +1330,7 @@
           description: {
             zh: "可选，仅本次测试生效的音调覆盖值"
             en: "Optional pitch override for this test only"
+            ru: "Необязательное переопределение высоты тона только для этой проверки"
           }
           type: number
           required: false
@@ -1036,6 +1342,7 @@
       description: {
         zh: '''列出全部模型配置及功能模型绑定关系。'''
         en: '''List all model configs and function-model bindings.'''
+        ru: '''Выводит все конфигурации моделей и привязки функциональных моделей.'''
       }
       parameters: []
     },
@@ -1044,6 +1351,7 @@
       description: {
         zh: '''新增模型配置（可带初始化字段）。'''
         en: '''Create a model config (optional initialization fields).'''
+        ru: '''Создаёт конфигурацию модели (необязательные поля инициализации).'''
       }
       parameters: [
         {
@@ -1051,6 +1359,7 @@
           description: {
             zh: "可选，配置名称"
             en: "Optional config name"
+            ru: "Необязательное имя конфигурации"
           }
           type: string
           required: false
@@ -1060,6 +1369,7 @@
           description: {
             zh: "可选，提供商枚举名（如 OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP；其中 LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP 为本地模型链路）"
             en: "Optional provider enum name (e.g. OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP; LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP are local-model providers)"
+            ru: "Необязательное имя перечисления провайдера (например, OPENAI_GENERIC/OPENAI_LOCAL/OPENAI_RESPONSES_GENERIC/DEEPSEEK/GEMINI_GENERIC/LMSTUDIO/OLLAMA/MNN/LLAMA_CPP; LMSTUDIO/OLLAMA/OPENAI_LOCAL/MNN/LLAMA_CPP — провайдеры локальных моделей)"
           }
           type: string
           required: false
@@ -1069,6 +1379,7 @@
           description: {
             zh: "可选，API端点"
             en: "Optional API endpoint"
+            ru: "Необязательный эндпоинт API"
           }
           type: string
           required: false
@@ -1078,6 +1389,7 @@
           description: {
             zh: "可选，API Key"
             en: "Optional API key"
+            ru: "Необязательный ключ API"
           }
           type: string
           required: false
@@ -1087,6 +1399,7 @@
           description: {
             zh: "可选，模型名（多个可逗号分隔）"
             en: "Optional model name (comma-separated for multiple models)"
+            ru: "Необязательное имя модели (несколько моделей — через запятую)"
           }
           type: string
           required: false
@@ -1096,6 +1409,7 @@
           description: {
             zh: "可选，是否启用 max_tokens 参数"
             en: "Optional switch for max_tokens"
+            ru: "Необязательный переключатель max_tokens"
           }
           type: boolean
           required: false
@@ -1105,6 +1419,7 @@
           description: {
             zh: "可选，max_tokens 数值"
             en: "Optional max_tokens value"
+            ru: "Необязательное значение max_tokens"
           }
           type: integer
           required: false
@@ -1114,6 +1429,7 @@
           description: {
             zh: "可选，是否启用 temperature 参数"
             en: "Optional switch for temperature"
+            ru: "Необязательный переключатель temperature"
           }
           type: boolean
           required: false
@@ -1123,6 +1439,7 @@
           description: {
             zh: "可选，temperature 数值"
             en: "Optional temperature value"
+            ru: "Необязательное значение temperature"
           }
           type: number
           required: false
@@ -1132,6 +1449,7 @@
           description: {
             zh: "可选，是否启用 top_p 参数"
             en: "Optional switch for top_p"
+            ru: "Необязательный переключатель top_p"
           }
           type: boolean
           required: false
@@ -1141,6 +1459,7 @@
           description: {
             zh: "可选，top_p 数值"
             en: "Optional top_p value"
+            ru: "Необязательное значение top_p"
           }
           type: number
           required: false
@@ -1150,6 +1469,7 @@
           description: {
             zh: "可选，是否启用 top_k 参数"
             en: "Optional switch for top_k"
+            ru: "Необязательный переключатель top_k"
           }
           type: boolean
           required: false
@@ -1159,6 +1479,7 @@
           description: {
             zh: "可选，top_k 数值"
             en: "Optional top_k value"
+            ru: "Необязательное значение top_k"
           }
           type: integer
           required: false
@@ -1168,6 +1489,7 @@
           description: {
             zh: "可选，是否启用 presence_penalty 参数"
             en: "Optional switch for presence_penalty"
+            ru: "Необязательный переключатель presence_penalty"
           }
           type: boolean
           required: false
@@ -1177,6 +1499,7 @@
           description: {
             zh: "可选，presence_penalty 数值"
             en: "Optional presence_penalty value"
+            ru: "Необязательное значение presence_penalty"
           }
           type: number
           required: false
@@ -1186,6 +1509,7 @@
           description: {
             zh: "可选，是否启用 frequency_penalty 参数"
             en: "Optional switch for frequency_penalty"
+            ru: "Необязательный переключатель frequency_penalty"
           }
           type: boolean
           required: false
@@ -1195,6 +1519,7 @@
           description: {
             zh: "可选，frequency_penalty 数值"
             en: "Optional frequency_penalty value"
+            ru: "Необязательное значение frequency_penalty"
           }
           type: number
           required: false
@@ -1204,6 +1529,7 @@
           description: {
             zh: "可选，是否启用 repetition_penalty 参数"
             en: "Optional switch for repetition_penalty"
+            ru: "Необязательный переключатель repetition_penalty"
           }
           type: boolean
           required: false
@@ -1213,6 +1539,7 @@
           description: {
             zh: "可选，repetition_penalty 数值"
             en: "Optional repetition_penalty value"
+            ru: "Необязательное значение repetition_penalty"
           }
           type: number
           required: false
@@ -1222,6 +1549,7 @@
           description: {
             zh: "可选，自定义参数 JSON 字符串"
             en: "Optional custom parameters JSON string"
+            ru: "Необязательная строка JSON пользовательских параметров"
           }
           type: string
           required: false
@@ -1231,6 +1559,7 @@
           description: {
             zh: "可选，自定义请求头 JSON 对象字符串"
             en: "Optional custom request headers JSON object string"
+            ru: "Необязательная строка объекта JSON пользовательских заголовков запроса"
           }
           type: string
           required: false
@@ -1240,6 +1569,7 @@
           description: {
             zh: "可选，上下文长度倍率"
             en: "Optional context length multiplier"
+            ru: "Необязательный множитель длины контекста"
           }
           type: number
           required: false
@@ -1249,6 +1579,7 @@
           description: {
             zh: "可选，最大上下文长度倍率"
             en: "Optional max context length multiplier"
+            ru: "Необязательный множитель максимальной длины контекста"
           }
           type: number
           required: false
@@ -1258,6 +1589,7 @@
           description: {
             zh: "可选，是否启用最大上下文模式"
             en: "Optional max-context mode switch"
+            ru: "Необязательный переключатель режима максимального контекста"
           }
           type: boolean
           required: false
@@ -1267,6 +1599,7 @@
           description: {
             zh: "可选，总结触发阈值"
             en: "Optional summary trigger threshold"
+            ru: "Необязательный порог срабатывания сводки"
           }
           type: number
           required: false
@@ -1276,6 +1609,7 @@
           description: {
             zh: "可选，是否启用总结"
             en: "Optional summary switch"
+            ru: "Необязательный переключатель сводки"
           }
           type: boolean
           required: false
@@ -1285,6 +1619,7 @@
           description: {
             zh: "可选，是否按消息数触发总结"
             en: "Optional summary-by-message-count switch"
+            ru: "Необязательный переключатель сводки по количеству сообщений"
           }
           type: boolean
           required: false
@@ -1294,6 +1629,7 @@
           description: {
             zh: "可选，按消息数总结的阈值"
             en: "Optional message-count threshold for summary"
+            ru: "Необязательный порог количества сообщений для сводки"
           }
           type: integer
           required: false
@@ -1303,6 +1639,7 @@
           description: {
             zh: "可选，是否启用直接图片处理"
             en: "Optional direct image processing switch"
+            ru: "Необязательный переключатель прямой обработки изображений"
           }
           type: boolean
           required: false
@@ -1312,6 +1649,7 @@
           description: {
             zh: "可选，是否启用直接音频处理"
             en: "Optional direct audio processing switch"
+            ru: "Необязательный переключатель прямой обработки аудио"
           }
           type: boolean
           required: false
@@ -1321,6 +1659,7 @@
           description: {
             zh: "可选，是否启用直接视频处理"
             en: "Optional direct video processing switch"
+            ru: "Необязательный переключатель прямой обработки видео"
           }
           type: boolean
           required: false
@@ -1330,6 +1669,7 @@
           description: {
             zh: "可选，是否启用 Google Search"
             en: "Optional Google Search switch"
+            ru: "Необязательный переключатель Google Search"
           }
           type: boolean
           required: false
@@ -1339,6 +1679,7 @@
           description: {
             zh: "可选，是否启用 Claude 1h Prompt Cache"
             en: "Optional Claude 1h prompt cache switch"
+            ru: "Необязательный переключатель кэша промптов Claude на 1 ч"
           }
           type: boolean
           required: false
@@ -1348,6 +1689,7 @@
           description: {
             zh: "可选，是否开启Tool Call"
             en: "Optional tool-call switch"
+            ru: "Необязательный переключатель вызова инструментов"
           }
           type: boolean
           required: false
@@ -1357,6 +1699,7 @@
           description: {
             zh: "可选，MNN 前向类型"
             en: "Optional MNN forward type"
+            ru: "Необязательный тип прямого прохода MNN"
           }
           type: integer
           required: false
@@ -1366,6 +1709,7 @@
           description: {
             zh: "可选，MNN 线程数"
             en: "Optional MNN thread count"
+            ru: "Необязательное число потоков MNN"
           }
           type: integer
           required: false
@@ -1375,6 +1719,7 @@
           description: {
             zh: "可选，llama.cpp 线程数"
             en: "Optional llama.cpp thread count"
+            ru: "Необязательное число потоков llama.cpp"
           }
           type: integer
           required: false
@@ -1384,6 +1729,7 @@
           description: {
             zh: "可选，llama.cpp 上下文长度"
             en: "Optional llama.cpp context size"
+            ru: "Необязательный размер контекста llama.cpp"
           }
           type: integer
           required: false
@@ -1393,6 +1739,7 @@
           description: {
             zh: "可选，llama.cpp GPU 层数"
             en: "Optional llama.cpp GPU layer count"
+            ru: "Необязательное число слоёв GPU llama.cpp"
           }
           type: integer
           required: false
@@ -1402,6 +1749,7 @@
           description: {
             zh: "可选，每分钟请求限制"
             en: "Optional request-per-minute limit"
+            ru: "Необязательный лимит запросов в минуту"
           }
           type: integer
           required: false
@@ -1411,6 +1759,7 @@
           description: {
             zh: "可选，最大并发请求数"
             en: "Optional max concurrent requests"
+            ru: "Необязательное максимальное число одновременных запросов"
           }
           type: integer
           required: false
