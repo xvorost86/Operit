@@ -1865,7 +1865,7 @@
     <string name="no_page_nodes_found">Узлы страницы не найдены</string>
     <string name="type_info">Тип: %1$s</string>
     <string name="control_info">Сведения об элементе управления</string>
-    <string name="current_activity_title">Текущая активность</string>
+    <string name="current_activity_title">Текущая Activity</string>
     <string name="dimensions">Размеры: %1$d×%2$dpx</string>
     <string name="ffmpeg_command">Команда FFmpeg</string>
     <string name="common_command_templates">Типовые шаблоны команд</string>
@@ -1985,7 +1985,7 @@
     <string name="tool_user_agreement">Пользовательское соглашение</string>
     <string name="tool_user_agreement_desc">Просмотр пользовательского соглашения и политики конфиденциальности приложения</string>
     <string name="tool_default_assistant_guide">Настройка ассистента по умолчанию</string>
-    <string name="tool_default_assistant_guide_desc">Назначить плавающее окно голосового Operit системным ассистентом по умолчанию</string>
+    <string name="tool_default_assistant_guide_desc">Назначить голосовое плавающее окно Operit системным ассистентом по умолчанию</string>
     <string name="tool_terminal">Командный терминал</string>
     <string name="tool_terminal_desc">Мощный терминал командной строки для выполнения системных команд</string>
     <string name="tool_terminal_auto_config">Автоматическая настройка терминала</string>
