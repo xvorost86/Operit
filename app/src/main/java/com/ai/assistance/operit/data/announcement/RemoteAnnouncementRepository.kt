@@ -211,6 +211,7 @@ class RemoteAnnouncementRepository(
 
         return normalizedMap[fullTag]
             ?: normalizedMap[language]
+            ?: RemoteAnnouncementTranslations.find(normalizedMap[defaultKey], language)
             ?: normalizedMap[defaultKey]
             ?: content.locales.values.firstOrNull()
     }
