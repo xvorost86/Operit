@@ -26,9 +26,15 @@ internal object ReleasedProviderModelKeyDecoder {
                 require(previous == null || previous == identity)
             }
         }
+        // Only a known provider alias can identify a released provider/model key. Keys from the
+        // pre-provider/model format (for example FILE_BINDING) must stay unassigned instead of
+        // being decoded as an unknown provider.
         val known = aliases.keys.sortedByDescending(String::length)
-            .firstOrNull { encoded == it || encoded.startsWith("${it}_") }
-        val separator = known?.length ?: encoded.indexOf('_')
+            .firstOrNull { encoded.startsWith("${it}_") }
+            ?: throw IllegalArgumentException(
+                "released token key does not reference a known provider: $encoded"
+            )
+        val separator = known.length
         require(separator > 0 && separator < encoded.lastIndex) {
             "released token key does not contain a provider and model: $encoded"
         }
@@ -36,7 +42,7 @@ internal object ReleasedProviderModelKeyDecoder {
         val model = encoded.substring(separator + 1)
         return ReleasedProviderModelKey(
             storedProviderModel = "$providerAlias:$model",
-            provider = if (known == null) providerAlias else aliases.getValue(providerAlias),
+            provider = aliases.getValue(providerAlias),
             model = model,
         )
     }
