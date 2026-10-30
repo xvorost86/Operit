@@ -107,4 +107,13 @@
     <string name="l10n_chat_group_participant_user_name">User</string>
     <string name="l10n_mcp_command_required">MCP server %1$s: command cannot be empty</string>
     <string name="l10n_settings_language_auto_native">System language</string>
+    <string name="l10n_memory_toggle_folders">Toggle folders</string>
+    <string name="l10n_memory_delete_selected">Delete selected</string>
+    <string name="l10n_memory_toggle_box_selection">Toggle box selection mode</string>
+    <string name="l10n_memory_toggle_linking">Toggle linking mode</string>
+    <string name="l10n_memory_import_document">Import document</string>
+    <string name="l10n_memory_create">Create memory</string>
+    <string name="l10n_memory_search">Search</string>
+    <string name="l10n_memory_clear_search">Clear search</string>
+    <string name="l10n_memory_select_profile">Select profile</string>
 </resources>

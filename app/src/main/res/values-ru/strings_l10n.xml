@@ -107,4 +107,13 @@
     <string name="l10n_chat_group_participant_user_name">Пользователь</string>
     <string name="l10n_mcp_command_required">MCP-сервер %1$s: поле command не может быть пустым</string>
     <string name="l10n_settings_language_auto_native">Системный язык</string>
+    <string name="l10n_memory_toggle_folders">Показать или скрыть папки</string>
+    <string name="l10n_memory_delete_selected">Удалить выбранное</string>
+    <string name="l10n_memory_toggle_box_selection">Режим выделения рамкой</string>
+    <string name="l10n_memory_toggle_linking">Режим связывания</string>
+    <string name="l10n_memory_import_document">Импортировать документ</string>
+    <string name="l10n_memory_create">Создать запись</string>
+    <string name="l10n_memory_search">Поиск</string>
+    <string name="l10n_memory_clear_search">Очистить поиск</string>
+    <string name="l10n_memory_select_profile">Выбрать профиль</string>
 </resources>

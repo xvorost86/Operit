@@ -107,4 +107,13 @@
     <string name="l10n_chat_group_participant_user_name">用户</string>
     <string name="l10n_mcp_command_required">MCP服务器 %1$s 的 command 不能为空</string>
     <string name="l10n_settings_language_auto_native">跟随系统</string>
+    <string name="l10n_memory_toggle_folders">Toggle Folders</string>
+    <string name="l10n_memory_delete_selected">Delete Selected</string>
+    <string name="l10n_memory_toggle_box_selection">Toggle Box Selection Mode</string>
+    <string name="l10n_memory_toggle_linking">Toggle Linking Mode</string>
+    <string name="l10n_memory_import_document">Import Document</string>
+    <string name="l10n_memory_create">Create Memory</string>
+    <string name="l10n_memory_search">Search Icon</string>
+    <string name="l10n_memory_clear_search">Clear Search</string>
+    <string name="l10n_memory_select_profile">Select Profile</string>
 </resources>
