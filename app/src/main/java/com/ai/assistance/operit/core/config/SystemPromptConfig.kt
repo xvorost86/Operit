@@ -669,6 +669,9 @@ AVAILABLE_TOOLS_SECTION""".trimIndent()
           participantNamesText = groupParticipantNamesText
       )
     }
+    if (LocaleUtils.getCurrentLanguage(context) == LocaleUtils.LanguageCodes.RUSSIAN) {
+      composedPrompt += "\nReply in the user's language."
+    }
 
     val composeContext =
         dispatchSystemPromptComposeHooks(
