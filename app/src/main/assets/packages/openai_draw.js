@@ -73,10 +73,18 @@ const openaiDraw = (function () {
     const DRAW_ROOT_DIR = getPluginConfigDir("draw");
     const STORAGE_DIR = `${DRAW_ROOT_DIR}/openai_draw`;
     const DRAWS_DIR = `${STORAGE_DIR}/draws`;
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     function getApiKey() {
         const apiKey = getEnv("OPENAI_API_KEY");
         if (!apiKey) {
-            throw new Error("OPENAI_API_KEY 未配置，请在环境变量中设置 OpenAI 的 API Key。");
+            throw new Error(localizedText("OPENAI_API_KEY 未配置，请在环境变量中设置 OpenAI 的 API Key。", "Ключ OPENAI_API_KEY не задан; укажите API Key OpenAI в переменных окружения.", "OPENAI_API_KEY is not configured; set the OpenAI API key in the environment variables."));
         }
         return apiKey;
     }
@@ -177,18 +185,18 @@ const openaiDraw = (function () {
             .body(JSON.stringify(body), "json");
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`OpenAI 图片 API 调用失败: ${response.statusCode} - ${response.content}`);
+            throw new Error(localizedText(`OpenAI 图片 API 调用失败: ${response.statusCode} - ${response.content}`, `Не удалось вызвать API изображений OpenAI: ${response.statusCode} — ${response.content}`, `OpenAI image API call failed: ${response.statusCode} - ${response.content}`));
         }
         let parsed;
         try {
             parsed = JSON.parse(response.content);
         }
         catch (e) {
-            throw new Error(`解析 OpenAI 响应失败: ${e?.message || e}`);
+            throw new Error(localizedText(`解析 OpenAI 响应失败: ${e?.message || e}`, `Не удалось разобрать ответ OpenAI: ${e?.message || e}`, `Failed to parse the OpenAI response: ${e?.message || e}`));
         }
         const item = parsed?.data?.[0];
         if (!item) {
-            throw new Error("OpenAI 响应中未找到 data[0]，请检查接口返回格式。");
+            throw new Error(localizedText("OpenAI 响应中未找到 data[0]，请检查接口返回格式。", "В ответе OpenAI не найден data[0]; проверьте формат ответа интерфейса.", "data[0] not found in the OpenAI response; check the endpoint response format."));
         }
         if (item.b64_json && String(item.b64_json).trim().length > 0) {
             return {
@@ -203,12 +211,12 @@ const openaiDraw = (function () {
             const tmpPath = `${DRAWS_DIR}/${tmpName}.png`;
             const downloadResult = await Tools.Files.download(String(item.url), tmpPath);
             if (!downloadResult.successful) {
-                throw new Error(`下载图片失败: ${downloadResult.details}`);
+                throw new Error(localizedText(`下载图片失败: ${downloadResult.details}`, `Не удалось скачать изображение: ${downloadResult.details}`, `Failed to download the image: ${downloadResult.details}`));
             }
             const readBinary = await Tools.Files.readBinary(tmpPath);
             const contentBase64 = readBinary?.contentBase64;
             if (!contentBase64 || String(contentBase64).trim().length === 0) {
-                throw new Error("读取下载图片失败: contentBase64 为空");
+                throw new Error(localizedText("读取下载图片失败: contentBase64 为空", "Не удалось прочитать скачанное изображение: contentBase64 пуст", "Failed to read the downloaded image: contentBase64 is empty"));
             }
             try {
                 await Tools.Files.deleteFile(tmpPath);
@@ -222,11 +230,11 @@ const openaiDraw = (function () {
                 effective_model: effectiveModel
             };
         }
-        throw new Error("OpenAI 响应中未找到 b64_json 或 url，请检查模型/参数以及接口兼容性。");
+        throw new Error(localizedText("OpenAI 响应中未找到 b64_json 或 url，请检查模型/参数以及接口兼容性。", "В ответе OpenAI не найден b64_json или url; проверьте модель, параметры и совместимость интерфейса.", "Neither b64_json nor url found in the OpenAI response; check the model, the parameters and the endpoint compatibility."));
     }
     async function draw_image(params) {
         if (!params || !params.prompt || params.prompt.trim().length === 0) {
-            throw new Error("参数 prompt 不能为空。");
+            throw new Error(localizedText("参数 prompt 不能为空。", "Параметр prompt не может быть пустым.", "Parameter prompt cannot be empty."));
         }
         const prompt = params.prompt.trim();
         await ensureDirectories();
@@ -240,15 +248,15 @@ const openaiDraw = (function () {
         const filePath = `${DRAWS_DIR}/${baseName}.png`;
         const writeResult = await Tools.Files.writeBinary(filePath, normalizeBase64(apiResult.b64_json));
         if (!writeResult.successful) {
-            throw new Error(`保存图片失败: ${writeResult.details}`);
+            throw new Error(localizedText(`保存图片失败: ${writeResult.details}`, `Не удалось сохранить изображение: ${writeResult.details}`, `Failed to save the image: ${writeResult.details}`));
         }
         const fileUri = `file://${filePath}`;
-        const markdown = `![AI生成的图片](${fileUri})`;
+        const markdown = localizedText(`![AI生成的图片](${fileUri})`, `![Изображение, созданное ИИ](${fileUri})`, `![AI-generated image](${fileUri})`);
         const hintLines = [];
-        hintLines.push(`图片已生成并保存在本地 ${DRAWS_DIR}。`);
-        hintLines.push(`本地路径: ${filePath}`);
+        hintLines.push(localizedText(`图片已生成并保存在本地 ${DRAWS_DIR}。`, `Изображение создано и сохранено локально: ${DRAWS_DIR}.`, `Image generated and saved locally to ${DRAWS_DIR}.`));
+        hintLines.push(localizedText(`本地路径: ${filePath}`, `Локальный путь: ${filePath}`, `Local path: ${filePath}`));
         hintLines.push("");
-        hintLines.push("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：");
+        hintLines.push(localizedText("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：", "В следующем ответе выведите эту строку Markdown, чтобы показать изображение:", "In your next answer, output this Markdown line directly to display the image:"));
         hintLines.push("");
         hintLines.push(markdown);
         return {
@@ -266,7 +274,7 @@ const openaiDraw = (function () {
             const result = await draw_image(params);
             complete({
                 success: true,
-                message: `图片生成成功，已保存到 ${DRAWS_DIR}，并返回 Markdown 图片提示。`,
+                message: localizedText(`图片生成成功，已保存到 ${DRAWS_DIR}，并返回 Markdown 图片提示。`, `Изображение создано и сохранено в ${DRAWS_DIR}; возвращена Markdown-подсказка изображения.`, `Image generated and saved to ${DRAWS_DIR}; a Markdown image hint was returned.`),
                 data: result
             });
         }
@@ -274,7 +282,7 @@ const openaiDraw = (function () {
             console.error("draw_image 执行失败:", error);
             complete({
                 success: false,
-                message: `图片生成失败: ${error?.message || error}`,
+                message: localizedText(`图片生成失败: ${error?.message || error}`, `Не удалось создать изображение: ${error?.message || error}`, `Image generation failed: ${error?.message || error}`),
                 error_stack: error?.stack
             });
         }

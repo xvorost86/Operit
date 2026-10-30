@@ -105,6 +105,14 @@ METADATA
     ]
 }*/
 const superAdmin = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     const MAX_INLINE_TERMINAL_OUTPUT_CHARS = 12000;
     const DEFAULT_FOREGROUND_TIMEOUT_MS = 15000;
     const DEFAULT_WAIT_TIMEOUT_MS = 300000;
@@ -171,7 +179,7 @@ const superAdmin = (function () {
     async function terminal(params) {
         try {
             if (!params.command) {
-                throw new Error("命令不能为空");
+                throw new Error(localizedText("命令不能为空", "Команда не может быть пустой", "Command cannot be empty"));
             }
             const command = params.command;
             const background = params.background;
@@ -183,7 +191,7 @@ const superAdmin = (function () {
                 if (timeoutMs !== undefined) {
                     const parsedTimeout = parseInt(timeoutMs, 10);
                     if (!Number.isFinite(parsedTimeout) || parsedTimeout < MIN_TIMEOUT_MS) {
-                        throw new Error(`timeoutMs必须是整数且不少于${MIN_TIMEOUT_MS}毫秒`);
+                        throw new Error(localizedText(`timeoutMs必须是整数且不少于${MIN_TIMEOUT_MS}毫秒`, `timeoutMs должен быть целым числом не меньше ${MIN_TIMEOUT_MS} мс`, `timeoutMs must be an integer of at least ${MIN_TIMEOUT_MS} ms`));
                     }
                     timeout = parsedTimeout;
                 }
@@ -254,7 +262,7 @@ const superAdmin = (function () {
             if (timeoutMs !== undefined) {
                 const parsedTimeout = parseInt(timeoutMs, 10);
                 if (!Number.isFinite(parsedTimeout) || parsedTimeout < MIN_TIMEOUT_MS) {
-                    throw new Error(`timeoutMs必须是整数且不少于${MIN_TIMEOUT_MS}毫秒`);
+                    throw new Error(localizedText(`timeoutMs必须是整数且不少于${MIN_TIMEOUT_MS}毫秒`, `timeoutMs должен быть целым числом не меньше ${MIN_TIMEOUT_MS} мс`, `timeoutMs must be an integer of at least ${MIN_TIMEOUT_MS} ms`));
                 }
                 timeout = parsedTimeout;
             }
@@ -297,7 +305,7 @@ const superAdmin = (function () {
     async function shell(params) {
         try {
             if (!params.command) {
-                throw new Error("命令不能为空");
+                throw new Error(localizedText("命令不能为空", "Команда не может быть пустой", "Command cannot be empty"));
             }
             const command = params.command;
             console.log(`执行Shell命令: ${command}`);
@@ -348,7 +356,7 @@ const superAdmin = (function () {
     async function terminal_input(params = {}) {
         try {
             if (params.input === undefined && params.control === undefined) {
-                throw new Error("input和control至少需要提供一个");
+                throw new Error(localizedText("input和control至少需要提供一个", "Нужно передать хотя бы один из параметров input или control", "Provide at least one of input or control"));
             }
             const session = params.sessionId
                 ? { sessionId: params.sessionId }

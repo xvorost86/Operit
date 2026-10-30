@@ -2800,12 +2800,20 @@
   ]
 }*/
 const operitEditorPackage = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     async function operit_editor(params) {
         try {
             const { query } = params ?? {};
             complete({
                 success: true,
-                message: "配置排查手册已加载（MCP/Skill/Sandbox Package/沙盒包调试烧录/功能模型与模型配置/TTS-STT语音服务），将按配置链路执行排查。",
+                message: localizedText("配置排查手册已加载（MCP/Skill/Sandbox Package/沙盒包调试烧录/功能模型与模型配置/TTS-STT语音服务），将按配置链路执行排查。", "Руководство по диагностике конфигурации загружено (MCP/Skill/Sandbox Package/отладка и установка пакетов песочницы/функциональные модели и конфигурация моделей/голосовые сервисы TTS-STT); диагностика будет выполняться по цепочке конфигурации.", "Configuration troubleshooting guide loaded (MCP/Skill/Sandbox Package/sandbox package debug install/functional models and model configuration/TTS-STT voice services); troubleshooting will follow the configuration chain."),
                 data: {
                     query: query ?? ""
                 }
@@ -2821,7 +2829,7 @@ const operitEditorPackage = (function () {
     async function how_make_skill() {
         try {
             const locale = (getLang() ?? "").toLowerCase();
-            const lang = locale.startsWith("zh") ? "zh" : locale.startsWith("en") ? "en" : "both";
+            const lang = locale.startsWith("zh") ? "zh" : locale.startsWith("en") ? "en" : locale.startsWith("ru") ? "ru" : "both";
             const zh = `如何制作 skill（简版）
 1. 先创建目录：/sdcard/Download/Operit/skills/<skill_name>/
 2. 必备文件：SKILL.md
@@ -2844,14 +2852,26 @@ description: one-line summary of what this skill does
 4. After metadata, write the main sections: use cases, workflow steps, constraints, expected outputs
 5. Optional content: scripts/, templates/, examples/, assets/; reference them from SKILL.md using relative paths
 6. Practical tip: download an existing skill, extract it directly, and ensure the directory contains SKILL.md`;
-            const message = lang === "zh" ? zh : lang === "en" ? en : `${zh}\n\n---\n\n${en}`;
+            const ru = `Как создать skill (краткое руководство)
+1. Сначала создайте каталог: /sdcard/Download/Operit/skills/<skill_name>/
+2. Обязательный файл: SKILL.md
+3. В начале SKILL.md задайте name и description в метаданных Markdown (frontmatter), например:
+---
+name: your_skill_name
+description: одной строкой опишите, что делает этот skill
+---
+4. После метаданных напишите основной текст: сценарии применения, шаги выполнения, границы ограничений, ожидаемый результат
+5. Необязательное содержимое: scripts/, templates/, examples/, assets/; ссылайтесь на него из SKILL.md по относительным путям
+6. Практический совет: сначала скачайте готовый skill, распакуйте его и убедитесь, что в каталоге есть SKILL.md.`;
+            const message = lang === "zh" ? zh : lang === "en" ? en : lang === "ru" ? ru : `${zh}\n\n---\n\n${en}`;
             complete({
                 success: true,
                 message,
                 data: {
                     lang,
                     zh,
-                    en
+                    en,
+                    ru
                 }
             });
         }

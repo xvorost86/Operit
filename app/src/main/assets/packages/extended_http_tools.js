@@ -51,6 +51,14 @@
     ]
 }*/
 const ExtendedHttpTools = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     const MAX_INLINE_HTTP_RESPONSE_CHARS = 12000;
     async function http_request(params) {
         const toolParams = {
@@ -93,7 +101,11 @@ const ExtendedHttpTools = (function () {
             };
             return {
                 success,
-                message: `HTTP 请求完成；响应内容过大，已保存到文件：${filePath}。请使用 read_file_part 读取指定行范围，或用 grep_code 在该文件中检索关键字。`,
+                message: localizedText(
+                    `HTTP 请求完成；响应内容过大，已保存到文件：${filePath}。请使用 read_file_part 读取指定行范围，或用 grep_code 在该文件中检索关键字。`,
+                    `Запрос HTTP выполнен; ответ слишком велик и сохранён в файл: ${filePath}. Используйте read_file_part, чтобы прочитать указанный диапазон строк, или grep_code, чтобы найти ключевые слова в этом файле.`,
+                    `HTTP request complete; the response is too large and has been saved to a file: ${filePath}. Use read_file_part to read the specified line range, or grep_code to search for keywords in that file.`
+                ),
                 data: {
                     result: resultMeta,
                     content_saved_to: filePath,
@@ -101,7 +113,7 @@ const ExtendedHttpTools = (function () {
                 },
             };
         }
-        return { success, message: 'HTTP 请求完成', data: result };
+        return { success, message: localizedText('HTTP 请求完成', 'Запрос HTTP выполнен', 'HTTP request complete'), data: result };
     }
     async function multipart_request(params) {
         const toolParams = {
@@ -118,7 +130,7 @@ const ExtendedHttpTools = (function () {
             toolParams.ignore_ssl = params.ignore_ssl;
         const result = await toolCall({ name: "multipart_request", params: toolParams });
         const success = result.statusCode >= 200 && result.statusCode < 400;
-        return { success, message: '文件上传完成', data: result };
+        return { success, message: localizedText('文件上传完成', 'Файл загружен', 'File upload complete'), data: result };
     }
     async function manage_cookies(params) {
         const toolParams = {
@@ -130,7 +142,7 @@ const ExtendedHttpTools = (function () {
             toolParams.cookies = params.cookies;
         const result = await toolCall({ name: "manage_cookies", params: toolParams });
         const success = result.statusCode >= 200 && result.statusCode < 400;
-        return { success, message: 'Cookies 操作完成', data: result };
+        return { success, message: localizedText('Cookies 操作完成', 'Операция с cookies выполнена', 'Cookies operation complete'), data: result };
     }
     async function wrapToolExecution(func, params) {
         try {
@@ -139,21 +151,22 @@ const ExtendedHttpTools = (function () {
         }
         catch (error) {
             console.error(`Tool ${func.name} failed unexpectedly`, error);
+            const detail = error.message;
             complete({
                 success: false,
-                message: `工具执行时发生意外错误: ${error.message}`,
+                message: localizedText(`工具执行时发生意外错误: ${detail}`, `При выполнении инструмента произошла непредвиденная ошибка: ${detail}`, `Unexpected error while executing the tool: ${detail}`),
             });
         }
     }
     async function main() {
         const results = [];
         // 这些工具可能对外发请求 / 写 cookies，默认不做自动化演示。
-        results.push({ tool: 'http_request', result: { success: null, message: '未测试（会对外发起网络请求）' } });
-        results.push({ tool: 'multipart_request', result: { success: null, message: '未测试（会上传文件/对外发起网络请求）' } });
-        results.push({ tool: 'manage_cookies', result: { success: null, message: '未测试（会读写 cookies）' } });
+        results.push({ tool: 'http_request', result: { success: null, message: localizedText('未测试（会对外发起网络请求）', 'Не тестировалось (будет выполнен внешний сетевой запрос)', 'Not tested (would make an external network request)') } });
+        results.push({ tool: 'multipart_request', result: { success: null, message: localizedText('未测试（会上传文件/对外发起网络请求）', 'Не тестировалось (будут загружены файлы и выполнен внешний сетевой запрос)', 'Not tested (would upload files and make an external network request)') } });
+        results.push({ tool: 'manage_cookies', result: { success: null, message: localizedText('未测试（会读写 cookies）', 'Не тестировалось (чтение и запись cookies)', 'Not tested (would read and write cookies)') } });
         complete({
             success: true,
-            message: "拓展 HTTP 工具包加载完成（未执行网络请求测试）",
+            message: localizedText("拓展 HTTP 工具包加载完成（未执行网络请求测试）", "Пакет расширенных инструментов HTTP загружен (тесты сетевых запросов не выполнялись)", "Extended HTTP Tools package loaded (network request tests not executed)"),
             data: { results }
         });
     }

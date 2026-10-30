@@ -55,6 +55,14 @@ const googleSearch = (function () {
         "https://xs.cntpj.com/scholar",
     ];
     const MAX_RESULTS = 20;
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     function buildUrl(base, params) {
         const queryString = Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
@@ -101,20 +109,20 @@ const googleSearch = (function () {
             parts.push(content);
             return {
                 success: true,
-                message: `${sourceName} 搜索成功`,
+                message: localizedText(`${sourceName} 搜索成功`, `${sourceName}: поиск выполнен успешно`, `${sourceName} search succeeded`),
                 data: parts.join('\n\n')
             };
         }
         catch (error) {
             return {
                 success: false,
-                message: `${sourceName} 搜索失败: ${error.message}`
+                message: localizedText(`${sourceName} 搜索失败: ${error.message}`, `${sourceName}: не удалось выполнить поиск: ${error.message}`, `${sourceName} search failed: ${error.message}`)
             };
         }
     }
     async function searchWeb(params) {
         if (!params.query || params.query.trim() === "") {
-            throw new Error("请提供有效的 query 参数。");
+            throw new Error(localizedText("请提供有效的 query 参数。", "Укажите корректный параметр query.", "Please provide a valid query parameter."));
         }
         const maxResults = Math.min(Math.max(params.max_results || 10, 1), MAX_RESULTS);
         const language = params.language || "en";
@@ -130,7 +138,7 @@ const googleSearch = (function () {
     }
     async function searchScholar(params) {
         if (!params.query || params.query.trim() === "") {
-            throw new Error("请提供有效的 query 参数。");
+            throw new Error(localizedText("请提供有效的 query 参数。", "Укажите корректный параметр query.", "Please provide a valid query parameter."));
         }
         const maxResults = Math.min(Math.max(params.max_results || 10, 1), MAX_RESULTS);
         const language = params.language || "en";
@@ -144,7 +152,7 @@ const googleSearch = (function () {
     }
     async function searchScholarMirror(params) {
         if (!params.query || params.query.trim() === "") {
-            throw new Error("请提供有效的 query 参数。");
+            throw new Error(localizedText("请提供有效的 query 参数。", "Укажите корректный параметр query.", "Please provide a valid query parameter."));
         }
         const maxResults = Math.min(Math.max(params.max_results || 10, 1), MAX_RESULTS);
         const language = params.language || "en";
@@ -157,13 +165,13 @@ const googleSearch = (function () {
         if (mirrorUrls.length === 0) {
             return {
                 success: false,
-                message: "没有可用的 Google Scholar 镜像地址。"
+                message: localizedText("没有可用的 Google Scholar 镜像地址。", "Нет доступных зеркал Google Scholar.", "No available Google Scholar mirror addresses.")
             };
         }
         let lastError = null;
         for (const currentUrl of mirrorUrls) {
             try {
-                const searchResult = await performSearch(currentUrl, params.includeLinks, `Google Scholar 镜像 (${getHostname(currentUrl)})`);
+                const searchResult = await performSearch(currentUrl, params.includeLinks, localizedText(`Google Scholar 镜像 (${getHostname(currentUrl)})`, `Зеркало Google Scholar (${getHostname(currentUrl)})`, `Google Scholar mirror (${getHostname(currentUrl)})`));
                 if (searchResult.success && searchResult.data) {
                     // Check for CAPTCHA in the content
                     if (searchResult.data.includes("recaptcha") || searchResult.data.includes("人机身份验证")) {
@@ -178,9 +186,10 @@ const googleSearch = (function () {
                 console.log(`Attempt with ${currentUrl} failed: ${error.message}`);
             }
         }
+        const errorDetail = lastError?.message || 'Unknown error';
         return {
             success: false,
-            message: `Google Scholar 镜像搜索在尝试所有镜像后失败: ${lastError?.message || 'Unknown error'}`
+            message: localizedText(`Google Scholar 镜像搜索在尝试所有镜像后失败: ${errorDetail}`, `Не удалось выполнить поиск ни через одно зеркало Google Scholar: ${errorDetail}`, `Google Scholar mirror search failed after trying all mirrors: ${errorDetail}`)
         };
     }
     async function main() {

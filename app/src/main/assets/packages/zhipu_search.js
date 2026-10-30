@@ -70,10 +70,18 @@ const zhipuSearch = (function () {
         key = getEnv("DEFAULT_API_KEY");
         return key || "";
     }
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     async function httpPost(body, apiKey) {
         const key = getApiKey(apiKey || undefined);
         if (!key) {
-            throw new Error("未设置 API Key，请配置 ZHIPU_SEARCH_API_KEY 环境变量或在调用时传入 api_key 参数");
+            throw new Error(localizedText("未设置 API Key，请配置 ZHIPU_SEARCH_API_KEY 环境变量或在调用时传入 api_key 参数", "Ключ API не задан: настройте переменную окружения ZHIPU_SEARCH_API_KEY или передайте параметр api_key при вызове", "API Key is not set: configure the ZHIPU_SEARCH_API_KEY environment variable or pass the api_key parameter in the call"));
         }
         const request = client
             .newRequest()
@@ -147,14 +155,14 @@ const zhipuSearch = (function () {
             const result = await search(params);
             complete({
                 success: true,
-                message: "搜索完成，找到 " + result.count + " 条结果",
+                message: localizedText("搜索完成，找到 " + result.count + " 条结果", "Поиск выполнен, найдено результатов: " + result.count, "Search completed, found " + result.count + " results"),
                 data: result
             });
         }
         catch (error) {
             complete({
                 success: false,
-                message: "搜索失败：" + error.message,
+                message: localizedText("搜索失败：" + error.message, "Ошибка поиска: " + error.message, "Search failed: " + error.message),
                 error_stack: error.stack
             });
         }
@@ -164,14 +172,14 @@ const zhipuSearch = (function () {
             const result = await test();
             complete({
                 success: true,
-                message: "连接成功，延迟 " + result.latency + "ms",
+                message: localizedText("连接成功，延迟 " + result.latency + "ms", "Соединение установлено, задержка " + result.latency + "ms", "Connection succeeded, latency " + result.latency + "ms"),
                 data: result
             });
         }
         catch (error) {
             complete({
                 success: false,
-                message: "测试失败：" + error.message,
+                message: localizedText("测试失败：" + error.message, "Тест не пройден: " + error.message, "Test failed: " + error.message),
                 error_stack: error.stack
             });
         }

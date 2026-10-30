@@ -78,9 +78,15 @@ const FFmpegTools = (function () {
         }
         catch (error) {
             console.error(`Tool ${func.name} failed unexpectedly`, error);
+            const lang = getLang().toLowerCase().split("-")[0];
+            const message = lang === "zh"
+                ? `工具执行时发生意外错误: ${error.message}`
+                : lang === "ru"
+                    ? `Непредвиденная ошибка при выполнении инструмента: ${error.message}`
+                    : `Unexpected error while executing the tool: ${error.message}`;
             complete({
                 success: false,
-                message: `工具执行时发生意外错误: ${error.message}`,
+                message,
             });
         }
     }

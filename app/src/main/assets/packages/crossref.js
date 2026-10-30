@@ -116,6 +116,14 @@ const CrossrefSearch = (function () {
     const BASE_URL = "https://api.crossref.org";
     const DEFAULT_ROWS = 10;
     const MAX_ROWS = 100;
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split('-')[0];
+        if (langBase === 'zh')
+            return zhText;
+        if (langBase === 'ru')
+            return ruText;
+        return enText;
+    }
     function buildQueryString(params) {
         return Object.entries(params)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
@@ -210,7 +218,7 @@ const CrossrefSearch = (function () {
         if (!doi || doi.trim() === "") {
             return {
                 success: false,
-                message: "请提供有效的 DOI"
+                message: localizedText("请提供有效的 DOI", "Укажите корректный DOI", "Please provide a valid DOI")
             };
         }
         try {
@@ -222,7 +230,7 @@ const CrossrefSearch = (function () {
             if (!response.isSuccessful()) {
                 return {
                     success: false,
-                    message: `查询失败: HTTP ${response.statusCode} - ${response.statusMessage}`
+                    message: localizedText(`查询失败: HTTP ${response.statusCode} - ${response.statusMessage}`, `Ошибка запроса: HTTP ${response.statusCode} - ${response.statusMessage}`, `Query failed: HTTP ${response.statusCode} - ${response.statusMessage}`)
                 };
             }
             const data = response.json();
@@ -230,21 +238,22 @@ const CrossrefSearch = (function () {
                 const article = formatArticle(data.message);
                 return {
                     success: true,
-                    message: "查询成功",
+                    message: localizedText("查询成功", "Запрос выполнен", "Query succeeded"),
                     data: article
                 };
             }
             else {
                 return {
                     success: false,
-                    message: "未找到该 DOI 对应的文章"
+                    message: localizedText("未找到该 DOI 对应的文章", "Статья с указанным DOI не найдена", "No article found for this DOI")
                 };
             }
         }
         catch (error) {
+            const detail = error.message;
             return {
                 success: false,
-                message: `查询失败: ${error.message}`
+                message: localizedText(`查询失败: ${detail}`, `Ошибка запроса: ${detail}`, `Query failed: ${detail}`)
             };
         }
     }
@@ -256,7 +265,7 @@ const CrossrefSearch = (function () {
         if (!query || query.trim() === "") {
             return {
                 success: false,
-                message: "请提供有效的搜索关键词"
+                message: localizedText("请提供有效的搜索关键词", "Укажите корректное ключевое слово для поиска", "Please provide a valid search keyword")
             };
         }
         const actualRows = Math.min(Math.max(rows, 1), MAX_ROWS);
@@ -275,7 +284,7 @@ const CrossrefSearch = (function () {
             if (!response.isSuccessful()) {
                 return {
                     success: false,
-                    message: `搜索失败: HTTP ${response.statusCode} - ${response.statusMessage}`
+                    message: localizedText(`搜索失败: HTTP ${response.statusCode} - ${response.statusMessage}`, `Ошибка поиска: HTTP ${response.statusCode} - ${response.statusMessage}`, `Search failed: HTTP ${response.statusCode} - ${response.statusMessage}`)
                 };
             }
             const data = response.json();
@@ -286,7 +295,7 @@ const CrossrefSearch = (function () {
                 const summary = `Found ${totalResults} results (showing ${items.length}):\n${results.join('\n\n')}`;
                 return {
                     success: true,
-                    message: "搜索成功",
+                    message: localizedText("搜索成功", "Поиск выполнен", "Search succeeded"),
                     data: summary,
                     total: totalResults,
                     count: items.length
@@ -295,14 +304,15 @@ const CrossrefSearch = (function () {
             else {
                 return {
                     success: false,
-                    message: "未找到相关文章"
+                    message: localizedText("未找到相关文章", "Подходящие статьи не найдены", "No matching articles found")
                 };
             }
         }
         catch (error) {
+            const detail = error.message;
             return {
                 success: false,
-                message: `搜索失败: ${error.message}`
+                message: localizedText(`搜索失败: ${detail}`, `Ошибка поиска: ${detail}`, `Search failed: ${detail}`)
             };
         }
     }
@@ -314,7 +324,7 @@ const CrossrefSearch = (function () {
         if (!author || author.trim() === "") {
             return {
                 success: false,
-                message: "请提供有效的作者名字"
+                message: localizedText("请提供有效的作者名字", "Укажите корректное имя автора", "Please provide a valid author name")
             };
         }
         const actualRows = Math.min(Math.max(rows, 1), MAX_ROWS);
@@ -331,7 +341,7 @@ const CrossrefSearch = (function () {
             if (!response.isSuccessful()) {
                 return {
                     success: false,
-                    message: `搜索失败: HTTP ${response.statusCode} - ${response.statusMessage}`
+                    message: localizedText(`搜索失败: HTTP ${response.statusCode} - ${response.statusMessage}`, `Ошибка поиска: HTTP ${response.statusCode} - ${response.statusMessage}`, `Search failed: HTTP ${response.statusCode} - ${response.statusMessage}`)
                 };
             }
             const data = response.json();
@@ -342,7 +352,7 @@ const CrossrefSearch = (function () {
                 const summary = `Found ${totalResults} results for author "${author}" (showing ${items.length}):\n${results.join('\n\n')}`;
                 return {
                     success: true,
-                    message: "搜索成功",
+                    message: localizedText("搜索成功", "Поиск выполнен", "Search succeeded"),
                     data: summary,
                     total: totalResults,
                     count: items.length
@@ -351,14 +361,15 @@ const CrossrefSearch = (function () {
             else {
                 return {
                     success: false,
-                    message: `未找到该作者 "${author}" 的文章`
+                    message: localizedText(`未找到该作者 "${author}" 的文章`, `Статьи автора «${author}» не найдены`, `No articles found by author "${author}"`)
                 };
             }
         }
         catch (error) {
+            const detail = error.message;
             return {
                 success: false,
-                message: `搜索失败: ${error.message}`
+                message: localizedText(`搜索失败: ${detail}`, `Ошибка поиска: ${detail}`, `Search failed: ${detail}`)
             };
         }
     }
@@ -370,7 +381,7 @@ const CrossrefSearch = (function () {
         if (!title || title.trim() === "") {
             return {
                 success: false,
-                message: "请提供有效的文章标题"
+                message: localizedText("请提供有效的文章标题", "Укажите корректный заголовок статьи", "Please provide a valid article title")
             };
         }
         const actualRows = Math.min(Math.max(rows, 1), MAX_ROWS);
@@ -392,7 +403,7 @@ const CrossrefSearch = (function () {
                 const summary = `Found ${totalResults} results matching title "${title}" (showing ${items.length}):\n${results.join('\n\n')}`;
                 return {
                     success: true,
-                    message: "搜索成功",
+                    message: localizedText("搜索成功", "Поиск выполнен", "Search succeeded"),
                     data: summary,
                     total: totalResults,
                     count: items.length
@@ -401,14 +412,15 @@ const CrossrefSearch = (function () {
             else {
                 return {
                     success: false,
-                    message: `未找到标题包含 "${title}" 的文章`
+                    message: localizedText(`未找到标题包含 "${title}" 的文章`, `Статьи, в заголовке которых есть «${title}», не найдены`, `No articles found with title containing "${title}"`)
                 };
             }
         }
         catch (error) {
+            const detail = error.message;
             return {
                 success: false,
-                message: `搜索失败: ${error.message}`
+                message: localizedText(`搜索失败: ${detail}`, `Ошибка поиска: ${detail}`, `Search failed: ${detail}`)
             };
         }
     }
@@ -420,7 +432,7 @@ const CrossrefSearch = (function () {
         if (!issn || issn.trim() === "") {
             return {
                 success: false,
-                message: "请提供有效的 ISSN"
+                message: localizedText("请提供有效的 ISSN", "Укажите корректный ISSN", "Please provide a valid ISSN")
             };
         }
         const actualRows = Math.min(Math.max(rows, 1), MAX_ROWS);
@@ -433,7 +445,7 @@ const CrossrefSearch = (function () {
             if (!response.isSuccessful()) {
                 return {
                     success: false,
-                    message: `查询失败: HTTP ${response.statusCode} - ${response.statusMessage}`
+                    message: localizedText(`查询失败: HTTP ${response.statusCode} - ${response.statusMessage}`, `Ошибка запроса: HTTP ${response.statusCode} - ${response.statusMessage}`, `Query failed: HTTP ${response.statusCode} - ${response.statusMessage}`)
                 };
             }
             const data = response.json();
@@ -444,7 +456,7 @@ const CrossrefSearch = (function () {
                 const summary = `Found ${totalResults} articles from journal ISSN ${issn} (showing ${items.length}):\n${results.join('\n\n')}`;
                 return {
                     success: true,
-                    message: "查询成功",
+                    message: localizedText("查询成功", "Запрос выполнен", "Query succeeded"),
                     data: summary,
                     total: totalResults,
                     count: items.length
@@ -453,14 +465,15 @@ const CrossrefSearch = (function () {
             else {
                 return {
                     success: false,
-                    message: `未找到 ISSN "${issn}" 对应期刊的文章`
+                    message: localizedText(`未找到 ISSN "${issn}" 对应期刊的文章`, `Статьи журнала с ISSN «${issn}» не найдены`, `No articles found for journal ISSN "${issn}"`)
                 };
             }
         }
         catch (error) {
+            const detail = error.message;
             return {
                 success: false,
-                message: `查询失败: ${error.message}`
+                message: localizedText(`查询失败: ${detail}`, `Ошибка запроса: ${detail}`, `Query failed: ${detail}`)
             };
         }
     }
@@ -474,9 +487,10 @@ const CrossrefSearch = (function () {
         }
         catch (error) {
             console.error(`工具执行失败`, error);
+            const detail = error.message;
             complete({
                 success: false,
-                message: `工具执行时发生意外错误: ${error.message}`,
+                message: localizedText(`工具执行时发生意外错误: ${detail}`, `Неожиданная ошибка при выполнении инструмента: ${detail}`, `Unexpected error during tool execution: ${detail}`),
             });
         }
     }

@@ -162,21 +162,49 @@ const tavily = (function () {
         const response = await makeTavilyRequest(BASE_URLS.map, params);
         return formatMapResults(response);
     }
+    function localizedMessage(zhMessage, ruMessage, enMessage) {
+        const langBase = getLang().toLowerCase().split('-')[0];
+        if (langBase === 'zh')
+            return zhMessage;
+        if (langBase === 'ru')
+            return ruMessage;
+        return enMessage;
+    }
     async function wrap(func, params, successMessage, failMessage) {
         try {
             const result = await func(params);
-            complete({ success: true, message: successMessage, data: result });
+            complete({ success: true, message: successMessage(), data: result });
         }
         catch (error) {
             console.error(`Function ${func.name} failed! Error: ${error.message}`);
-            complete({ success: false, message: `${failMessage}: ${error.message}`, error_stack: error.stack });
+            complete({ success: false, message: `${failMessage()}: ${error.message}`, error_stack: error.stack });
         }
     }
     return {
-        search: (p) => wrap(search, p, '搜索成功', '搜索失败'),
-        extract: (p) => wrap(extract, p, '提取成功', '提取失败'),
-        crawl: (p) => wrap(crawl, p, '爬取成功', '爬取失败'),
-        map: (p) => wrap(map, p, '映射成功', '映射失败')
+        search: (p) => wrap(
+            search,
+            p,
+            () => localizedMessage('搜索成功', 'Поиск выполнен', 'Search succeeded'),
+            () => localizedMessage('搜索失败', 'Ошибка поиска', 'Search failed')
+        ),
+        extract: (p) => wrap(
+            extract,
+            p,
+            () => localizedMessage('提取成功', 'Извлечение выполнено', 'Extraction succeeded'),
+            () => localizedMessage('提取失败', 'Ошибка извлечения', 'Extraction failed')
+        ),
+        crawl: (p) => wrap(
+            crawl,
+            p,
+            () => localizedMessage('爬取成功', 'Обход выполнен', 'Crawl succeeded'),
+            () => localizedMessage('爬取失败', 'Ошибка обхода', 'Crawl failed')
+        ),
+        map: (p) => wrap(
+            map,
+            p,
+            () => localizedMessage('映射成功', 'Карта сайта построена', 'Mapping succeeded'),
+            () => localizedMessage('映射失败', 'Ошибка построения карты сайта', 'Mapping failed')
+        )
     };
 })();
 exports.search = tavily.search;

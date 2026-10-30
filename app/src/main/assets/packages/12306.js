@@ -104,6 +104,14 @@ const StationDataKeys = [
 ];
 // #endregion
 const ticket12306 = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     const API_BASE = 'https://kyfw.12306.cn';
     const WEB_URL = 'https://www.12306.cn/index/';
     const LCQUERY_INIT_URL = 'https://kyfw.12306.cn/otn/lcQuery/init';
@@ -323,26 +331,26 @@ const ticket12306 = (function () {
     function formatTicketStatus(num) {
         if (num.match(/^\d+$/)) {
             const count = parseInt(num);
-            return count === 0 ? '无票' : `剩余${count}张票`;
+            return count === 0 ? localizedText('无票', 'Нет билетов', 'No tickets') : localizedText(`剩余${count}张票`, `Осталось билетов: ${count}`, `Tickets left: ${count}`);
         }
         switch (num) {
             case '有':
-            case '充足': return '有票';
+            case '充足': return localizedText('有票', 'Есть билеты', 'Tickets available');
             case '无':
             case '--':
-            case '': return '无票';
-            case '候补': return '无票需候补';
-            default: return `${num}票`;
+            case '': return localizedText('无票', 'Нет билетов', 'No tickets');
+            case '候补': return localizedText('无票需候补', 'Нет билетов, только лист ожидания', 'No tickets, waiting list only');
+            default: return localizedText(`${num}票`, `${num} билетов`, `${num} tickets`);
         }
     }
     function formatTicketsInfo(ticketsInfo) {
         if (ticketsInfo.length === 0)
-            return '没有查询到相关车次信息';
-        let result = '车次 | 出发站 -> 到达站 | 出发时间 -> 到达时间 | 历时\n';
+            return localizedText('没有查询到相关车次信息', 'Сведения о подходящих поездах не найдены', 'No matching train information found');
+        let result = localizedText('车次 | 出发站 -> 到达站 | 出发时间 -> 到达时间 | 历时\n', 'Поезд | Станция отправления -> Станция прибытия | Время отправления -> Время прибытия | В пути\n', 'Train | From station -> To station | Departure time -> Arrival time | Duration\n');
         ticketsInfo.forEach((ticketInfo) => {
-            let infoStr = `${ticketInfo.start_train_code}(实际车次train_no: ${ticketInfo.train_no}) ${ticketInfo.from_station}(telecode: ${ticketInfo.from_station_telecode}) -> ${ticketInfo.to_station}(telecode: ${ticketInfo.to_station_telecode}) ${ticketInfo.start_time} -> ${ticketInfo.arrive_time} 历时：${ticketInfo.lishi}`;
+            let infoStr = localizedText(`${ticketInfo.start_train_code}(实际车次train_no: ${ticketInfo.train_no}) ${ticketInfo.from_station}(telecode: ${ticketInfo.from_station_telecode}) -> ${ticketInfo.to_station}(telecode: ${ticketInfo.to_station_telecode}) ${ticketInfo.start_time} -> ${ticketInfo.arrive_time} 历时：${ticketInfo.lishi}`, `${ticketInfo.start_train_code} (фактический номер поезда train_no: ${ticketInfo.train_no}) ${ticketInfo.from_station} (telecode: ${ticketInfo.from_station_telecode}) -> ${ticketInfo.to_station} (telecode: ${ticketInfo.to_station_telecode}) ${ticketInfo.start_time} -> ${ticketInfo.arrive_time}, в пути: ${ticketInfo.lishi}`, `${ticketInfo.start_train_code} (actual train_no: ${ticketInfo.train_no}) ${ticketInfo.from_station} (telecode: ${ticketInfo.from_station_telecode}) -> ${ticketInfo.to_station} (telecode: ${ticketInfo.to_station_telecode}) ${ticketInfo.start_time} -> ${ticketInfo.arrive_time}, duration: ${ticketInfo.lishi}`);
             ticketInfo.prices.forEach((price) => {
-                infoStr += `\n- ${price.seat_name}: ${formatTicketStatus(price.num)} ${price.price}元`;
+                infoStr += localizedText(`\n- ${price.seat_name}: ${formatTicketStatus(price.num)} ${price.price}元`, `\n- ${price.seat_name}: ${formatTicketStatus(price.num)}, цена: ${price.price} юаней`, `\n- ${price.seat_name}: ${formatTicketStatus(price.num)}, price: ${price.price} CNY`);
             });
             result += `${infoStr}\n`;
         });
@@ -443,12 +451,12 @@ const ticket12306 = (function () {
     }
     function formatInterlinesInfo(interlinesInfo) {
         if (interlinesInfo.length === 0)
-            return '没有查询到相关的中转车次信息';
-        let result = '出发时间 -> 到达时间 | 出发车站 -> 中转车站 -> 到达车站 | 换乘标志 | 换乘等待时间 | 总历时\n\n';
+            return localizedText('没有查询到相关的中转车次信息', 'Сведения о подходящих поездах с пересадкой не найдены', 'No matching transfer train information found');
+        let result = localizedText('出发时间 -> 到达时间 | 出发车站 -> 中转车站 -> 到达车站 | 换乘标志 | 换乘等待时间 | 总历时\n\n', 'Время отправления -> Время прибытия | Станция отправления -> Станция пересадки -> Станция прибытия | Тип пересадки | Время ожидания пересадки | Общее время в пути\n\n', 'Departure time -> Arrival time | From station -> Transfer station -> To station | Transfer type | Transfer wait time | Total duration\n\n');
         interlinesInfo.forEach((info) => {
             result += `${info.start_date} ${info.start_time} -> ${info.arrive_date} ${info.arrive_time} | `;
             result += `${info.from_station_name} -> ${info.middle_station_name} -> ${info.end_station_name} | `;
-            result += `${info.same_train ? '同车换乘' : info.same_station ? '同站换乘' : '换站换乘'} | ${info.wait_time} | ${info.lishi}\n\n`;
+            result += localizedText(`${info.same_train ? '同车换乘' : info.same_station ? '同站换乘' : '换站换乘'} | ${info.wait_time} | ${info.lishi}\n\n`, `${info.same_train ? 'пересадка в том же поезде' : info.same_station ? 'пересадка на той же станции' : 'пересадка на другой станции'} | ${info.wait_time} | ${info.lishi}\n\n`, `${info.same_train ? 'same train' : info.same_station ? 'same station' : 'different station'} | ${info.wait_time} | ${info.lishi}\n\n`);
             result += '\t' + formatTicketsInfo(info.ticketList).replace(/\n/g, '\n\t') + '\n';
         });
         return result;
@@ -551,7 +559,7 @@ const ticket12306 = (function () {
         let result = {};
         for (const city of params.citys.split('|')) {
             if (!(city in CITY_CODES)) {
-                result[city] = { error: '未检索到城市。' };
+                result[city] = { error: localizedText('未检索到城市。', 'Город не найден.', 'City not found.') };
             }
             else {
                 result[city] = CITY_CODES[city];
@@ -565,7 +573,7 @@ const ticket12306 = (function () {
         for (let stationName of params.station_names.split('|')) {
             stationName = stationName.endsWith('站') ? stationName.slice(0, -1) : stationName;
             if (!(stationName in NAME_STATIONS)) {
-                result[stationName] = { error: '未检索到车站。' };
+                result[stationName] = { error: localizedText('未检索到车站。', 'Станция не найдена.', 'Station not found.') };
             }
             else {
                 result[stationName] = NAME_STATIONS[stationName];
@@ -631,7 +639,7 @@ const ticket12306 = (function () {
             if (!response)
                 throw new Error('Request interline tickets data failed.');
             if (typeof response.data === 'string')
-                return `很抱歉，未查到相关的列车余票。(${response.errorMsg})`;
+                return localizedText(`很抱歉，未查到相关的列车余票。(${response.errorMsg})`, `К сожалению, наличие билетов на подходящие поезда не найдено. (${response.errorMsg})`, `Sorry, ticket availability for matching trains was not found. (${response.errorMsg})`);
             interlineData.push(...response.data.middleList);
             if (response.data.can_query === 'N' || !response.data.middleList || response.data.middleList.length === 0)
                 break;
@@ -658,7 +666,7 @@ const ticket12306 = (function () {
             throw new Error('Get train route stations failed.');
         const routeStationsInfo = parseRouteStationsInfo(response.data.data);
         if (routeStationsInfo.length === 0)
-            return '未查询到相关车次信息。';
+            return localizedText('未查询到相关车次信息。', 'Сведения о подходящих поездах не найдены.', 'No matching train information found.');
         return routeStationsInfo;
     }
     // #endregion
@@ -732,21 +740,21 @@ const ticket12306 = (function () {
         }
         catch (e) {
             console.error("测试主函数出现错误:", e.message, e.stack);
-            complete({ success: false, message: `测试失败: ${e.message}` });
+            complete({ success: false, message: localizedText(`测试失败: ${e.message}`, `Тест не пройден: ${e.message}`, `Test failed: ${e.message}`) });
             return;
         }
         console.log("\n--- 12306 工具包测试完成 ---");
-        complete({ success: true, message: "所有测试已成功或已记录错误。" });
+        complete({ success: true, message: localizedText("所有测试已成功或已记录错误。", "Все тесты выполнены успешно либо ошибки зафиксированы.", "All tests succeeded or errors were logged.") });
     }
     return {
-        get_current_date: (p) => wrap(get_current_date, p, '获取当前日期成功', '获取当前日期失败'),
-        get_stations_code_in_city: (p) => wrap(get_stations_code_in_city, p, '查询成功', '查询失败'),
-        get_station_code_of_citys: (p) => wrap(get_station_code_of_citys, p, '查询成功', '查询失败'),
-        get_station_code_by_names: (p) => wrap(get_station_code_by_names, p, '查询成功', '查询失败'),
-        get_station_by_telecode: (p) => wrap(get_station_by_telecode, p, '查询成功', '查询失败'),
-        get_tickets: (p) => wrap(get_tickets, p, '查询余票成功', '查询余票失败'),
-        get_interline_tickets: (p) => wrap(get_interline_tickets, p, '查询中转票成功', '查询中转票失败'),
-        get_train_route_stations: (p) => wrap(get_train_route_stations, p, '查询经停站成功', '查询经停站失败'),
+        get_current_date: (p) => wrap(get_current_date, p, localizedText('获取当前日期成功', 'Текущая дата получена', 'Current date retrieved'), localizedText('获取当前日期失败', 'Не удалось получить текущую дату', 'Failed to get current date')),
+        get_stations_code_in_city: (p) => wrap(get_stations_code_in_city, p, localizedText('查询成功', 'Запрос выполнен', 'Query succeeded'), localizedText('查询失败', 'Запрос не выполнен', 'Query failed')),
+        get_station_code_of_citys: (p) => wrap(get_station_code_of_citys, p, localizedText('查询成功', 'Запрос выполнен', 'Query succeeded'), localizedText('查询失败', 'Запрос не выполнен', 'Query failed')),
+        get_station_code_by_names: (p) => wrap(get_station_code_by_names, p, localizedText('查询成功', 'Запрос выполнен', 'Query succeeded'), localizedText('查询失败', 'Запрос не выполнен', 'Query failed')),
+        get_station_by_telecode: (p) => wrap(get_station_by_telecode, p, localizedText('查询成功', 'Запрос выполнен', 'Query succeeded'), localizedText('查询失败', 'Запрос не выполнен', 'Query failed')),
+        get_tickets: (p) => wrap(get_tickets, p, localizedText('查询余票成功', 'Наличие билетов получено', 'Ticket availability retrieved'), localizedText('查询余票失败', 'Не удалось получить наличие билетов', 'Failed to retrieve ticket availability')),
+        get_interline_tickets: (p) => wrap(get_interline_tickets, p, localizedText('查询中转票成功', 'Билеты с пересадкой получены', 'Transfer tickets retrieved'), localizedText('查询中转票失败', 'Не удалось получить билеты с пересадкой', 'Failed to retrieve transfer tickets')),
+        get_train_route_stations: (p) => wrap(get_train_route_stations, p, localizedText('查询经停站成功', 'Сведения об остановках получены', 'Stop stations retrieved'), localizedText('查询经停站失败', 'Не удалось получить сведения об остановках', 'Failed to retrieve stop stations')),
         main: main,
     };
 })();

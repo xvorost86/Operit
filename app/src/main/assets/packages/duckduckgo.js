@@ -45,6 +45,14 @@ METADATA
 }*/
 const duckduckgo = (function () {
     const client = OkHttp.newClient();
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     const BASE_URL = "https://html.duckduckgo.com/html/";
     /**
      * A simple rate limiter to avoid sending too many requests.
@@ -97,7 +105,7 @@ const duckduckgo = (function () {
             }
         }
         if (!query) {
-            throw new Error("查询不能为空");
+            throw new Error(localizedText("查询不能为空", "Поисковый запрос не может быть пустым", "Query cannot be empty"));
         }
         await searchRateLimiter.acquire();
         console.log(`正在从DuckDuckGo搜索: ${query}`);
@@ -110,7 +118,7 @@ const duckduckgo = (function () {
         });
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`HTTP 错误! 状态码: ${response.statusCode}`);
+            throw new Error(localizedText(`HTTP 错误! 状态码: ${response.statusCode}`, `Ошибка HTTP! Код состояния: ${response.statusCode}`, `HTTP error! Status code: ${response.statusCode}`));
         }
         const html = response.content;
         const results = [];
@@ -147,7 +155,7 @@ const duckduckgo = (function () {
     async function fetch_content(params) {
         const { url } = params;
         if (!url) {
-            throw new Error("URL不能为空");
+            throw new Error(localizedText("URL不能为空", "URL не может быть пустым", "URL cannot be empty"));
         }
         await fetchRateLimiter.acquire();
         console.log(`正在抓取内容: ${url}`);
@@ -158,7 +166,7 @@ const duckduckgo = (function () {
                 .headers({ "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" });
             const response = await request.build().execute();
             if (!response.isSuccessful()) {
-                throw new Error(`无法访问网页 (${response.statusCode})`);
+                throw new Error(localizedText(`无法访问网页 (${response.statusCode})`, `Не удалось получить доступ к веб-странице (${response.statusCode})`, `Webpage is inaccessible (${response.statusCode})`));
             }
             let text = response.content;
             text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
@@ -169,14 +177,15 @@ const duckduckgo = (function () {
             text = text.replace(/<[^>]+>/g, ' ');
             text = text.replace(/\s+/g, ' ').trim();
             if (text.length > 8000) {
-                text = text.substring(0, 8000) + "... [内容被截断]";
+                text = text.substring(0, 8000) + localizedText("... [内容被截断]", "... [содержимое усечено]", "... [content truncated]");
             }
             console.log(`成功抓取并解析内容 (${text.length} 字符)`);
             return text;
         }
         catch (error) {
             console.error(`从 ${url} 抓取内容时出错: ${error.message}`);
-            return `错误: 从网页抓取内容时发生意外错误 (${error.message})`;
+            const detail = error.message;
+            return localizedText(`错误: 从网页抓取内容时发生意外错误 (${detail})`, `Ошибка: при загрузке содержимого веб-страницы произошла непредвиденная ошибка (${detail})`, `Error: an unexpected error occurred while fetching webpage content (${detail})`);
         }
     }
     /**
@@ -186,10 +195,10 @@ const duckduckgo = (function () {
      */
     function format_results_for_llm(results) {
         if (!results || results.length === 0) {
-            return "没有为您的搜索查询找到结果。这可能是由于DuckDuckGo的机器人检测或查询没有匹配项。请尝试重新措辞您的搜索或在几分钟后重试。";
+            return localizedText("没有为您的搜索查询找到结果。这可能是由于DuckDuckGo的机器人检测或查询没有匹配项。请尝试重新措辞您的搜索或在几分钟后重试。", "По вашему поисковому запросу ничего не найдено. Возможно, сработала защита DuckDuckGo от ботов или по запросу нет совпадений. Попробуйте переформулировать запрос или повторите попытку через несколько минут.", "No results were found for your search query. This may be caused by DuckDuckGo's bot detection or by the query having no matches. Try rephrasing your search or retry in a few minutes.");
         }
-        const output = results.map(r => `${r.position}. ${r.title}\n   URL: ${r.link}\n   摘要: ${r.snippet}`);
-        return `找到 ${results.length} 个搜索结果:\n\n${output.join('\n\n')}`;
+        const output = results.map(r => localizedText(`${r.position}. ${r.title}\n   URL: ${r.link}\n   摘要: ${r.snippet}`, `${r.position}. ${r.title}\n   URL: ${r.link}\n   Краткое описание: ${r.snippet}`, `${r.position}. ${r.title}\n   URL: ${r.link}\n   Snippet: ${r.snippet}`));
+        return localizedText(`找到 ${results.length} 个搜索结果:\n\n${output.join('\n\n')}`, `Найдено результатов: ${results.length}\n\n${output.join('\n\n')}`, `Found ${results.length} search results:\n\n${output.join('\n\n')}`);
     }
     /**
      * Wraps function calls for standardized success/error handling.
@@ -198,16 +207,16 @@ const duckduckgo = (function () {
         try {
             console.log(`开始执行函数: ${func.name || '匿名函数'}`);
             const result = await func(params);
-            complete({ success: true, message: successMessage, data: result });
+            complete({ success: true, message: successMessage(), data: result });
         }
         catch (error) {
             console.error(`函数 ${func.name || '匿名函数'} 执行失败! 错误: ${error.message}`);
-            complete({ success: false, message: `${failMessage}: ${error.message}`, error_stack: error.stack });
+            complete({ success: false, message: `${failMessage()}: ${error.message}`, error_stack: error.stack });
         }
     }
     return {
-        search: (params) => duckduckgo_wrap(search, params, '搜索完成', '搜索失败'),
-        fetch_content: (params) => duckduckgo_wrap(fetch_content, params, '内容抓取完成', '内容抓取失败'),
+        search: (params) => duckduckgo_wrap(search, params, () => localizedText('搜索完成', 'Поиск выполнен', 'Search completed'), () => localizedText('搜索失败', 'Ошибка поиска', 'Search failed')),
+        fetch_content: (params) => duckduckgo_wrap(fetch_content, params, () => localizedText('内容抓取完成', 'Содержимое загружено', 'Content fetching completed'), () => localizedText('内容抓取失败', 'Ошибка загрузки содержимого', 'Content fetching failed')),
     };
 })();
 exports.search = duckduckgo.search;

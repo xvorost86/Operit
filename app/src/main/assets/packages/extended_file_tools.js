@@ -90,37 +90,45 @@
     ]
 }*/
 const ExtendedFileTools = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split('-')[0];
+        if (langBase === 'zh')
+            return zhText;
+        if (langBase === 'ru')
+            return ruText;
+        return enText;
+    }
     async function file_exists(params) {
         const result = await Tools.Files.exists(params.path, params.environment);
-        return { success: !!result && (result.exists ?? true), message: '检查完成', data: result };
+        return { success: !!result && (result.exists ?? true), message: localizedText('检查完成', 'Проверка завершена', 'Check complete'), data: result };
     }
     async function move_file(params) {
         const result = await Tools.Files.move(params.source, params.destination, params.environment);
-        return { success: !!result, message: '移动完成', data: result };
+        return { success: !!result, message: localizedText('移动完成', 'Перемещение завершено', 'Move complete'), data: result };
     }
     async function copy_file(params) {
         const result = await Tools.Files.copy(params.source, params.destination, params.recursive, params.source_environment, params.dest_environment);
-        return { success: !!result, message: '复制完成', data: result };
+        return { success: !!result, message: localizedText('复制完成', 'Копирование завершено', 'Copy complete'), data: result };
     }
     async function file_info(params) {
         const result = await Tools.Files.info(params.path, params.environment);
-        return { success: !!result, message: '获取信息完成', data: result };
+        return { success: !!result, message: localizedText('获取信息完成', 'Сведения получены', 'Info retrieved'), data: result };
     }
     async function zip_files(params) {
         const result = await Tools.Files.zip(params.source, params.destination, params.environment, params.include_root_directory);
-        return { success: !!result, message: '压缩完成', data: result };
+        return { success: !!result, message: localizedText('压缩完成', 'Упаковка завершена', 'Compression complete'), data: result };
     }
     async function unzip_files(params) {
         const result = await Tools.Files.unzip(params.source, params.destination, params.environment);
-        return { success: !!result, message: '解压完成', data: result };
+        return { success: !!result, message: localizedText('解压完成', 'Распаковка завершена', 'Extraction complete'), data: result };
     }
     async function open_file(params) {
         const result = await Tools.Files.open(params.path, params.environment);
-        return { success: !!result, message: '打开文件完成', data: result };
+        return { success: !!result, message: localizedText('打开文件完成', 'Файл открыт', 'File opened'), data: result };
     }
     async function share_file(params) {
         const result = await Tools.Files.share(params.path, params.title, params.environment);
-        return { success: !!result, message: '分享文件完成', data: result };
+        return { success: !!result, message: localizedText('分享文件完成', 'Файл передан для общего доступа', 'File shared'), data: result };
     }
     async function wrapToolExecution(func, params) {
         try {
@@ -129,25 +137,26 @@ const ExtendedFileTools = (function () {
         }
         catch (error) {
             console.error(`Tool ${func.name} failed unexpectedly`, error);
+            const detail = error.message;
             complete({
                 success: false,
-                message: `工具执行时发生意外错误: ${error.message}`,
+                message: localizedText(`工具执行时发生意外错误: ${detail}`, `При выполнении инструмента произошла непредвиденная ошибка: ${detail}`, `Unexpected error while executing the tool: ${detail}`),
             });
         }
     }
     async function main() {
         const results = [];
-        results.push({ tool: 'file_exists', result: { success: null, message: '未测试' } });
-        results.push({ tool: 'move_file', result: { success: null, message: '未测试（会移动/重命名文件）' } });
-        results.push({ tool: 'copy_file', result: { success: null, message: '未测试（会复制文件）' } });
-        results.push({ tool: 'file_info', result: { success: null, message: '未测试' } });
-        results.push({ tool: 'zip_files', result: { success: null, message: '未测试（会写入zip文件）' } });
-        results.push({ tool: 'unzip_files', result: { success: null, message: '未测试（会写入解压文件）' } });
-        results.push({ tool: 'open_file', result: { success: null, message: '未测试（会拉起系统应用）' } });
-        results.push({ tool: 'share_file', result: { success: null, message: '未测试（会弹出分享面板）' } });
+        results.push({ tool: 'file_exists', result: { success: null, message: localizedText('未测试', 'Не тестировалось', 'Not tested') } });
+        results.push({ tool: 'move_file', result: { success: null, message: localizedText('未测试（会移动/重命名文件）', 'Не тестировалось (перемещает/переименовывает файлы)', 'Not tested (moves/renames files)') } });
+        results.push({ tool: 'copy_file', result: { success: null, message: localizedText('未测试（会复制文件）', 'Не тестировалось (копирует файлы)', 'Not tested (copies files)') } });
+        results.push({ tool: 'file_info', result: { success: null, message: localizedText('未测试', 'Не тестировалось', 'Not tested') } });
+        results.push({ tool: 'zip_files', result: { success: null, message: localizedText('未测试（会写入zip文件）', 'Не тестировалось (создаёт zip-файл)', 'Not tested (writes a zip file)') } });
+        results.push({ tool: 'unzip_files', result: { success: null, message: localizedText('未测试（会写入解压文件）', 'Не тестировалось (записывает распакованные файлы)', 'Not tested (writes extracted files)') } });
+        results.push({ tool: 'open_file', result: { success: null, message: localizedText('未测试（会拉起系统应用）', 'Не тестировалось (запускает системное приложение)', 'Not tested (launches a system app)') } });
+        results.push({ tool: 'share_file', result: { success: null, message: localizedText('未测试（会弹出分享面板）', 'Не тестировалось (открывает панель общего доступа)', 'Not tested (opens the share sheet)') } });
         complete({
             success: true,
-            message: '拓展文件工具包加载完成（未执行破坏性测试）',
+            message: localizedText('拓展文件工具包加载完成（未执行破坏性测试）', 'Пакет расширенных файловых инструментов загружен (разрушительные тесты не выполнялись)', 'Extended file tools package loaded (no destructive tests performed)'),
             data: { results }
         });
     }

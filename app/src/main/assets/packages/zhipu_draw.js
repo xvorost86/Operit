@@ -61,6 +61,14 @@ const zhipuDraw = (function () {
     const DRAW_ROOT_DIR = getPluginConfigDir("draw");
     const STORAGE_DIR = `${DRAW_ROOT_DIR}/zhipu_draw`;
     const DRAWS_DIR = `${STORAGE_DIR}/draws`;
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     function getErrorMessage(error) {
         if (error instanceof Error)
             return error.message;
@@ -74,7 +82,7 @@ const zhipuDraw = (function () {
     function getApiKey() {
         const apiKey = getEnv("ZHIPU_API_KEY");
         if (!apiKey) {
-            throw new Error("ZHIPU_API_KEY 未配置，请在环境变量中设置智谱的 API Key。");
+            throw new Error(localizedText("ZHIPU_API_KEY 未配置，请在环境变量中设置智谱的 API Key。", "Ключ ZHIPU_API_KEY не задан; укажите API Key Zhipu в переменных окружения.", "ZHIPU_API_KEY is not configured; set the Zhipu API key in the environment variables."));
         }
         return apiKey;
     }
@@ -131,18 +139,18 @@ const zhipuDraw = (function () {
             .body(JSON.stringify(body), "json");
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`智谱图片 API 调用失败: ${response.statusCode} - ${response.content}`);
+            throw new Error(localizedText(`智谱图片 API 调用失败: ${response.statusCode} - ${response.content}`, `Не удалось вызвать API изображений Zhipu: ${response.statusCode} — ${response.content}`, `Zhipu image API call failed: ${response.statusCode} - ${response.content}`));
         }
         let parsed;
         try {
             parsed = JSON.parse(response.content);
         }
         catch (e) {
-            throw new Error(`解析智谱响应失败: ${getErrorMessage(e)}`);
+            throw new Error(localizedText(`解析智谱响应失败: ${getErrorMessage(e)}`, `Не удалось разобрать ответ Zhipu: ${getErrorMessage(e)}`, `Failed to parse the Zhipu response: ${getErrorMessage(e)}`));
         }
         const first = parsed?.data?.[0];
         if (!first || !first.url) {
-            throw new Error("智谱响应中未找到有效的图片数据，请检查API返回格式");
+            throw new Error(localizedText("智谱响应中未找到有效的图片数据，请检查API返回格式", "В ответе Zhipu не найдены корректные данные изображения; проверьте формат ответа API", "No valid image data found in the Zhipu response; check the API response format"));
         }
         const result = {
             url: String(first.url),
@@ -155,7 +163,7 @@ const zhipuDraw = (function () {
     }
     async function draw_image(params) {
         if (!params || !params.prompt || params.prompt.trim().length === 0) {
-            throw new Error("参数 prompt 不能为空。");
+            throw new Error(localizedText("参数 prompt 不能为空。", "Параметр prompt не может быть пустым.", "Parameter prompt cannot be empty."));
         }
         const prompt = params.prompt.trim();
         const size = params.size || "1024x1024";
@@ -163,23 +171,23 @@ const zhipuDraw = (function () {
         await ensureDirectories();
         const apiResult = await callZhipuImageAPI({ prompt, size, model });
         if (!apiResult.url || !apiResult.url.trim()) {
-            throw new Error("API响应中未包含图片URL");
+            throw new Error(localizedText("API响应中未包含图片URL", "Ответ API не содержит URL изображения", "The API response does not contain an image URL"));
         }
         const baseName = buildFileName(prompt, params.file_name);
         const filePath = `${DRAWS_DIR}/${baseName}.png`;
         const downloadResult = await Tools.Files.download(apiResult.url, filePath);
         if (!downloadResult.successful) {
-            throw new Error(`下载图片失败: ${downloadResult.details}`);
+            throw new Error(localizedText(`下载图片失败: ${downloadResult.details}`, `Не удалось скачать изображение: ${downloadResult.details}`, `Failed to download the image: ${downloadResult.details}`));
         }
         const fileUri = `file://${filePath}`;
-        const markdown = `![AI生成的图片](${fileUri})`;
+        const markdown = localizedText(`![AI生成的图片](${fileUri})`, `![Изображение, созданное ИИ](${fileUri})`, `![AI-generated image](${fileUri})`);
         const hintLines = [];
-        hintLines.push(`图片已生成并保存在本地 ${DRAWS_DIR}。`);
-        hintLines.push(`本地路径: ${filePath}`);
-        hintLines.push(`提示词: ${prompt}`);
-        hintLines.push(`模型: ${apiResult.model || "glm-image"}`);
+        hintLines.push(localizedText(`图片已生成并保存在本地 ${DRAWS_DIR}。`, `Изображение создано и сохранено локально: ${DRAWS_DIR}.`, `Image generated and saved locally to ${DRAWS_DIR}.`));
+        hintLines.push(localizedText(`本地路径: ${filePath}`, `Локальный путь: ${filePath}`, `Local path: ${filePath}`));
+        hintLines.push(localizedText(`提示词: ${prompt}`, `Промпт: ${prompt}`, `Prompt: ${prompt}`));
+        hintLines.push(localizedText(`模型: ${apiResult.model || "glm-image"}`, `Модель: ${apiResult.model || "glm-image"}`, `Model: ${apiResult.model || "glm-image"}`));
         hintLines.push("");
-        hintLines.push("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：");
+        hintLines.push(localizedText("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：", "В следующем ответе выведите эту строку Markdown, чтобы показать изображение:", "In your next answer, output this Markdown line directly to display the image:"));
         hintLines.push("");
         hintLines.push(markdown);
         return {
@@ -195,7 +203,7 @@ const zhipuDraw = (function () {
             const result = await draw_image(params);
             complete({
                 success: true,
-                message: `图片生成成功，已保存到 ${DRAWS_DIR}，并返回 Markdown 图片提示。`,
+                message: localizedText(`图片生成成功，已保存到 ${DRAWS_DIR}，并返回 Markdown 图片提示。`, `Изображение создано и сохранено в ${DRAWS_DIR}; возвращена Markdown-подсказка изображения.`, `Image generated and saved to ${DRAWS_DIR}; a Markdown image hint was returned.`),
                 data: result
             });
         }
@@ -203,7 +211,7 @@ const zhipuDraw = (function () {
             console.error("draw_image 执行失败:", error);
             complete({
                 success: false,
-                message: `图片生成失败: ${getErrorMessage(error)}`,
+                message: localizedText(`图片生成失败: ${getErrorMessage(error)}`, `Не удалось создать изображение: ${getErrorMessage(error)}`, `Image generation failed: ${getErrorMessage(error)}`),
                 error_stack: getErrorStack(error)
             });
         }

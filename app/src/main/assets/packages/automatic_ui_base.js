@@ -100,9 +100,17 @@
     ]
 }*/
 const UIAutomationTools = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split('-')[0];
+        if (langBase === 'zh')
+            return zhText;
+        if (langBase === 'ru')
+            return ruText;
+        return enText;
+    }
     async function get_page_info(params) {
         const result = (await UINode.getCurrentPage()).toFormattedString();
-        return { success: true, message: '成功获取页面信息', data: result };
+        return { success: true, message: localizedText('成功获取页面信息', 'Сведения о странице получены', 'Page information retrieved'), data: result };
     }
     async function get_page_screenshot_image(params) {
         try {
@@ -116,7 +124,7 @@ const UIAutomationTools = (function () {
             const imageLink = NativeInterface.registerImageFromPath(filePath);
             return {
                 success: true,
-                message: `截图已保存到 ${filePath}`,
+                message: localizedText(`截图已保存到 ${filePath}`, `Снимок экрана сохранён в ${filePath}`, `Screenshot saved to ${filePath}`),
                 data: {
                     file_path: filePath,
                     image_link: imageLink,
@@ -128,13 +136,13 @@ const UIAutomationTools = (function () {
             console.error(`获取屏幕截图失败: ${error.message}`);
             return {
                 success: false,
-                message: `获取屏幕截图失败: ${error.message}`,
+                message: localizedText(`获取屏幕截图失败: ${error.message}`, `Не удалось получить снимок экрана: ${error.message}`, `Failed to capture screenshot: ${error.message}`),
             };
         }
     }
     async function tap(params) {
         const result = await Tools.UI.tap(params.x, params.y);
-        return { success: true, message: '点击操作成功', data: result };
+        return { success: true, message: localizedText('点击操作成功', 'Нажатие выполнено', 'Tap completed'), data: result };
     }
     async function double_tap(params) {
         const first = await Tools.UI.tap(params.x, params.y);
@@ -142,40 +150,40 @@ const UIAutomationTools = (function () {
         const second = await Tools.UI.tap(params.x, params.y);
         return {
             success: true,
-            message: '双击操作成功',
+            message: localizedText('双击操作成功', 'Двойное нажатие выполнено', 'Double tap completed'),
             data: { first, second },
         };
     }
     async function long_press(params) {
         const result = await Tools.UI.longPress(params.x, params.y);
-        return { success: true, message: '长按操作成功', data: result };
+        return { success: true, message: localizedText('长按操作成功', 'Долгое нажатие выполнено', 'Long press completed'), data: result };
     }
     async function click_element(params) {
         const result = await Tools.UI.clickElement(params);
-        return { success: true, message: '点击元素操作成功', data: result };
+        return { success: true, message: localizedText('点击元素操作成功', 'Нажатие на элемент выполнено', 'Element click completed'), data: result };
     }
     async function set_input_text(params) {
         const result = await Tools.UI.setText(params.text);
-        return { success: true, message: '输入文本操作成功', data: result };
+        return { success: true, message: localizedText('输入文本操作成功', 'Текст введён', 'Text input completed'), data: result };
     }
     async function press_key(params) {
         const result = await Tools.UI.pressKey(params.key_code);
-        return { success: true, message: '按键操作成功', data: result };
+        return { success: true, message: localizedText('按键操作成功', 'Нажатие клавиши выполнено', 'Key press completed'), data: result };
     }
     async function swipe(params) {
         const result = await Tools.UI.swipe(params.start_x, params.start_y, params.end_x, params.end_y);
-        return { success: true, message: '滑动操作成功', data: result };
+        return { success: true, message: localizedText('滑动操作成功', 'Пролистывание выполнено', 'Swipe completed'), data: result };
     }
     async function app_launch(params) {
         if (!params.package_name) {
-            return { success: false, message: '必须提供package_name参数' };
+            return { success: false, message: localizedText('必须提供package_name参数', 'Требуется параметр package_name', 'The package_name parameter is required') };
         }
         try {
             const startResult = await Tools.System.startApp(params.package_name);
             if (startResult && startResult.success) {
                 return {
                     success: true,
-                    message: '应用启动成功',
+                    message: localizedText('应用启动成功', 'Приложение запущено', 'App launched'),
                     data: {
                         operation: startResult,
                     },
@@ -184,7 +192,7 @@ const UIAutomationTools = (function () {
             const appList = await Tools.System.listApps(false);
             return {
                 success: false,
-                message: '未能启动应用，可能未安装或无法找到启动入口。已返回当前安装的应用列表。',
+                message: localizedText('未能启动应用，可能未安装或无法找到启动入口。已返回当前安装的应用列表。', 'Не удалось запустить приложение: возможно, оно не установлено или не найдена точка входа. Возвращён список установленных приложений.', 'Failed to launch the app: it may not be installed or no launch entry was found. The list of installed apps was returned.'),
                 data: {
                     operation: startResult,
                     installed_apps: appList,
@@ -197,7 +205,7 @@ const UIAutomationTools = (function () {
                 const appList = await Tools.System.listApps(false);
                 return {
                     success: false,
-                    message: `启动应用时发生错误: ${error.message}。已返回当前安装的应用列表。`,
+                    message: localizedText(`启动应用时发生错误: ${error.message}。已返回当前安装的应用列表。`, `Ошибка при запуске приложения: ${error.message}. Возвращён список установленных приложений.`, `Error while launching the app: ${error.message}. The list of installed apps was returned.`),
                     data: {
                         installed_apps: appList,
                     },
@@ -207,7 +215,7 @@ const UIAutomationTools = (function () {
                 console.error(`获取应用列表失败: ${listError.message}`);
                 return {
                     success: false,
-                    message: `启动应用失败且无法获取应用列表: ${listError.message}`,
+                    message: localizedText(`启动应用失败且无法获取应用列表: ${listError.message}`, `Не удалось запустить приложение и получить список приложений: ${listError.message}`, `Failed to launch the app and to retrieve the app list: ${listError.message}`),
                 };
             }
         }
@@ -221,7 +229,7 @@ const UIAutomationTools = (function () {
             console.error(`Tool ${func.name} failed unexpectedly`, error);
             complete({
                 success: false,
-                message: `工具执行时发生意外错误: ${error.message}`,
+                message: localizedText(`工具执行时发生意外错误: ${error.message}`, `При выполнении инструмента произошла непредвиденная ошибка: ${error.message}`, `Unexpected error while executing the tool: ${error.message}`),
             });
         }
     }
@@ -286,7 +294,7 @@ const UIAutomationTools = (function () {
             });
             complete({
                 success: true,
-                message: "所有UI工具测试完成",
+                message: localizedText("所有UI工具测试完成", "Все тесты инструментов интерфейса завершены", "All UI tool tests completed"),
                 data: results
             });
         }
@@ -294,7 +302,7 @@ const UIAutomationTools = (function () {
             console.error("测试过程中发生错误:", error);
             complete({
                 success: false,
-                message: `测试失败: ${error.message}`,
+                message: localizedText(`测试失败: ${error.message}`, `Тест завершился ошибкой: ${error.message}`, `Test failed: ${error.message}`),
                 data: results
             });
         }

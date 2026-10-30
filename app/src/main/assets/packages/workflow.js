@@ -518,10 +518,21 @@ Notes:
 }*/
 /// <reference path="./types/index.d.ts" />
 const WorkflowIntegration = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     async function usage_advice(_params) {
         return {
             success: true,
-            message: "请阅读 workflow 工具 METADATA 中的 usage_advice 说明：包含节点/连线 schema、分支 condition 规则、触发类型与配置示例。建议在脚本里直接使用 Tools.Workflow.getAll/get/create/update/patch/setEnabled/enable/disable/delete/trigger 等封装方法。"
+            message: localizedText(
+                "请阅读 workflow 工具 METADATA 中的 usage_advice 说明：包含节点/连线 schema、分支 condition 规则、触发类型与配置示例。建议在脚本里直接使用 Tools.Workflow.getAll/get/create/update/patch/setEnabled/enable/disable/delete/trigger 等封装方法。",
+                "Прочтите описание usage_advice в METADATA инструмента workflow: там описаны schema узлов и связей, правила condition для ветвлений, типы триггеров и примеры конфигурации. В скриптах рекомендуется напрямую вызывать методы-обёртки Tools.Workflow.getAll/get/create/update/patch/setEnabled/enable/disable/delete/trigger.",
+                "Read the usage_advice description in the METADATA of the workflow tool: it covers the node/connection schema, branch condition rules, trigger types and configuration examples. In scripts, prefer calling the wrapped methods Tools.Workflow.getAll/get/create/update/patch/setEnabled/enable/disable/delete/trigger directly.")
         };
     }
     /**
@@ -532,7 +543,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.getAll();
         return {
             success: true,
-            message: "成功获取工作流列表",
+            message: localizedText("成功获取工作流列表", "Список воркфлоу получен", "Workflow list retrieved"),
             data
         };
     }
@@ -545,7 +556,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.create(params.name, params.description || "", params.nodes || null, params.connections || null, params.enabled);
         return {
             success: true,
-            message: "成功创建工作流",
+            message: localizedText("成功创建工作流", "Воркфлоу создан", "Workflow created"),
             data
         };
     }
@@ -558,7 +569,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.get(params.workflow_id);
         return {
             success: true,
-            message: "成功获取工作流详情",
+            message: localizedText("成功获取工作流详情", "Детали воркфлоу получены", "Workflow details retrieved"),
             data
         };
     }
@@ -572,7 +583,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.update(workflow_id, updates);
         return {
             success: true,
-            message: "成功更新工作流",
+            message: localizedText("成功更新工作流", "Воркфлоу обновлён", "Workflow updated"),
             data
         };
     }
@@ -586,7 +597,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.patch(workflow_id, patch);
         return {
             success: true,
-            message: "成功差异更新工作流",
+            message: localizedText("成功差异更新工作流", "Воркфлоу точечно обновлён", "Workflow patched"),
             data
         };
     }
@@ -599,7 +610,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.enable(params.workflow_id);
         return {
             success: true,
-            message: "成功启用工作流",
+            message: localizedText("成功启用工作流", "Воркфлоу включён", "Workflow enabled"),
             data
         };
     }
@@ -612,7 +623,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.disable(params.workflow_id);
         return {
             success: true,
-            message: "成功禁用工作流",
+            message: localizedText("成功禁用工作流", "Воркфлоу отключён", "Workflow disabled"),
             data
         };
     }
@@ -625,7 +636,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow['delete'](params.workflow_id);
         return {
             success: true,
-            message: "成功删除工作流",
+            message: localizedText("成功删除工作流", "Воркфлоу удалён", "Workflow deleted"),
             data
         };
     }
@@ -638,7 +649,7 @@ const WorkflowIntegration = (function () {
         const data = await Tools.Workflow.trigger(params.workflow_id);
         return {
             success: true,
-            message: "成功触发工作流",
+            message: localizedText("成功触发工作流", "Воркфлоу запущен", "Workflow triggered"),
             data
         };
     }

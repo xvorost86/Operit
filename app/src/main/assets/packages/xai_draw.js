@@ -90,6 +90,14 @@
 }*/
 /// <reference path="./types/index.d.ts" />
 const xaiDraw = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     const HTTP_TIMEOUT_MS = 600000;
     const client = OkHttp.newBuilder()
         .connectTimeout(HTTP_TIMEOUT_MS)
@@ -146,7 +154,7 @@ const xaiDraw = (function () {
     function getApiKey() {
         const apiKey = getEnv("XAI_API_KEY");
         if (!apiKey) {
-            throw new Error("XAI_API_KEY 未配置，请在环境变量中设置 xAI 的 API Key。");
+            throw new Error(localizedText("XAI_API_KEY 未配置，请在环境变量中设置 xAI 的 API Key。", "XAI_API_KEY не настроен — укажите ключ API xAI в переменных окружения.", "XAI_API_KEY is not set — configure the xAI API key in the environment variables."));
         }
         return apiKey;
     }
@@ -208,7 +216,7 @@ const xaiDraw = (function () {
         if (!raw)
             return DEFAULT_VIDEO_ASPECT_RATIO;
         if (!VIDEO_ASPECT_RATIOS.includes(raw)) {
-            throw new Error(`aspect_ratio 仅支持 ${VIDEO_ASPECT_RATIOS.join(" 或 ")}。`);
+            throw new Error(localizedText(`aspect_ratio 仅支持 ${VIDEO_ASPECT_RATIOS.join(" 或 ")}。`, `Параметр aspect_ratio поддерживает только ${VIDEO_ASPECT_RATIOS.join(", ")}.`, `aspect_ratio supports only ${VIDEO_ASPECT_RATIOS.join(", ")}.`));
         }
         return raw;
     }
@@ -217,7 +225,7 @@ const xaiDraw = (function () {
         if (!raw)
             return DEFAULT_VIDEO_RESOLUTION;
         if (!VIDEO_RESOLUTIONS.includes(raw)) {
-            throw new Error(`resolution 仅支持 ${VIDEO_RESOLUTIONS.join(" 或 ")}。`);
+            throw new Error(localizedText(`resolution 仅支持 ${VIDEO_RESOLUTIONS.join(" 或 ")}。`, `Параметр resolution поддерживает только ${VIDEO_RESOLUTIONS.join(", ")}.`, `resolution supports only ${VIDEO_RESOLUTIONS.join(", ")}.`));
         }
         return raw;
     }
@@ -226,11 +234,11 @@ const xaiDraw = (function () {
             return DEFAULT_VIDEO_DURATION;
         const parsed = typeof value === "number" ? value : parseInt(String(value), 10);
         if (!Number.isFinite(parsed)) {
-            throw new Error("duration 必须是数字。");
+            throw new Error(localizedText("duration 必须是数字。", "Параметр duration должен быть числом.", "duration must be a number."));
         }
         const normalized = Math.floor(parsed);
         if (normalized < MIN_VIDEO_DURATION || normalized > MAX_VIDEO_DURATION) {
-            throw new Error(`duration 仅支持 ${MIN_VIDEO_DURATION}-${MAX_VIDEO_DURATION} 秒。`);
+            throw new Error(localizedText(`duration 仅支持 ${MIN_VIDEO_DURATION}-${MAX_VIDEO_DURATION} 秒。`, `Параметр duration должен быть от ${MIN_VIDEO_DURATION} до ${MAX_VIDEO_DURATION} секунд.`, `duration must be between ${MIN_VIDEO_DURATION} and ${MAX_VIDEO_DURATION} seconds.`));
         }
         return normalized;
     }
@@ -252,12 +260,12 @@ const xaiDraw = (function () {
         try {
             const parsed = JSON.parse(response.content);
             if (!isRecord(parsed)) {
-                throw new Error("响应不是对象");
+                throw new Error(localizedText("响应不是对象", "ответ не является объектом", "the response is not an object"));
             }
             return parsed;
         }
         catch (error) {
-            throw new Error(`解析 ${label} 响应失败: ${getErrorMessage(error)}`);
+            throw new Error(localizedText(`解析 ${label} 响应失败: ${getErrorMessage(error)}`, `Не удалось разобрать ответ ${label}: ${getErrorMessage(error)}`, `Failed to parse the ${label} response: ${getErrorMessage(error)}`));
         }
     }
     function extractApiErrorMessage(payload) {
@@ -278,18 +286,18 @@ const xaiDraw = (function () {
     async function readLocalImageAsDataUrl(filePath) {
         const trimmedPath = String(filePath || "").trim();
         if (!trimmedPath) {
-            throw new Error("image_path 不能为空。");
+            throw new Error(localizedText("image_path 不能为空。", "Параметр image_path не может быть пустым.", "image_path cannot be empty."));
         }
         const existsResult = await Tools.Files.exists(trimmedPath);
         if (!existsResult.exists) {
-            throw new Error(`本地图片不存在: ${trimmedPath}`);
+            throw new Error(localizedText(`本地图片不存在: ${trimmedPath}`, `Локальное изображение не найдено: ${trimmedPath}`, `Local image not found: ${trimmedPath}`));
         }
         const binaryResult = await Tools.Files.readBinary(trimmedPath);
         const base64Content = binaryResult && binaryResult.contentBase64
             ? String(binaryResult.contentBase64).trim()
             : "";
         if (!base64Content) {
-            throw new Error(`读取本地图片失败: ${trimmedPath}`);
+            throw new Error(localizedText(`读取本地图片失败: ${trimmedPath}`, `Не удалось прочитать локальное изображение: ${trimmedPath}`, `Failed to read the local image: ${trimmedPath}`));
         }
         return `data:${guessMimeTypeFromPath(trimmedPath)};base64,${base64Content}`;
     }
@@ -299,14 +307,14 @@ const xaiDraw = (function () {
         const trimmedVideoUrl = String(videoUrl || "").trim();
         const imageInputCount = (trimmedImageUrl ? 1 : 0) + (trimmedImagePath ? 1 : 0);
         if (imageInputCount > 1) {
-            throw new Error("image_url 和 image_path 只能二选一，请不要同时传。");
+            throw new Error(localizedText("image_url 和 image_path 只能二选一，请不要同时传。", "Параметры image_url и image_path взаимоисключающие — не передавайте их одновременно.", "image_url and image_path are mutually exclusive — do not pass both."));
         }
         if (trimmedVideoUrl && imageInputCount > 0) {
-            throw new Error("视频生成一次只能使用一种输入源：纯文本、图片或视频。请不要同时传 image_* 和 video_url。");
+            throw new Error(localizedText("视频生成一次只能使用一种输入源：纯文本、图片或视频。请不要同时传 image_* 和 video_url。", "За одну генерацию видео можно использовать только один источник входных данных: текст, изображение или видео. Не передавайте image_* и video_url одновременно.", "A single video generation accepts only one input source: text, image or video. Do not pass image_* and video_url together."));
         }
         if (trimmedImageUrl) {
             if (!isProbablyUrl(trimmedImageUrl)) {
-                throw new Error("image_url 必须是 http 或 https 链接。");
+                throw new Error(localizedText("image_url 必须是 http 或 https 链接。", "Параметр image_url должен быть ссылкой http или https.", "image_url must be an http or https link."));
             }
             return {
                 image: trimmedImageUrl,
@@ -321,7 +329,7 @@ const xaiDraw = (function () {
         }
         if (trimmedVideoUrl) {
             if (!isProbablyUrl(trimmedVideoUrl)) {
-                throw new Error("video_url 必须是 http 或 https 链接。");
+                throw new Error(localizedText("video_url 必须是 http 或 https 链接。", "Параметр video_url должен быть ссылкой http или https.", "video_url must be an http or https link."));
             }
             return {
                 video_url: trimmedVideoUrl,
@@ -356,14 +364,14 @@ const xaiDraw = (function () {
             .body(JSON.stringify(body), "json");
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`xAI 图片 API 调用失败: ${response.statusCode} - ${response.content}`);
+            throw new Error(localizedText(`xAI 图片 API 调用失败: ${response.statusCode} - ${response.content}`, `Не удалось вызвать API изображений xAI: ${response.statusCode} — ${response.content}`, `xAI image API call failed: ${response.statusCode} — ${response.content}`));
         }
-        const parsed = await parseJsonResponse(response, "xAI 图片生成");
+        const parsed = await parseJsonResponse(response, localizedText("xAI 图片生成", "генерации изображения xAI", "xAI image generation"));
         const data = Array.isArray(parsed.data) ? parsed.data : [];
         const first = data.length > 0 && isRecord(data[0]) ? data[0] : null;
         const imageUrl = first && typeof first.url === "string" ? String(first.url).trim() : "";
         if (!imageUrl) {
-            throw new Error("xAI 响应中未找到图片 URL，请检查模型和参数是否正确。");
+            throw new Error(localizedText("xAI 响应中未找到图片 URL，请检查模型和参数是否正确。", "В ответе xAI не найден URL изображения — проверьте, верны ли модель и параметры.", "No image URL found in the xAI response — check that the model and parameters are correct."));
         }
         return {
             image_url: imageUrl,
@@ -404,13 +412,13 @@ const xaiDraw = (function () {
             .body(JSON.stringify(body), "json");
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`xAI 视频创建任务失败: ${response.statusCode} - ${response.content}`);
+            throw new Error(localizedText(`xAI 视频创建任务失败: ${response.statusCode} - ${response.content}`, `Не удалось создать задачу генерации видео xAI: ${response.statusCode} — ${response.content}`, `xAI video task creation failed: ${response.statusCode} — ${response.content}`));
         }
-        const parsed = await parseJsonResponse(response, "xAI 视频创建");
+        const parsed = await parseJsonResponse(response, localizedText("xAI 视频创建", "создания видео xAI", "xAI video creation"));
         const requestId = typeof parsed.request_id === "string" ? parsed.request_id.trim() : "";
         const status = typeof parsed.status === "string" ? parsed.status.trim() : "";
         if (!requestId) {
-            throw new Error(`xAI 视频创建响应中未找到 request_id: ${response.content}`);
+            throw new Error(localizedText(`xAI 视频创建响应中未找到 request_id: ${response.content}`, `В ответе xAI на создание видео не найден request_id: ${response.content}`, `No request_id found in the xAI video creation response: ${response.content}`));
         }
         return {
             request_id: requestId,
@@ -434,9 +442,9 @@ const xaiDraw = (function () {
         });
         const response = await request.build().execute();
         if (!response.isSuccessful()) {
-            throw new Error(`xAI 视频查询失败: ${response.statusCode} - ${response.content}`);
+            throw new Error(localizedText(`xAI 视频查询失败: ${response.statusCode} - ${response.content}`, `Не удалось получить статус видео xAI: ${response.statusCode} — ${response.content}`, `xAI video status query failed: ${response.statusCode} — ${response.content}`));
         }
-        const parsed = await parseJsonResponse(response, "xAI 视频查询");
+        const parsed = await parseJsonResponse(response, localizedText("xAI 视频查询", "статуса видео xAI", "xAI video status"));
         const status = typeof parsed.status === "string" ? parsed.status.trim() : "";
         const video = isRecord(parsed.video) ? parsed.video : null;
         const videoUrl = video && typeof video.url === "string" ? video.url.trim() : "";
@@ -467,7 +475,7 @@ const xaiDraw = (function () {
     }
     async function draw_image(params) {
         if (!params || !params.prompt || params.prompt.trim().length === 0) {
-            throw new Error("参数 prompt 不能为空。");
+            throw new Error(localizedText("参数 prompt 不能为空。", "Параметр prompt не может быть пустым.", "Parameter prompt cannot be empty."));
         }
         const prompt = params.prompt.trim();
         await ensureDirectories();
@@ -481,15 +489,15 @@ const xaiDraw = (function () {
         const filePath = `${DRAWS_DIR}/${baseName}.${ext}`;
         const downloadResult = await Tools.Files.download(apiResult.image_url, filePath);
         if (!downloadResult.successful) {
-            throw new Error(`下载图片失败: ${downloadResult.details}`);
+            throw new Error(localizedText(`下载图片失败: ${downloadResult.details}`, `Не удалось скачать изображение: ${downloadResult.details}`, `Failed to download the image: ${downloadResult.details}`));
         }
         const fileUri = `file://${filePath}`;
-        const markdown = `![AI生成的图片](${fileUri})`;
+        const markdown = localizedText(`![AI生成的图片](${fileUri})`, `![Изображение, созданное ИИ](${fileUri})`, `![AI-generated image](${fileUri})`);
         const hintLines = [];
-        hintLines.push(`图片已生成并保存在本地 ${DRAWS_DIR}。`);
-        hintLines.push(`本地路径: ${filePath}`);
+        hintLines.push(localizedText(`图片已生成并保存在本地 ${DRAWS_DIR}。`, `Изображение создано и сохранено локально в ${DRAWS_DIR}.`, `The image was generated and saved locally to ${DRAWS_DIR}.`));
+        hintLines.push(localizedText(`本地路径: ${filePath}`, `Локальный путь: ${filePath}`, `Local path: ${filePath}`));
         hintLines.push("");
-        hintLines.push("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：");
+        hintLines.push(localizedText("在后续回答中，请直接输出下面这一行 Markdown 来展示这张图片：", "В дальнейшем ответе выведите эту строку Markdown, чтобы показать изображение:", "In your follow-up answer, output this Markdown line to display the image:"));
         hintLines.push("");
         hintLines.push(markdown);
         return {
@@ -505,7 +513,7 @@ const xaiDraw = (function () {
     async function draw_video(params) {
         const prompt = String(params && params.prompt ? params.prompt : "").trim();
         if (!prompt) {
-            throw new Error("prompt 不能为空。");
+            throw new Error(localizedText("prompt 不能为空。", "Параметр prompt не может быть пустым.", "prompt cannot be empty."));
         }
         await ensureDirectories();
         const resolvedInputs = await resolveVideoInputs(params.image_url, params.image_path, params.video_url);
@@ -537,36 +545,36 @@ const xaiDraw = (function () {
             if (normalizedStatus === "completed") {
                 remoteVideoUrl = statusResult.video_url;
                 if (!remoteVideoUrl) {
-                    throw new Error("视频任务已完成，但响应中未找到 video.url。");
+                    throw new Error(localizedText("视频任务已完成，但响应中未找到 video.url。", "Задача видео завершена, но в ответе не найден video.url.", "The video task is complete, but no video.url was found in the response."));
                 }
                 break;
             }
             if (normalizedStatus === "failed") {
-                throw new Error(`视频生成失败或过期: ${latestErrorMessage || latestStatus || "接口未返回失败原因"}`);
+                throw new Error(localizedText(`视频生成失败或过期: ${latestErrorMessage || latestStatus || "接口未返回失败原因"}`, `Генерация видео завершилась неудачей или срок её действия истёк: ${latestErrorMessage || latestStatus || "API не вернул причину сбоя"}`, `Video generation failed or expired: ${latestErrorMessage || latestStatus || "the API returned no failure reason"}`));
             }
             await Tools.System.sleep(pollIntervalMs);
         }
         if (!remoteVideoUrl) {
-            throw new Error(`视频生成超时，最后状态为 ${latestStatus || "未知"}${latestErrorMessage ? `，原因：${latestErrorMessage}` : ""}`);
+            throw new Error(localizedText(`视频生成超时，最后状态为 ${latestStatus || "未知"}${latestErrorMessage ? `，原因：${latestErrorMessage}` : ""}`, `Генерация видео превысила время ожидания, последний статус — ${latestStatus || "неизвестен"}${latestErrorMessage ? `, причина: ${latestErrorMessage}` : ""}`, `Video generation timed out, last status: ${latestStatus || "unknown"}${latestErrorMessage ? `, reason: ${latestErrorMessage}` : ""}`));
         }
         const extension = guessExtensionFromUrl(remoteVideoUrl, "mp4");
         const baseName = buildFileName(prompt, params.file_name, "xai_video");
         const filePath = `${VIDEOS_DIR}/${baseName}.${extension}`;
         const downloadResult = await Tools.Files.download(remoteVideoUrl, filePath);
         if (!downloadResult.successful) {
-            throw new Error(`下载视频失败: ${downloadResult.details}`);
+            throw new Error(localizedText(`下载视频失败: ${downloadResult.details}`, `Не удалось скачать видео: ${downloadResult.details}`, `Failed to download the video: ${downloadResult.details}`));
         }
         const fileUri = `file://${filePath}`;
-        const markdownLink = `[点击查看生成的视频](${fileUri})`;
+        const markdownLink = localizedText(`[点击查看生成的视频](${fileUri})`, `[Открыть созданное видео](${fileUri})`, `[View the generated video](${fileUri})`);
         const htmlVideo = `<video controls src="${fileUri}"></video>`;
         const hintLines = [];
-        hintLines.push(`视频已生成并保存在本地 ${VIDEOS_DIR}。`);
-        hintLines.push(`本地路径: ${filePath}`);
+        hintLines.push(localizedText(`视频已生成并保存在本地 ${VIDEOS_DIR}。`, `Видео создано и сохранено локально в ${VIDEOS_DIR}.`, `The video was generated and saved locally to ${VIDEOS_DIR}.`));
+        hintLines.push(localizedText(`本地路径: ${filePath}`, `Локальный путь: ${filePath}`, `Local path: ${filePath}`));
         hintLines.push("");
-        hintLines.push("后续回答如果要给出视频，请优先返回这个本地链接：");
+        hintLines.push(localizedText("后续回答如果要给出视频，请优先返回这个本地链接：", "Если в дальнейшем ответе нужно показать видео, отдайте эту локальную ссылку:", "If your follow-up answer needs to show the video, prefer this local link:"));
         hintLines.push(markdownLink);
         hintLines.push("");
-        hintLines.push("如果当前渲染环境支持 HTML 视频标签，也可以使用：");
+        hintLines.push(localizedText("如果当前渲染环境支持 HTML 视频标签，也可以使用：", "Если среда отображения поддерживает HTML-тег video, можно использовать и такой вариант:", "If the current rendering environment supports the HTML video tag, you can also use:"));
         hintLines.push(htmlVideo);
         return {
             prompt,
@@ -593,7 +601,7 @@ const xaiDraw = (function () {
             const result = await draw_image(params);
             complete({
                 success: true,
-                message: "xAI 图片生成成功，已下载到本地。",
+                message: localizedText("xAI 图片生成成功，已下载到本地。", "Изображение xAI создано и скачано локально.", "The xAI image was generated and downloaded locally."),
                 data: result
             });
         }
@@ -601,7 +609,7 @@ const xaiDraw = (function () {
             console.error("draw_image 执行失败:", error);
             complete({
                 success: false,
-                message: `xAI 图片生成失败: ${getErrorMessage(error)}`,
+                message: localizedText(`xAI 图片生成失败: ${getErrorMessage(error)}`, `Не удалось создать изображение xAI: ${getErrorMessage(error)}`, `xAI image generation failed: ${getErrorMessage(error)}`),
                 error_stack: getErrorStack(error)
             });
         }
@@ -611,7 +619,7 @@ const xaiDraw = (function () {
             const result = await draw_video((params || {}));
             complete({
                 success: true,
-                message: "xAI 视频生成成功，已下载到本地。",
+                message: localizedText("xAI 视频生成成功，已下载到本地。", "Видео xAI создано и скачано локально.", "The xAI video was generated and downloaded locally."),
                 data: result
             });
         }
@@ -619,7 +627,7 @@ const xaiDraw = (function () {
             console.error("draw_video 执行失败:", error);
             complete({
                 success: false,
-                message: `xAI 视频生成失败: ${getErrorMessage(error)}`,
+                message: localizedText(`xAI 视频生成失败: ${getErrorMessage(error)}`, `Не удалось создать видео xAI: ${getErrorMessage(error)}`, `xAI video generation failed: ${getErrorMessage(error)}`),
                 error_stack: getErrorStack(error)
             });
         }

@@ -249,6 +249,14 @@
   ]
 }*/
 const various_search = (function () {
+    function localizedText(zhText, ruText, enText) {
+        const langBase = getLang().toLowerCase().split("-")[0];
+        if (langBase === "zh")
+            return zhText;
+        if (langBase === "ru")
+            return ruText;
+        return enText;
+    }
     function normalizeText(input) {
         if (!input)
             return "";
@@ -737,7 +745,7 @@ const various_search = (function () {
         try {
             const response = await Tools.Net.visit({ url });
             if (!response) {
-                throw new Error(`无法获取 ${platform} 搜索结果`);
+                throw new Error(localizedText(`无法获取 ${platform} 搜索结果`, `Результаты поиска ${platform} недоступны`, `Search results for ${platform} are unavailable`));
             }
             let parts = [];
             let hasFilteredLinks = false;
@@ -770,9 +778,10 @@ const various_search = (function () {
             };
         }
         catch (error) {
+            const detail = error.message;
             return {
                 platform,
-                content: `${platform} 搜索失败: ${error.message}`
+                content: localizedText(`${platform} 搜索失败: ${detail}`, `${platform}: не удалось выполнить поиск: ${detail}`, `${platform} search failed: ${detail}`)
             };
         }
     }
@@ -780,7 +789,7 @@ const various_search = (function () {
         try {
             const response = await Tools.Net.visit({ url, include_image_links: true });
             if (!response) {
-                throw new Error(`无法获取 ${platform} 图片搜索结果`);
+                throw new Error(localizedText(`无法获取 ${platform} 图片搜索结果`, `Результаты поиска изображений ${platform} недоступны`, `Image search results for ${platform} are unavailable`));
             }
             let parts = [];
             if (response.visitKey !== undefined) {
@@ -805,9 +814,10 @@ const various_search = (function () {
             };
         }
         catch (error) {
+            const detail = error.message;
             return {
                 platform,
-                content: `${platform} 图片搜索失败: ${error.message}`
+                content: localizedText(`${platform} 图片搜索失败: ${detail}`, `${platform}: не удалось выполнить поиск изображений: ${detail}`, `${platform} image search failed: ${detail}`)
             };
         }
     }
@@ -902,7 +912,7 @@ const various_search = (function () {
                 }
             }
             else {
-                searchPromises.push(Promise.resolve({ platform, success: false, message: `不支持的搜索平台: ${platform}` }));
+                searchPromises.push(Promise.resolve({ platform, success: false, message: localizedText(`不支持的搜索平台: ${platform}`, `Неподдерживаемая поисковая платформа: ${platform}`, `Unsupported search platform: ${platform}`) }));
             }
         }
         return Promise.all(searchPromises);
