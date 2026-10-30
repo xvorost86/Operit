@@ -146,36 +146,6 @@ fun PersonaCardGenerationScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val TAG = "CharacterCardGeneration"
 
-    // 引导文案（顶部说明）
-    val characterAssistantIntro = remember {
-        val locale = Locale.getDefault().language
-        if (locale == "zh" || locale == "zh-CN" || locale == "zh-TW") {
-            """
-            嗨嗨～这里是你的角色卡小助手(｡･ω･｡)ﾉ♡ 我会陪你一起把专属角色慢慢捏出来～
-            我们按部就班来哦：先告诉我你的称呼，再说说你想要的角色大方向，比方说：
-            - 角色名字和身份大概是怎样的？
-            - 有哪些可爱的性格关键词？
-            - 长相/发型/瞳色/穿搭想要什么感觉？
-            - 有没有特别的小设定或能力？
-            - 跟其他角色的关系要不要安排一点点？
-
-            接下来我会一步步问你关键问题，帮你把细节补齐～
-            """.trimIndent()
-        } else {
-            """
-            Hi there~ This is your character card assistant (｡･ω･｡)ﾉ♡ I\'ll help you create your unique character step by step~
-            Let\'s take it step by step: first tell me your name, then tell me what kind of character you want, for example:
-            - What should the character\'s name and identity be?
-            - What are some cute personality keywords?
-            - What kind of look/hairstyle/eye color/outfit do you want?
-            - Any special settings or abilities?
-            - Should we arrange some relationships with other characters?
-
-            Next, I\'ll ask you some key questions step by step to help you fill in the details~
-            """.trimIndent()
-        }
-    }
-
     val listState = rememberLazyListState()
     val chatMessages = remember { mutableStateListOf<CharacterChatMessage>() }
     var userInput by remember { mutableStateOf("") }

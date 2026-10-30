@@ -320,10 +320,8 @@ fun requiresStandaloneArtifactIdUpgrade(runtimePackageId: String): Boolean {
         !trimmed.equals(PLACEHOLDER_MARKET_ARTIFACT_ID, ignoreCase = true)
 }
 
-fun validateStandaloneArtifactRuntimePackageId(runtimePackageId: String) {
-    require(!requiresStandaloneArtifactIdUpgrade(runtimePackageId)) {
-        "当前包 ID「$runtimePackageId」无法生成稳定的市场项目 ID。请改用包含英文字母或数字的包 ID（可含 -、_、.），再重新发布。"
-    }
+fun validateStandaloneArtifactRuntimePackageId(runtimePackageId: String, message: String) {
+    require(!requiresStandaloneArtifactIdUpgrade(runtimePackageId)) { message }
 }
 
 fun sameArtifactRuntimePackageId(
@@ -354,9 +352,6 @@ fun buildPublishArtifactDescriptor(
     protection: String? = null
 ): PublishArtifactDescriptor {
     val runtimePackageId = localArtifact.packageName.trim().ifBlank { localArtifact.packageName }
-    if (publishContext == null) {
-        validateStandaloneArtifactRuntimePackageId(runtimePackageId)
-    }
     val normalizedRuntimePackageId = normalizeMarketArtifactId(runtimePackageId)
     val contextRuntimePackageId = publishContext?.runtimePackageId?.trim().orEmpty()
     if (contextRuntimePackageId.isNotBlank()) {

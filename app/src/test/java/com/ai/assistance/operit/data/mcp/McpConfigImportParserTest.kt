@@ -1,11 +1,17 @@
 package com.ai.assistance.operit.data.mcp
 
+import android.content.Context
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito
 
 class McpConfigImportParserTest {
+
+    private val context: Context = Mockito.mock(Context::class.java) { invocation ->
+        if (invocation.method.name == "getString") "MCP parse error" else null
+    }
 
     @Test
     fun parse_classifiesStdioAndRemoteTransports() {
@@ -33,7 +39,7 @@ class McpConfigImportParserTest {
             }
             """.trimIndent()
 
-        val parsed = McpConfigImportParser.parse(config)
+        val parsed = McpConfigImportParser.parse(config, context)
 
         val stdio = parsed.servers.filterIsInstance<StdioMcpImportedServer>().single()
         assertEquals("filesystem", stdio.id)
@@ -85,7 +91,7 @@ class McpConfigImportParserTest {
 
     private fun assertParseFails(config: String) {
         try {
-            McpConfigImportParser.parse(config)
+            McpConfigImportParser.parse(config, context)
         } catch (_: IllegalArgumentException) {
             return
         }

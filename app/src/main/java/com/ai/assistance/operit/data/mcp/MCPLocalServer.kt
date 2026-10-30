@@ -536,7 +536,9 @@ class MCPLocalServer private constructor(private val context: Context) {
         autoApprove: List<String>? = emptyList()
     ) {
         val normalizedCommand = command?.trim()
-        require(!normalizedCommand.isNullOrEmpty()) { "MCP服务器 $serverId 的 command 不能为空" }
+        require(!normalizedCommand.isNullOrEmpty()) {
+            context.getString(R.string.l10n_mcp_command_required, serverId)
+        }
 
         val updatedServerConfig = MCPConfig.ServerConfig(
             command = normalizedCommand,
@@ -600,14 +602,14 @@ class MCPLocalServer private constructor(private val context: Context) {
             try {
                 AppLogger.d(TAG, "开始合并配置，输入长度: ${jsonConfig.length}")
                 val parsedConfig = try {
-                    McpConfigImportParser.parse(jsonConfig)
+                    McpConfigImportParser.parse(jsonConfig, context)
                 } catch (e: Exception) {
                     AppLogger.e(TAG, "标准 MCP 配置解析失败", e)
                     return@withContext Result.failure(
                         Exception(
                             context.getString(
                                 R.string.mcp_local_json_format_error,
-                                e.message ?: "配置字段无效"
+                                e.message ?: context.getString(R.string.l10n_mcp_invalid_config_field)
                             )
                         )
                     )

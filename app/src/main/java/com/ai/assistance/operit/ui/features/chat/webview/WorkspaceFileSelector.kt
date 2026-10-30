@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -608,12 +609,13 @@ private fun buildMentionPackageOptions(
     return options.values.toList()
 }
 
+@Composable
 private fun buildMentionPackageSubtitle(suggestion: MentionPackageSuggestion): String {
     val typeLabel =
         when (suggestion.kind) {
-            MentionPackageKind.PACKAGE -> "工具包"
-            MentionPackageKind.SKILL -> "Skill 包"
-            MentionPackageKind.MCP -> "MCP 包"
+            MentionPackageKind.PACKAGE -> stringResource(R.string.l10n_mention_package_type_tool)
+            MentionPackageKind.SKILL -> stringResource(R.string.l10n_mention_package_type_skill)
+            MentionPackageKind.MCP -> stringResource(R.string.l10n_mention_package_type_mcp)
         }
 
     val metaParts = buildList {

@@ -607,6 +607,7 @@ private fun MarketNotificationsPane() {
 
 @Composable
 private fun MarketNotificationCard(notification: MarketV2Notification) {
+    val kindLabel = notificationKindLabel(notification.kind)
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -633,7 +634,7 @@ private fun MarketNotificationCard(notification: MarketV2Notification) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = notificationKindLabel(notification.kind),
+                        text = kindLabel,
                         style = MaterialTheme.typography.labelMedium,
                         color = notificationKindColor(notification.kind)
                     )
@@ -644,7 +645,7 @@ private fun MarketNotificationCard(notification: MarketV2Notification) {
                     )
                 }
                 Text(
-                    text = notification.title.ifBlank { notificationKindLabel(notification.kind) },
+                    text = notification.title.ifBlank { kindLabel },
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
@@ -674,14 +675,15 @@ private fun notificationKindIcon(kind: String): ImageVector {
     }
 }
 
+@Composable
 private fun notificationKindLabel(kind: String): String {
     return when (kind) {
-        "comment_new" -> "新评论"
-        "comment_reply" -> "回复了你的评论"
-        "review_approved" -> "已通过审核"
-        "review_rejected" -> "未通过审核"
-        "review_changes" -> "需要修改"
-        "entry_curated" -> "入选精选"
+        "comment_new" -> stringResource(R.string.notification_kind_comment_new)
+        "comment_reply" -> stringResource(R.string.notification_kind_comment_reply)
+        "review_approved" -> stringResource(R.string.notification_kind_review_approved)
+        "review_rejected" -> stringResource(R.string.notification_kind_review_rejected)
+        "review_changes" -> stringResource(R.string.notification_kind_review_changes)
+        "entry_curated" -> stringResource(R.string.notification_kind_entry_curated)
         else -> kind
     }
 }
@@ -698,23 +700,24 @@ private fun notificationKindColor(kind: String): Color {
     }
 }
 
+@Composable
 private fun relativeTime(isoDate: String): String {
     if (isoDate.isBlank()) return ""
-    return try {
+    val seconds = try {
         val instant = java.time.Instant.parse(isoDate)
         val now = java.time.Instant.now()
         val duration = java.time.Duration.between(instant, now)
-        val seconds = duration.seconds
-        when {
-            seconds < 60 -> "刚刚"
-            seconds < 3600 -> "${seconds / 60} 分钟前"
-            seconds < 86400 -> "${seconds / 3600} 小时前"
-            seconds < 2592000 -> "${seconds / 86400} 天前"
-            seconds < 31104000 -> "${seconds / 2592000} 个月前"
-            else -> "${seconds / 31104000} 年前"
-        }
+        duration.seconds
     } catch (e: Exception) {
-        isoDate.take(16).replace("T", " ")
+        return isoDate.take(16).replace("T", " ")
+    }
+    return when {
+        seconds < 60 -> stringResource(R.string.time_just_now)
+        seconds < 3600 -> stringResource(R.string.time_minutes_ago, seconds / 60)
+        seconds < 86400 -> stringResource(R.string.time_hours_ago, seconds / 3600)
+        seconds < 2592000 -> stringResource(R.string.time_days_ago, seconds / 86400)
+        seconds < 31104000 -> stringResource(R.string.l10n_market_months_ago, seconds / 2592000)
+        else -> stringResource(R.string.l10n_market_years_ago, seconds / 31104000)
     }
 }
 

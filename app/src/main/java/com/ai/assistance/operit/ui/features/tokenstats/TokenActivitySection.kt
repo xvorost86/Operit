@@ -159,7 +159,15 @@ private fun TokenActivityDailyHeatmap(
     val monthLabelHeight = 20.dp
     val weekdayLabelWidth = 24.dp
     val heatmapColumnGap = 6.dp
-    val weekdayLabels = listOf("一", "二", "三", "四", "五", "六", "日")
+    val weekdayLabels = listOf(
+        stringResource(R.string.l10n_token_heatmap_weekday_mon),
+        stringResource(R.string.l10n_token_heatmap_weekday_tue),
+        stringResource(R.string.l10n_token_heatmap_weekday_wed),
+        stringResource(R.string.l10n_token_heatmap_weekday_thu),
+        stringResource(R.string.l10n_token_heatmap_weekday_fri),
+        stringResource(R.string.l10n_token_heatmap_weekday_sat),
+        stringResource(R.string.l10n_token_heatmap_weekday_sun),
+    )
     val scroll = rememberScrollState()
     val palette = LocalTokenStatsColors.current
     // 色阶：level 0 = 未激活灰格；level 1..5 = 主色透明度阶（少→多）

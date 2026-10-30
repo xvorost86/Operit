@@ -1183,11 +1183,13 @@ class MessageCoordinationDelegate(
     ): String {
         val useEnglish = !LocaleUtils.usesChineseContent(context)
         val userName = displayPreferencesManager.globalUserName.first()?.trim().orEmpty()
-        val formattedUserName = if (userName.isNotBlank()) {
-            "$userName（用户）"
-        } else {
-            "用户（用户）"
-        }
+        val formattedUserName =
+            context.getString(
+                R.string.l10n_chat_group_participant_user_label,
+                userName.ifBlank {
+                    context.getString(R.string.l10n_chat_group_participant_user_name)
+                }
+            )
         val participantNames = members
             .sortedBy { it.orderIndex }
             .mapNotNull { member -> memberCardsById[member.characterCardId]?.name?.trim()?.takeIf { it.isNotBlank() } }

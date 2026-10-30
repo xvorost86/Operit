@@ -1,6 +1,7 @@
 package com.ai.assistance.operit.ui.features.packages.market
 
 import android.content.Context
+import com.ai.assistance.operit.R
 import com.ai.assistance.operit.data.api.GitHubApiService
 import com.ai.assistance.operit.data.api.GitHubRelease
 import com.ai.assistance.operit.data.api.GitHubReleaseAsset
@@ -98,6 +99,20 @@ class GitHubForgePublishService(
         try {
             if (!githubAuth.isLoggedIn()) {
                 return@withContext Result.failure(Exception("GitHub login required"))
+            }
+
+            if (request.publishContext == null) {
+                val runtimePackageId =
+                    request.localArtifact.packageName.trim().ifBlank {
+                        request.localArtifact.packageName
+                    }
+                validateStandaloneArtifactRuntimePackageId(
+                    runtimePackageId,
+                    context.getString(
+                        R.string.l10n_market_unstable_runtime_package_id,
+                        runtimePackageId
+                    )
+                )
             }
 
             onProgress(PublishProgressStage.VALIDATING)

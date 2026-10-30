@@ -127,6 +127,7 @@ fun <T> MarketBrowseList(
     val showInitialLoading = isLoading && items.isEmpty()
     val lastLoadMoreIndex = remember { mutableStateOf(-1) }
     val isRefreshing = isLoading && items.isNotEmpty() && searchQuery.isBlank()
+    val olderUpdatedLabel = stringResource(R.string.l10n_market_updated_older)
 
     LaunchedEffect(listState, items.size, searchQuery, hasMore, isLoadingMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
@@ -175,6 +176,7 @@ fun <T> MarketBrowseList(
                                 items = items,
                                 itemKey = itemKey,
                                 updatedAtSelector = updatedAtSelector,
+                                olderUpdatedLabel = olderUpdatedLabel,
                                 itemContent = itemContent
                             )
                         } else {
@@ -287,11 +289,12 @@ private fun <T> LazyListScope.groupedMarketItems(
     items: List<T>,
     itemKey: (T) -> Any,
     updatedAtSelector: (T) -> String,
+    olderUpdatedLabel: String,
     itemContent: @Composable (T) -> Unit
 ) {
     val groupedItems =
         items.groupBy { item ->
-            resolveMarketUpdatedDateLabel(updatedAtSelector(item))
+            resolveMarketUpdatedDateLabel(updatedAtSelector(item), olderUpdatedLabel)
         }
 
     groupedItems.forEach { (dateLabel, groupItems) ->
@@ -315,10 +318,10 @@ private fun MarketBrowseDateHeader(dateLabel: String) {
     )
 }
 
-private fun resolveMarketUpdatedDateLabel(rawUpdatedAt: String): String {
+private fun resolveMarketUpdatedDateLabel(rawUpdatedAt: String, olderUpdatedLabel: String): String {
     val trimmed = rawUpdatedAt.trim()
     if (trimmed.isBlank()) {
-        return "更早"
+        return olderUpdatedLabel
     }
 
     parseMarketUpdatedDate(trimmed)?.let { date ->
