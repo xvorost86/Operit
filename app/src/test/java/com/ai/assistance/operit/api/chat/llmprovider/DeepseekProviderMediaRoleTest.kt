@@ -232,24 +232,30 @@ class DeepseekProviderMediaRoleTest {
         availableTools: List<ToolPrompt>
     ): JSONObject {
         val provider =
-            OpenAIResponsesProvider(
+            object : OpenAIResponsesProvider(
                 responsesApiEndpoint = "https://example.test/v1/responses",
                 apiKeyProvider = SingleApiKeyProvider("test-key"),
                 modelName = "openai-responses-test",
                 client = OkHttpClient(),
                 supportsVision = true,
                 enableToolCall = true
-            )
-        val body =
-            provider.createRequestBody(
-                context = mock<Context>(),
-                chatHistory = history,
-                modelParameters = emptyList<ModelParameter<*>>(),
-                enableThinking = false,
-                stream = false,
-                availableTools = availableTools,
-                preserveThinkInHistory = false
-            )
+            ) {
+                fun requestBodyForTest(
+                    context: Context,
+                    history: List<PromptTurn>,
+                    tools: List<ToolPrompt>
+                ): RequestBody =
+                    createRequestBody(
+                        context = context,
+                        chatHistory = history,
+                        modelParameters = emptyList(),
+                        enableThinking = false,
+                        stream = false,
+                        availableTools = tools,
+                        preserveThinkInHistory = false
+                    )
+            }
+        val body = provider.requestBodyForTest(mock(), history, availableTools)
         val buffer = Buffer()
         body.writeTo(buffer)
         return JSONObject(buffer.readUtf8())
