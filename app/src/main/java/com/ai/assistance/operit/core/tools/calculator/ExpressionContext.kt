@@ -313,7 +313,8 @@ object ExpressionContext {
         if (result == Math.floor(result) && !result.isNaN() && !result.isInfinite()) {
             return result.toInt().toString()
         }
-        // 否则使用小数格式
-        return "%.6f".format(result).trimEnd('0').trimEnd('.')
+        // Decimal separator stays locale-independent: formatted results are fed back into
+        // expressions, where a comma would be parsed as an argument separator.
+        return String.format(Locale.US, "%.6f", result).trimEnd('0').trimEnd('.')
     }
 }
