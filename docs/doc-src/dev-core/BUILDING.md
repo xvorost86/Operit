@@ -195,6 +195,12 @@ npm install
 ```
 这一步会安装 `tools/example_packages/sync_example_packages.py` 预构建示例脚本包时需要用到的 `typescript`、`esbuild` 等依赖。
 
+**构建根目录的 JS 包（MCP 桥接）:**
+```bash
+pnpm run build
+```
+该命令通过 `pnpm --filter mcp-tcp-bridge build` 编译 `tools/mcp_bridge`（`tsc` + `ncc`），并把产物复制到 `app/src/main/assets/bridge/`。修改 `tools/mcp_bridge/index.ts` 或 `spawn-helper.ts` 后，重新编译 APK 前需要执行这一步。产物 `spawn-helper.js` 与仓库中已提交的版本只差 `ncc` 生成的若干行尾空格，`git diff` 中可直接丢弃这些空白改动。
+
 5. **安装 web-chat 的前端依赖:**
 ```bash
 npm --prefix web-chat install

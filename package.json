@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "build": "webpack",
+        "build": "pnpm --filter mcp-tcp-bridge build",
         "java2ts": "java2ts config.json",
         "builder": "node ./build/build.js",
         "build:examples:github": "node ./examples/github/build.js",
