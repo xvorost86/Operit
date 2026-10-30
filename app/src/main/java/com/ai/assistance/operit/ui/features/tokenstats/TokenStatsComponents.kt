@@ -133,7 +133,11 @@ internal fun formatDateRangeLabel(range: TokenStatsTimeRange, zone: ZoneId): Str
 }
 
 internal fun formatCompactDateRangeLabel(range: TokenStatsTimeRange, zone: ZoneId): String {
-    val formatter = DateTimeFormatter.ofPattern("M/d", Locale.getDefault())
+    // Скелет "Md" отдаёт порядок дня и месяца как в локали (ru «1.10», en «10/1»);
+    // жёсткий шаблон "M/d" показывал американский порядок дат в любой локали.
+    val locale = Locale.getDefault()
+    val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "Md")
+    val formatter = DateTimeFormatter.ofPattern(pattern, locale)
     val start = java.time.Instant.ofEpochMilli(range.startMs).atZone(zone).toLocalDate()
     val end = java.time.Instant.ofEpochMilli(range.endMs - 1L).atZone(zone).toLocalDate()
     return if (start == end) start.format(formatter) else "${start.format(formatter)}-${end.format(formatter)}"
@@ -178,8 +182,9 @@ internal fun TokenStatsCardTitle(
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = LocalTokenStatsColors.current.cardContent,
-            maxLines = 1,
-            softWrap = false,
+            // Русские заголовки карточек длиннее китайских и английских, одной строки им не хватает.
+            maxLines = 2,
+            softWrap = true,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),
         )
@@ -284,7 +289,7 @@ internal fun TokenStatsOverviewCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 currentStreakText?.let {
@@ -406,7 +411,7 @@ private fun TokenStatsMetricCard(
                     text = label,
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.cardSupportingContent,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(

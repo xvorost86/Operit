@@ -770,7 +770,15 @@ internal fun bucketTimeLabel(startMs: Long, granularity: TokenStatsGranularity, 
         TokenStatsGranularity.TEN_MINUTES, TokenStatsGranularity.HOURLY ->
             DateTimeFormatter.ofPattern("HH:mm").format(zdt)
         TokenStatsGranularity.DAILY ->
-            DateTimeFormatter.ofPattern("MM/dd").format(zdt)
+            // Скелет "Md" соблюдает порядок дня и месяца принятый в локали (ru «30.10»,
+            // en «10/30»); жёсткий шаблон "MM/dd" навязывал американский порядок всем.
+            DateTimeFormatter.ofPattern(
+                    android.text.format.DateFormat.getBestDateTimePattern(
+                            java.util.Locale.getDefault(),
+                            "Md"
+                    ),
+                    java.util.Locale.getDefault()
+            ).format(zdt)
     }
 }
 

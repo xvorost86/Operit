@@ -696,7 +696,7 @@ private fun SidebarQuickActionCard(
                                                 if (selected) appearance.selectedContentColor
                                                 else appearance.itemColor,
                                         textAlign = TextAlign.Center,
-                                        maxLines = 1,
+                                        maxLines = 2,
                                         overflow = TextOverflow.Ellipsis
                                 )
                         }
@@ -789,9 +789,11 @@ private fun BottomShortcutDrawerItem(
         val accentColor = appearance.selectedContentColor
 
         Surface(
+                // 68dp хватало на одну строку подписи; русские названия пунктов не влезают
+                // в одну строку, поэтому высота даёт место второй.
                 modifier =
                         modifier
-                                .height(68.dp)
+                                .height(72.dp)
                                 .liquidGlass(
                                         enabled = appearance.buttonLiquidGlassEnabled,
                                         shape = itemShape,
@@ -828,7 +830,7 @@ private fun BottomShortcutDrawerItem(
                                 )
                         }
                         Column(
-                                modifier = Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 8.dp),
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 6.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                         ) {
@@ -840,7 +842,7 @@ private fun BottomShortcutDrawerItem(
                                                 else appearance.itemColor,
                                         modifier = Modifier.size(20.dp)
                                 )
-                                Spacer(modifier = Modifier.height(5.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                         text = stringResource(id = item.titleResId),
                                         style = MaterialTheme.typography.labelSmall.copy(
@@ -851,7 +853,7 @@ private fun BottomShortcutDrawerItem(
                                         color =
                                                 if (selected) appearance.selectedContentColor
                                                 else appearance.itemColor,
-                                        maxLines = 1,
+                                        maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.fillMaxWidth()
                                 )

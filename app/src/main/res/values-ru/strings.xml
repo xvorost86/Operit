@@ -9,7 +9,7 @@
     <string name="nav_adb_commands">Разрешения</string>
     <string name="nav_settings">Настройки</string>
     <string name="nav_tool_permissions">Разрешения для инструментов</string>
-    <string name="nav_about">О приложении</string>
+    <string name="nav_about">О программе</string>
     <string name="nav_packages">Пакеты</string>
     <string name="nav_assistant_config">Настройки ассистента</string>
     <string name="nav_terminal">Терминал</string>
@@ -85,7 +85,7 @@
     <string name="floating_thinking_2">Размышление…</string>
     <string name="floating_didnt_hear_clearly">Не удалось расслышать</string>
     <string name="floating_hello">Здравствуйте</string>
-    <string name="nav_help">Руководство пользователя</string>
+    <string name="nav_help">Справка</string>
     <string name="colorpicker_select_primary">Выбрать основной цвет</string>
     <string name="colorpicker_select_secondary">Выбрать дополнительный цвет</string>
     <string name="colorpicker_select_statusbar">Выбрать цвет строки состояния</string>
@@ -1980,7 +1980,7 @@
     <string name="tts_usage_instructions_content">1. Введите в поле ввода текст для преобразования в речь\n2. Настройте скорость и тон речи\n3. Нажмите кнопку «Воспроизвести речь», чтобы начать воспроизведение\n4. Нажмите кнопку «Остановить воспроизведение», чтобы остановить воспроизведение\n5. При возникновении ошибки просмотрите подробности ошибки и отладочную информацию\n6. Кнопкой «Сбросить сообщение об ошибке» очистите отображение ошибки</string>
     <string name="tool_speech_recognition">Распознавание речи</string>
     <string name="tool_speech_recognition_desc">Преобразование речи в текст с поддержкой нескольких движков и языков</string>
-    <string name="tool_permission_manager">Менеджер разрешений приложений</string>
+    <string name="tool_permission_manager">Разрешения приложений</string>
     <string name="tool_permission_manager_desc">Управление разрешениями всех приложений устройства для защиты конфиденциальности</string>
     <string name="tool_user_agreement">Пользовательское соглашение</string>
     <string name="tool_user_agreement_desc">Просмотр пользовательского соглашения и политики конфиденциальности приложения</string>
@@ -3546,7 +3546,7 @@
     <string name="token_stats_unknown_part_suffix">неизвестно %1$d</string>
     <string name="token_stats_token_uncached">Некэшированный ввод</string>
     <string name="token_stats_token_cached">Чтение из кэша</string>
-    <string name="token_stats_cache_rate">Доля попаданий в кэш</string>
+    <string name="token_stats_cache_rate">Попадания в кэш</string>
     <string name="token_stats_token_output">Вывод</string>
     <string name="token_stats_date_range">Диапазон дат</string>
     <string name="token_stats_range_analysis">Анализ диапазона</string>
@@ -4047,7 +4047,7 @@
     <string name="screen_title_file_manager">Файловый менеджер</string>
     <string name="screen_title_terminal">Терминал команд</string>
     <string name="screen_title_terminal_auto_config">Автонастройка терминала</string>
-    <string name="screen_title_app_permissions">Менеджер разрешений приложений</string>
+    <string name="screen_title_app_permissions">Разрешения приложений</string>
     <string name="screen_title_ui_debugger">Отладчик интерфейса</string>
     <string name="screen_title_shell_executor">Выполнение команд оболочки</string>
     <string name="screen_title_logcat">Просмотр журнала</string>
@@ -7674,7 +7674,7 @@
     <string name="token_activity_longest_streak_badge">Максимум %1$d дн.</string>
     <string name="token_activity_chart_tap_hint">Нажмите на график, чтобы увидеть подробности</string>
     <string name="token_activity_total_tokens">Всего токенов</string>
-    <string name="token_activity_peak_tokens">Максимум токенов</string>
+    <string name="token_activity_peak_tokens">Пик токенов</string>
     <string name="token_activity_current_streak">Текущая серия</string>
     <string name="token_activity_longest_streak">Самая длинная серия</string>
     <string name="token_activity_days">%1$d дн.</string>
