@@ -106,4 +106,5 @@
     <string name="l10n_chat_group_participant_user_label">%1$s（用户）</string>
     <string name="l10n_chat_group_participant_user_name">用户</string>
     <string name="l10n_mcp_command_required">MCP服务器 %1$s 的 command 不能为空</string>
+    <string name="l10n_settings_language_auto_native">跟随系统</string>
 </resources>

@@ -183,7 +183,13 @@ fun LanguageItem(
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
-                text = language.nativeName,
+                // 「跟随系统」不是语言的本名，直接显示 nativeName 会把中文带到 en/ru 界面，
+                // 因此 AUTO 项按当前界面语言取译文，其余语言仍显示原生名称。
+                text = if (language.code == LocaleUtils.LanguageCodes.AUTO) {
+                    stringResource(R.string.l10n_settings_language_auto_native)
+                } else {
+                    language.nativeName
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
