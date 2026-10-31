@@ -1,0 +1,69 @@
+name: L10n Check
+
+# Localization guard rails for the ru-localization branch. Runs on plain Python 3 so it needs no
+# Android SDK: resource key sets, placeholders, Android escaping, CJK leftovers and the tool tests.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ru-localization]
+    paths:
+      - 'app/src/main/res/values*/**'
+      - 'terminal/src/main/res/values*/**'
+      - 'tools/l10n/**'
+      - 'l10n/**'
+      - '.github/workflows/l10n-check.yml'
+  pull_request:
+    paths:
+      - 'app/src/main/res/values*/**'
+      - 'terminal/src/main/res/values*/**'
+      - 'tools/l10n/**'
+      - 'l10n/**'
+      - '.github/workflows/l10n-check.yml'
+
+jobs:
+  resource-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Tool unit tests
+        run: python3 -m unittest discover -s tools/l10n/tests -v
+
+      - name: Russian locale against the zh base (strict Android escaping)
+        run: |
+          python3 tools/l10n/check_locale.py \
+            app/src/main/res/values-ru \
+            --base app/src/main/res/values \
+            --files strings.xml strings_l10n.xml \
+            --strict-android
+
+      - name: English locale against the zh base
+        run: |
+          python3 tools/l10n/check_locale.py \
+            app/src/main/res/values-en \
+            --base app/src/main/res/values \
+            --files strings.xml strings_l10n.xml
+
+      - name: Terminal module Russian locale
+        run: |
+          python3 tools/l10n/check_locale.py \
+            terminal/src/main/res/values-ru \
+            --base terminal/src/main/res/values \
+            --files strings.xml strings_l10n.xml \
+            --strict-android
+
+      - name: CJK inventory (informational)
+        # Not a gate: the remaining non-comment CJK is classified in l10n/coverage_audit.md
+        # (prompts, logs, functional data, zh branches of the D11 selector). The summary is
+        # printed so a growing literal count is visible in CI output and in the job summary.
+        run: |
+          {
+            echo '### CJK inventory'
+            echo '```'
+            python3 tools/l10n/scan_cjk.py --summary
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
