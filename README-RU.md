@@ -97,6 +97,26 @@ python3 tools/l10n/scan_cjk.py --summary          # сводка остатка 
 4. Всё, что переводить нельзя, фиксируется в `l10n/functional_cjk.md`, а точечные исключения для
    проверяющего — в `l10n/cjk_allowlist.txt` (`<файл>:<имя ключа>  # причина`).
 
+## Публикация
+
+Ветка опубликована в форке: **`ru-localization`** в https://github.com/xvorost86/Operit
+(111 коммитов поверх апстрима `dbf7191`). Русские ресурсы модуля терминала закоммичены в его
+собственном репозитории, поэтому второй форк — https://github.com/xvorost86/OperitTerminalCore
+(ветка `ru-localization`, коммит `5cc5777`), и `.gitmodules` указывает именно на него: с адресом
+апстрима `git clone --recurse-submodules` не смог бы разрешить закреплённый коммит.
+
+```bash
+git clone --recurse-submodules -b ru-localization git@github.com:xvorost86/Operit.git
+# или по HTTPS:
+git clone --recurse-submodules -b ru-localization https://github.com/xvorost86/Operit.git
+```
+
+Pull request в апстрим не открывается: `applicationId`, подпись и версия отличаются от апстрима
+(D7). Гейт — `.github/workflows/l10n-check.yml` (job `L10n Check`): 66 тестов инструментов, строгие
+проверки ru/en/terminal и информационный инвентарь CJK. На `822b910` прогон зелёный за 30 c:
+`OK` (ru, strict, 13 warnings), `OK` (en, 45 warnings), `OK` (terminal ru), инвентарь
+`literal 2513 / 118`.
+
 ## Инструменты проверки
 
 | Команда | Что делает |
@@ -125,12 +145,12 @@ request, который трогает ресурсы или `tools/l10n`. Ин�
 
 | # | Что | Состояние |
 |---|---|---|
-| 1 | Публикация: форка нет (`origin` и `upstream` — оба `AAswordman/Operit`), ветка `ru-localization` нигде не опубликована, `l10n-check.yml` на GitHub ни разу не запускался — локально прогнаны только его команды | открыто, ждёт команды владельца |
-| 2 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`) и `super_admin.js` (`hint: Output is large…`) | продуктовое решение: перевод добавил бы zh-значение, которого не было |
-| 3 | Рантайм JS-пакетов (QuickJS) и переключение языка внутри них | подтверждено статически (`node --check`, сверка zh-сегментов и METADATA), исполнение не проверялось |
-| 4 | `terminal`: 13 оставшихся иероглифов — комментарии `#` внутри shell-скриптов | подтверждено статически |
-| 5 | Ротация подписи апстрима: finalizer `assembleRelease` включается только при заданных `APK_ROTATION_*` (legacy-ключа нет) | не настроено осознанно |
-| 6 | CI: проверки локалей и тестов — гейт, инвентарь CJK — только в job summary; `l10n/inventory.json` локальный, поэтому `--diff` в CI недоступен | рост `literal` виден, но не блокируется |
+| 1 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`) и `super_admin.js` (`hint: Output is large…`) | продуктовое решение: перевод добавил бы zh-значение, которого не было |
+| 2 | Рантайм JS-пакетов (QuickJS) и переключение языка внутри них | подтверждено статически (`node --check`, сверка zh-сегментов и METADATA), исполнение не проверялось |
+| 3 | `terminal`: 13 оставшихся иероглифов — комментарии `#` внутри shell-скриптов | подтверждено статически |
+| 4 | Ротация подписи апстрима: finalizer `assembleRelease` включается только при заданных `APK_ROTATION_*` (legacy-ключа нет) | не настроено осознанно |
+| 5 | CI: проверки локалей и тестов — гейт, инвентарь CJK — только в job summary; `l10n/inventory.json` локальный, поэтому `--diff` в CI недоступен | рост `literal` виден, но не блокируется |
+| 6 | Экраны под API-ключ/аккаунт (реальный диалог, публикация в маркет, вход в GitHub), содержимое маркета и внешних источников, подключённый сеанс LAN-страницы | не проверялись: нужны ключи/аккаунты и Bearer Token |
 
 ## Отчёты
 
