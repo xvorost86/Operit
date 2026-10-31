@@ -4,6 +4,9 @@
 локализацией. Собирается как **отдельное приложение** `ru.xvorost.operit` и ставится рядом с
 официальным Operit: свои данные, своя подпись, чужой APK не перезаписывается.
 
+[![Latest release](https://img.shields.io/github/v/release/xvorost86/Operit?label=release)](https://github.com/xvorost86/Operit/releases/latest)
+[![L10n Check](https://github.com/xvorost86/Operit/actions/workflows/l10n-check.yml/badge.svg?branch=ru-localization)](https://github.com/xvorost86/Operit/actions/workflows/l10n-check.yml)
+
 | | |
 |---|---|
 | applicationId | `ru.xvorost.operit` (debug-вариант — `ru.xvorost.operit.debug`) |
@@ -84,6 +87,16 @@ python3 tools/l10n/check_locale.py app/src/main/res/values-en --base app/src/mai
 python3 tools/l10n/scan_cjk.py --summary          # сводка остатка до и после мержа
 ```
 
+Ветка `main` форка синхронизируется отдельно: в ней нет перевода, только блок `ru-build-note` в самом
+верху `README.md`.
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main     # конфликт возможен только в этом блоке — оставить наш вариант
+git push fork main
+```
+
 Для точного сравнения с состоянием до мержа снимите инвентарь заранее (`--out`) и после мержа
 сравните с ним (`--diff`). `l10n/inventory.json` намеренно не лежит в git: это 4 МБ машинного вывода,
 его генерируют локально.
@@ -110,6 +123,14 @@ git clone --recurse-submodules -b ru-localization git@github.com:xvorost86/Operi
 # или по HTTPS:
 git clone --recurse-submodules -b ru-localization https://github.com/xvorost86/Operit.git
 ```
+
+Оба сабмодуля адресуются по HTTPS: `terminal` — на форк с русскими ресурсами, `tools/hotbuild/OperitNightlyRelease`
+— на публичный репозиторий апстрима (в апстриме там SSH-адрес, из-за которого анонимный клон спотыкался).
+Закреплённый коммит ночного сборщика (`35016523…`) — вершина `main` его репозитория, поэтому резолвится без ключа.
+
+Главная страница форка — дефолтная ветка `main`, а GitHub рендерит `README.md` только из неё. Поэтому в
+`README.md` ветки `main` лежит короткий блок между маркерами `ru-build-note:start` / `ru-build-note:end`
+со ссылкой на релиз и на эту ветку; в остальном `main` — апстрим без изменений.
 
 Pull request в апстрим не открывается: `applicationId`, подпись и версия отличаются от апстрима
 (D7). Гейт — `.github/workflows/l10n-check.yml` (job `L10n Check`): 67 тестов инструментов, строгие
