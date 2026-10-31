@@ -1,3 +1,16 @@
+<!-- ru-build-note:start — добавлено только в форке xvorost86, не в апстриме -->
+> **Русская сборка · [Operit 1.12.2-ru2](https://github.com/xvorost86/Operit/releases/latest)**
+> Отдельное приложение `ru.xvorost.operit`: ставится рядом с официальным Operit, свои данные и подпись.
+> Исходники и инструкция — ветка [`ru-localization`](https://github.com/xvorost86/Operit/tree/ru-localization),
+> [`README-RU.md`](https://github.com/xvorost86/Operit/blob/ru-localization/README-RU.md).
+>
+> **Russian build:** a standalone `ru.xvorost.operit` package, installs side by side with the official
+> Operit. Sources and build notes live in the `ru-localization` branch.
+>
+> Ветка `main` этого форка — код апстрима плюс только этот блок.
+> The `main` branch here is upstream code plus this block only.
+<!-- ru-build-note:end -->
+
 <h1 align="center">
   <img src="app/src/main/assets/logo.svg" width="48" height="48" align="absmiddle" alt=""> Operit AI
 </h1>
