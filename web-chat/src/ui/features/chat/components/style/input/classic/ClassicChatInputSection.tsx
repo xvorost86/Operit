@@ -17,11 +17,13 @@ import type {
   WebThemeSnapshot,
   WebUploadedAttachment
 } from '../../../../util/chatTypes';
+import { t } from '../../../../util/i18n';
 
 function processingLabel(stage: InputProcessingStage) {
-  if (stage === 'connecting') return '正在同步会话与主题';
-  if (stage === 'uploading') return '正在上传附件';
-  if (stage === 'streaming') return '正在接收回复';
+  if (stage === 'connecting')
+    return t('正在同步会话与主题', 'Syncing the conversation and theme', 'Синхронизация беседы и темы');
+  if (stage === 'uploading') return t('正在上传附件', 'Uploading attachments', 'Загрузка вложений');
+  if (stage === 'streaming') return t('正在接收回复', 'Receiving the reply', 'Получение ответа');
   return '';
 }
 
@@ -142,7 +144,11 @@ export function ClassicChatInputSection({
                 submitCurrentAction();
               }
             }}
-            placeholder="发消息给当前会话..."
+            placeholder={t(
+              '发消息给当前会话...',
+              'Message the current conversation...',
+              'Сообщение в текущую беседу…'
+            )}
             ref={textareaRef}
             rows={1}
             value={messageInput}
@@ -157,7 +163,7 @@ export function ClassicChatInputSection({
           onClick={() => {
             onAttachmentPanelChange(!attachmentPanelOpen);
           }}
-          title="附件"
+          title={t('附件', 'Attachments', 'Вложения')}
           type="button"
         >
           <PlusIcon size={18} />

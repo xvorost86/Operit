@@ -1,5 +1,6 @@
 import { PencilIcon, SendIcon, TrashIcon } from '../../../../util/chatIcons';
 import type { PendingQueueMessageItem } from '../../../../util/chatTypes';
+import { t } from '../../../../util/i18n';
 
 export function PendingMessageQueuePanel({
   queuedMessages,
@@ -27,7 +28,7 @@ export function PendingMessageQueuePanel({
         onClick={() => onExpandedChange(!expanded)}
         type="button"
       >
-        <strong>待发送队列</strong>
+        <strong>{t('待发送队列', 'Queued messages', 'Очередь отправки')}</strong>
         <span>{queuedMessages.length}</span>
       </button>
 

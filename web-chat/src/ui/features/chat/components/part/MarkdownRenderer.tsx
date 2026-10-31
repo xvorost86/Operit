@@ -1,6 +1,7 @@
 import { useMemo, useState, type HTMLAttributes, type ImgHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { t } from '../../util/i18n';
 
 function copyText(text: string) {
   void navigator.clipboard.writeText(text).catch(() => {});
@@ -32,14 +33,14 @@ function MarkdownCodeBlock({
             onClick={() => setAutoWrapEnabled((value) => !value)}
             type="button"
           >
-            自动换行
+            {t('自动换行', 'Word wrap', 'Перенос по словам')}
           </button>
           <button
             className="markdown-code-action"
             onClick={() => copyText(code)}
             type="button"
           >
-            复制
+            {t('复制', 'Copy', 'Копировать')}
           </button>
         </div>
       </header>

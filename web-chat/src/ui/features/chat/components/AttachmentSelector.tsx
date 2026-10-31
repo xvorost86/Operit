@@ -7,6 +7,7 @@ import {
   ScreenshotMonitorIcon
 } from '../util/chatIcons';
 import { InputOverlayPopup } from './style/input/common/InputOverlayPopup';
+import { t } from '../util/i18n';
 
 type AttachmentSelectorMode = 'classic' | 'agent';
 type AttachmentSelectorItem = {
@@ -72,14 +73,22 @@ export function AttachmentSelector({
   }
 
   const selectorItems: AttachmentSelectorItem[] = [
-    { title: '照片', onClick: () => imageInputRef.current?.click(), icon: ImageAttachmentIcon },
-    { title: '拍照', disabled: true, icon: PlusIcon },
-    { title: '记忆', disabled: true, icon: DataObjectIcon },
-    { title: '文件', onClick: () => fileInputRef.current?.click(), icon: DescriptionAttachmentIcon },
-    { title: '屏幕内容', disabled: true, icon: ScreenshotMonitorIcon },
-    { title: '通知', disabled: true, icon: PlusIcon },
-    { title: '定位', disabled: true, icon: PlusIcon },
-    { title: '包', disabled: true, icon: PlusIcon }
+    {
+      title: t('照片', 'Photo', 'Фото'),
+      onClick: () => imageInputRef.current?.click(),
+      icon: ImageAttachmentIcon
+    },
+    { title: t('拍照', 'Camera', 'Камера'), disabled: true, icon: PlusIcon },
+    { title: t('记忆', 'Memory', 'Память'), disabled: true, icon: DataObjectIcon },
+    {
+      title: t('文件', 'Files', 'Файлы'),
+      onClick: () => fileInputRef.current?.click(),
+      icon: DescriptionAttachmentIcon
+    },
+    { title: t('屏幕内容', 'Screen Content', 'Содержимое экрана'), disabled: true, icon: ScreenshotMonitorIcon },
+    { title: t('通知', 'Notification', 'Уведомление'), disabled: true, icon: PlusIcon },
+    { title: t('定位', 'Location', 'Геолокация'), disabled: true, icon: PlusIcon },
+    { title: t('包', 'Package', 'Пакет'), disabled: true, icon: PlusIcon }
   ];
 
   const fileInputs = (

@@ -8,6 +8,7 @@ import {
   VideoAttachmentIcon
 } from '../../util/chatIcons';
 import type { WebMessageAttachment } from '../../util/chatTypes';
+import { t } from '../../util/i18n';
 
 type MessageAttachmentTagProps = {
   attachment: WebMessageAttachment;
@@ -53,10 +54,10 @@ function toRgba(color: string | null | undefined, alpha: number) {
 
 function attachmentDisplayLabel(attachment: WebMessageAttachment) {
   if (attachment.mime_type === 'text/json' && attachment.file_name === 'screen_content.json') {
-    return '屏幕内容';
+    return t('屏幕内容', 'Screen Content', 'Содержимое экрана');
   }
   if (attachment.mime_type === 'application/vnd.workspace-context+xml') {
-    return '工作区';
+    return t('工作区', 'Workspace', 'Рабочее пространство');
   }
   return attachment.file_name;
 }

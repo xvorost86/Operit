@@ -1,4 +1,5 @@
 import { ApiError } from '../util/chatApi';
+import { t } from '../util/i18n';
 import type {
   ContextStatsSnapshot,
   WebChatMessage,
@@ -12,7 +13,7 @@ export function normalizeError(error: unknown) {
   if (error instanceof Error) {
     return error.message;
   }
-  return '发生未知错误';
+  return t('发生未知错误', 'An unknown error occurred', 'Произошла неизвестная ошибка');
 }
 
 export function buildVisibleChats(chats: WebChatSummary[], search: string) {

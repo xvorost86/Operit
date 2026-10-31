@@ -25,6 +25,7 @@ import type {
   WebChatReorderItem,
   WebChatSummary
 } from '../util/chatTypes';
+import { t, tf } from '../util/i18n';
 
 const HISTORY_SHOW_SWIPE_HINT_KEY = 'web_chat_show_swipe_hint';
 const LONG_PRESS_DURATION_MS = 420;
@@ -67,7 +68,12 @@ function buildBindingLabel(chat: WebChatSummary) {
   if (chat.character_group_id) {
     return {
       key: `group:${chat.character_group_id}`,
-      label: `群组: ${chat.character_group_name ?? chat.character_group_id}`,
+      label: tf(
+        '群组: {0}',
+        'Group: {0}',
+        'Группа: {0}',
+        chat.character_group_name ?? chat.character_group_id
+      ),
       kind: 'group' as const,
       avatarUrl: chat.binding_avatar_url ?? null,
       characterCardName: null
@@ -84,7 +90,7 @@ function buildBindingLabel(chat: WebChatSummary) {
   }
   return {
     key: 'unbound',
-    label: '未绑定',
+    label: t('未绑定', 'Not bound', 'Не привязано'),
     kind: 'unbound' as const,
     avatarUrl: null,
     characterCardName: null
@@ -391,7 +397,7 @@ function buildGroupBuckets(chats: WebChatSummary[]) {
 
     buckets.set(key, {
       key,
-      label: chat.group ?? '未分组',
+      label: chat.group ?? t('未分组', 'Ungrouped', 'Без группы'),
       chats: [chat]
     });
   });
@@ -546,7 +552,9 @@ function HistoryGroupHeader({
           <span className="chat-history-selector-group-header-copy">
             <span className="chat-history-selector-group-header-title-row">
               <strong>{label}</strong>
-              {canManageGroup && showManageHint ? <em>{` (长按管理)`}</em> : null}
+              {canManageGroup && showManageHint ? (
+                <em>{t(' (长按管理)', ' (long-press to manage)', ' (долгое нажатие — управление)')}</em>
+              ) : null}
             </span>
           </span>
         </span>
@@ -960,7 +968,7 @@ export function ChatHistorySelector({
         } else {
           bucket.groups.push({
             key: groupKey,
-            label: chat.group ?? '未分组',
+            label: chat.group ?? t('未分组', 'Ungrouped', 'Без группы'),
             chats: [chat]
           });
         }
@@ -1109,7 +1117,7 @@ export function ChatHistorySelector({
       <aside className={`chat-history-selector ${open ? 'is-open' : ''}`}>
         <div className="chat-history-selector-top">
           <header className="chat-history-selector-title-row">
-            <strong>对话历史</strong>
+            <strong>{t('对话历史', 'Chat History', 'История чата')}</strong>
             <div className="chat-history-selector-title-actions">
               <button
                 onClick={() => {
@@ -1141,7 +1149,7 @@ export function ChatHistorySelector({
               type="button"
             >
               <PlusIcon size={20} />
-              <span>新建对话</span>
+              <span>{t('新建对话', 'New Chat', 'Новый чат')}</span>
             </button>
             <button
               className="chat-history-selector-create-icon"
@@ -1158,7 +1166,7 @@ export function ChatHistorySelector({
               <SearchIcon size={16} />
               <input
                 onChange={(event) => onSearchChange(event.target.value)}
-                placeholder="搜索"
+                placeholder={t('搜索', 'Search', 'Поиск')}
                 value={search}
               />
             </label>
@@ -1167,7 +1175,13 @@ export function ChatHistorySelector({
           {showSwipeHint ? (
             <button className="chat-history-selector-swipe-hint" onClick={dismissSwipeHint} type="button">
               <SwapIcon size={16} />
-              <span>左右滑动可编辑或删除(点击不再显示)</span>
+              <span>
+                {t(
+                  '左右滑动可编辑或删除(点击不再显示)',
+                  'Swipe left or right to edit or delete (tap to hide)',
+                  'Смахните влево или вправо, чтобы изменить или удалить (нажмите, чтобы скрыть)'
+                )}
+              </span>
             </button>
           ) : null}
         </div>
@@ -1214,16 +1228,48 @@ export function ChatHistorySelector({
                   })
                 ) : (
                   <div className="chat-history-selector-empty">
-                    <strong>{busy ? '正在同步会话' : '没有匹配的会话'}</strong>
-                    <span>{busy ? '历史列表会在打开侧栏时按需加载。' : '换个关键词，或者直接新建对话。'}</span>
+                    <strong>
+                      {busy
+                        ? t('正在同步会话', 'Syncing the conversation', 'Синхронизация беседы')
+                        : t('没有匹配的会话', 'No matching conversations', 'Нет подходящих чатов')}
+                    </strong>
+                    <span>
+                      {busy
+                        ? t(
+                            '历史列表会在打开侧栏时按需加载。',
+                            'The history list loads when the sidebar opens.',
+                            'Список истории загружается при открытии панели.'
+                          )
+                        : t(
+                            '换个关键词，或者直接新建对话。',
+                            'Try another keyword, or start a new chat.',
+                            'Попробуйте другой запрос или начните новый чат.'
+                          )}
+                    </span>
                   </div>
                 )
               ) : groupBuckets.length ? (
                 groupBuckets.map((group) => renderGroupBucket(group))
               ) : (
                 <div className="chat-history-selector-empty">
-                  <strong>{busy ? '正在同步会话' : '没有匹配的会话'}</strong>
-                  <span>{busy ? '历史列表会在打开侧栏时按需加载。' : '换个关键词，或者直接新建对话。'}</span>
+                  <strong>
+                      {busy
+                        ? t('正在同步会话', 'Syncing the conversation', 'Синхронизация беседы')
+                        : t('没有匹配的会话', 'No matching conversations', 'Нет подходящих чатов')}
+                    </strong>
+                  <span>
+                      {busy
+                        ? t(
+                            '历史列表会在打开侧栏时按需加载。',
+                            'The history list loads when the sidebar opens.',
+                            'Список истории загружается при открытии панели.'
+                          )
+                        : t(
+                            '换个关键词，或者直接新建对话。',
+                            'Try another keyword, or start a new chat.',
+                            'Попробуйте другой запрос или начните новый чат.'
+                          )}
+                    </span>
                 </div>
               )}
             </div>
@@ -1239,7 +1285,7 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog history-action-dialog" role="dialog">
             <header>
-              <h3>对话历史</h3>
+              <h3>{t('对话历史', 'Chat History', 'История чата')}</h3>
               <p>{actionTarget.title}</p>
             </header>
             <div className="history-action-list">
@@ -1253,7 +1299,7 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <PencilIcon size={18} />
-                <span>编辑标题</span>
+                <span>{t('编辑标题', 'Edit Title', 'Изменить заголовок')}</span>
               </button>
               <button
                 className="history-action-item"
@@ -1265,7 +1311,7 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <PersonIcon size={18} />
-                <span>编辑绑定</span>
+                <span>{t('编辑绑定', 'Edit binding', 'Изменить привязку')}</span>
               </button>
               <button
                 className="history-action-item"
@@ -1277,7 +1323,7 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <FolderIcon size={18} />
-                <span>移动分组</span>
+                <span>{t('移动分组', 'Move to group', 'Переместить в группу')}</span>
               </button>
               <button
                 className="history-action-item"
@@ -1288,7 +1334,7 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <ChevronUpIcon size={18} />
-                <span>上移</span>
+                <span>{t('上移', 'Move Up', 'Переместить вверх')}</span>
               </button>
               <button
                 className="history-action-item"
@@ -1299,7 +1345,7 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <ChevronDownIcon size={18} />
-                <span>下移</span>
+                <span>{t('下移', 'Move Down', 'Переместить вниз')}</span>
               </button>
               <button
                 className="history-action-item"
@@ -1313,7 +1359,11 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <LockIcon size={18} />
-                <span>{actionTarget.locked ? '解锁' : '锁定'}</span>
+                <span>
+                  {actionTarget.locked
+                    ? t('解锁', 'Unlock', 'Разблокировать')
+                    : t('锁定', 'Lock', 'Заблокировать')}
+                </span>
               </button>
               <button
                 className="history-action-item is-danger"
@@ -1324,12 +1374,12 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <TrashIcon size={18} />
-                <span>删除</span>
+                <span>{t('删除', 'Delete', 'Удалить')}</span>
               </button>
             </div>
             <footer>
               <button onClick={() => setActionTarget(null)} type="button">
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
             </footer>
           </div>
@@ -1340,25 +1390,33 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog history-settings-dialog" role="dialog">
             <header>
-              <h3>聊天记录设置</h3>
+              <h3>{t('聊天记录设置', 'Chat History Settings', 'Настройки истории чата')}</h3>
             </header>
             <div className="history-settings-section">
-              <span>显示模式</span>
+              <span>{t('显示模式', 'Display Mode', 'Режим отображения')}</span>
               {[
                 {
                   mode: 'BY_CHARACTER_CARD' as const,
-                  title: '按角色卡分类',
-                  description: '角色卡 - 文件夹 - 对话'
+                  title: t('按角色卡分类', 'Categorize by Character Card', 'Группировать по карточке персонажа'),
+                  description: t('角色卡 - 文件夹 - 对话', 'Character card - folder - chat', 'Карточка — папка — чат')
                 },
                 {
                   mode: 'BY_FOLDER' as const,
-                  title: '按文件夹分类',
-                  description: '显示所有角色卡的文件夹'
+                  title: t('按文件夹分类', 'Categorize by Folder', 'Группировать по папке'),
+                  description: t(
+                    '显示所有角色卡的文件夹',
+                    'Show the folders of all character cards',
+                    'Показывать папки всех карточек персонажей'
+                  )
                 },
                 {
                   mode: 'CURRENT_CHARACTER_ONLY' as const,
-                  title: '仅当前角色',
-                  description: '只显示当前绑定下的聊天'
+                  title: t('仅当前角色', 'Current character only', 'Только текущий персонаж'),
+                  description: t(
+                    '只显示当前绑定下的聊天',
+                    'Show only the chats of the current binding',
+                    'Показывать только чаты текущей привязки'
+                  )
                 }
               ].map((item) => {
                 const selected = historyDisplayMode === item.mode;
@@ -1379,15 +1437,27 @@ export function ChatHistorySelector({
               })}
             </div>
             <div className="history-settings-section">
-              <span>自动切换</span>
+              <span>{t('自动切换', 'Auto-switch', 'Автопереключение')}</span>
               <button
                 className={`history-settings-option is-toggle ${autoSwitchCharacterCard ? 'is-selected' : ''}`}
                 onClick={() => onAutoSwitchCharacterCardChange(!autoSwitchCharacterCard)}
                 type="button"
               >
                 <span className="history-settings-option-copy">
-                  <strong>切换聊天时同步角色卡</strong>
-                  <small>选中聊天后，自动切到聊天绑定的角色</small>
+                  <strong>
+                    {t(
+                      '切换聊天时同步角色卡',
+                      'Sync the character card when switching chats',
+                      'Синхронизировать карточку при смене чата'
+                    )}
+                  </strong>
+                  <small>
+                    {t(
+                      '选中聊天后，自动切到聊天绑定的角色',
+                      'After picking a chat, switch to the character it is bound to',
+                      'После выбора чата переключаться на привязанного к нему персонажа'
+                    )}
+                  </small>
                 </span>
                 <HistorySettingsSwitch checked={autoSwitchCharacterCard} />
               </button>
@@ -1399,15 +1469,27 @@ export function ChatHistorySelector({
                 type="button"
               >
                 <span className="history-settings-option-copy">
-                  <strong>切换角色时同步聊天</strong>
-                  <small>切角色后，自动跳到匹配的聊天</small>
+                  <strong>
+                    {t(
+                      '切换角色时同步聊天',
+                      'Sync the chat when switching characters',
+                      'Синхронизировать чат при смене персонажа'
+                    )}
+                  </strong>
+                  <small>
+                    {t(
+                      '切角色后，自动跳到匹配的聊天',
+                      'After switching characters, jump to the matching chat',
+                      'После смены персонажа переходить к подходящему чату'
+                    )}
+                  </small>
                 </span>
                 <HistorySettingsSwitch checked={autoSwitchChatOnCharacterSelect} />
               </button>
             </div>
             <footer>
               <button onClick={() => setShowSettingsDialog(false)} type="button">
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
             </footer>
           </div>
@@ -1418,12 +1500,12 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog" role="dialog">
             <header>
-              <h3>新建分组</h3>
+              <h3>{t('新建分组', 'New Group', 'Новая группа')}</h3>
             </header>
             <input
               autoFocus
               onChange={(event) => setNewGroupName(event.target.value)}
-              placeholder="新分组名称"
+              placeholder={t('新分组名称', 'New group name', 'Название новой группы')}
               value={newGroupName}
             />
             <footer>
@@ -1434,7 +1516,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 onClick={() => {
@@ -1450,7 +1532,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                创建
+                {t('创建', 'Create', 'Создать')}
               </button>
             </footer>
           </div>
@@ -1461,8 +1543,14 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog" role="dialog">
             <header>
-              <h3>重命名会话</h3>
-              <p>会同步修改手机当前历史列表中的标题。</p>
+              <h3>{t('重命名会话', 'Rename chat', 'Переименовать чат')}</h3>
+              <p>
+                {t(
+                  '会同步修改手机当前历史列表中的标题。',
+                  'The title in the phone’s current history list changes too.',
+                  'Заголовок в текущем списке истории на телефоне изменится тоже.'
+                )}
+              </p>
             </header>
             <input autoFocus onChange={(event) => setDraftTitle(event.target.value)} value={draftTitle} />
             <footer>
@@ -1473,7 +1561,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 onClick={() => {
@@ -1485,7 +1573,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                保存
+                {t('保存', 'Save', 'Сохранить')}
               </button>
             </footer>
           </div>
@@ -1496,29 +1584,43 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog" role="dialog">
             <header>
-              <h3>编辑绑定</h3>
+              <h3>{t('编辑绑定', 'Edit binding', 'Изменить привязку')}</h3>
               <p>{bindingTarget.title}</p>
             </header>
             <select
               onChange={(event) => setBindingDraftValue(event.target.value)}
               value={bindingDraftValue}
             >
-              <option value="unbound">未绑定</option>
+              <option value="unbound">{t('未绑定', 'Not bound', 'Не привязано')}</option>
               {characterSelector?.cards.map((card) => (
                 <option key={`card:${card.id}`} value={`card:${card.id}`}>
-                  {`角色卡: ${card.name}`}
+                  {tf('角色卡: {0}', 'Character card: {0}', 'Карточка персонажа: {0}', card.name)}
                 </option>
               ))}
               {characterSelector?.groups.map((group) => (
                 <option key={`group:${group.id}`} value={`group:${group.id}`}>
-                  {`角色组: ${group.name}`}
+                  {tf('角色组: {0}', 'Character group: {0}', 'Группа персонажей: {0}', group.name)}
                 </option>
               ))}
               {bindingDraftValue.startsWith('card-legacy:') ? (
-                <option value={bindingDraftValue}>{`角色卡: ${bindingDraftValue.slice('card-legacy:'.length)}`}</option>
+                <option value={bindingDraftValue}>
+                  {tf(
+                    '角色卡: {0}',
+                    'Character card: {0}',
+                    'Карточка персонажа: {0}',
+                    bindingDraftValue.slice('card-legacy:'.length)
+                  )}
+                </option>
               ) : null}
               {bindingDraftValue.startsWith('group-legacy:') ? (
-                <option value={bindingDraftValue}>{`角色组: ${bindingDraftValue.slice('group-legacy:'.length)}`}</option>
+                <option value={bindingDraftValue}>
+                  {tf(
+                    '角色组: {0}',
+                    'Character group: {0}',
+                    'Группа персонажей: {0}',
+                    bindingDraftValue.slice('group-legacy:'.length)
+                  )}
+                </option>
               ) : null}
             </select>
             <footer>
@@ -1529,7 +1631,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 onClick={() => {
@@ -1579,7 +1681,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                保存
+                {t('保存', 'Save', 'Сохранить')}
               </button>
             </footer>
           </div>
@@ -1590,13 +1692,17 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog" role="dialog">
             <header>
-              <h3>移动分组</h3>
+              <h3>{t('移动分组', 'Move to group', 'Переместить в группу')}</h3>
               <p>{moveTarget.title}</p>
             </header>
             <input
               autoFocus
               onChange={(event) => setMoveGroupDraft(event.target.value)}
-              placeholder="留空表示未分组"
+              placeholder={t(
+                '留空表示未分组',
+                'Leave empty for no group',
+                'Оставьте пустым, чтобы убрать из группы'
+              )}
               value={moveGroupDraft}
             />
             <footer>
@@ -1607,7 +1713,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 onClick={() => {
@@ -1622,7 +1728,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                保存
+                {t('保存', 'Save', 'Сохранить')}
               </button>
             </footer>
           </div>
@@ -1633,13 +1739,13 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
         <div className="history-dialog" role="dialog">
           <header>
-            <h3>管理分组</h3>
+            <h3>{t('管理分组', 'Manage Group', 'Управление группами')}</h3>
             <p>{groupActionTarget.groupName}</p>
           </header>
             <input
               autoFocus
               onChange={(event) => setGroupRenameDraft(event.target.value)}
-              placeholder="新的分组名称"
+              placeholder={t('新的分组名称', 'New group name', 'Новое название группы')}
               value={groupRenameDraft}
             />
             <footer>
@@ -1647,7 +1753,7 @@ export function ChatHistorySelector({
                 onClick={() => setGroupActionTarget(null)}
                 type="button"
               >
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 onClick={() => {
@@ -1662,7 +1768,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                重命名
+                {t('重命名', 'Rename', 'Переименовать')}
               </button>
               <button
                 onClick={() => {
@@ -1677,7 +1783,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                清空分组
+                {t('清空分组', 'Clear group', 'Очистить группу')}
               </button>
               <button
                 className="is-danger"
@@ -1693,7 +1799,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                删除分组和聊天
+                {t('删除分组和聊天', 'Delete group and chats', 'Удалить группу и чаты')}
               </button>
             </footer>
           </div>
@@ -1704,13 +1810,20 @@ export function ChatHistorySelector({
         <div className="dialog-scrim" role="presentation">
           <div className="history-dialog" role="dialog">
             <header>
-              <h3>确认删除聊天</h3>
-              <p>确定要删除聊天“{deleteTarget.title}”吗？此操作不可撤销。</p>
+              <h3>{t('确认删除聊天', 'Confirm Delete Chat', 'Подтвердить удаление чата')}</h3>
+              <p>
+                {tf(
+                  '确定要删除聊天“{0}”吗？此操作不可撤销。',
+                  'Delete the chat “{0}”? This cannot be undone.',
+                  'Удалить чат «{0}»? Это действие необратимо.',
+                  deleteTarget.title
+                )}
+              </p>
             </header>
             <div className="history-dialog-delete-target">{deleteTarget.title}</div>
             <footer>
               <button onClick={() => setDeleteTarget(null)} type="button">
-                取消
+                {t('取消', 'Cancel', 'Отмена')}
               </button>
               <button
                 className="is-danger"
@@ -1722,7 +1835,7 @@ export function ChatHistorySelector({
                 }}
                 type="button"
               >
-                确定删除
+                {t('确定删除', 'Confirm Delete', 'Подтвердить удаление')}
               </button>
             </footer>
           </div>

@@ -5,6 +5,7 @@ import {
   ToolSummaryRow
 } from './XmlCanvasSummaryComponents';
 import type { WebMessageContentBlock } from '../../util/chatTypes';
+import { tf } from '../../util/i18n';
 
 const TOOL_PARAM_TOKEN_THRESHOLD = 50;
 
@@ -178,11 +179,17 @@ function buildParamsHeadPreview(params: string, maxChars = 120) {
 
 function buildToolSemanticDescription(toolName: string, params: string, useByteSummary: boolean) {
   if (!params.trim()) {
-    return `工具调用: ${toolName}`;
+    return tf('工具调用: {0}', 'Tool call: {0}', 'Вызов инструмента: {0}', toolName);
   }
 
   const summary = useByteSummary ? `${calculateToolParamsBytes(params)} B` : buildParamsHeadPreview(params);
-  return `工具调用: ${toolName}，调用参数: ${summary}`;
+  return tf(
+    '工具调用: {0}，调用参数: {1}',
+    'Tool call: {0}, arguments: {1}',
+    'Вызов инструмента: {0}, параметры: {1}',
+    toolName,
+    summary
+  );
 }
 
 function isFileDiffTool(toolName: string) {
@@ -227,7 +234,7 @@ export function ToolDisplayComponent({ block }: { block: WebMessageContentBlock 
           content={normalizeEscapedTextForDisplay(displayParams)}
           iconName={iconName}
           onDismiss={() => setDetailOpen(false)}
-          title={`${displayToolName} 调用参数`}
+          title={tf('{0} 调用参数', '{0} call arguments', 'Параметры вызова {0}', displayToolName)}
         />
       ) : null}
     </>

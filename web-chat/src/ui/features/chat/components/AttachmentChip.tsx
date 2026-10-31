@@ -1,5 +1,6 @@
 import { formatFileSize, isImageAttachment } from '../util/chatUtils';
 import type { WebMessageAttachment } from '../util/chatTypes';
+import { t } from '../util/i18n';
 
 export function AttachmentChip({
   attachment,
@@ -34,7 +35,7 @@ export function AttachmentChip({
       </div>
       {removable && onRemove ? (
         <button onClick={() => onRemove(attachment.id)} type="button">
-          移除
+          {t('移除', 'Remove', 'Убрать')}
         </button>
       ) : null}
     </div>

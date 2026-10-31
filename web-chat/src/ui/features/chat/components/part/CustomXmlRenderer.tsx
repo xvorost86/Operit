@@ -5,6 +5,7 @@ import { AnimatedExpandBody, StructuredExpandRow } from './StructuredExpand';
 import { ToolDisplayComponent } from './ToolDisplayComponents';
 import { ToolResultDisplay } from './ToolResultDisplay';
 import type { WebMessageContentBlock } from '../../util/chatTypes';
+import { t, tf } from '../../util/i18n';
 
 const BUILT_IN_TAGS = new Set([
   'think',
@@ -283,18 +284,23 @@ function GroupBlock({
   const [userOverride, setUserOverride] = useState<boolean | null>(null);
   const title = (() => {
     if (block.group_type === 'search_only') {
-      return '搜索';
+      return t('搜索', 'Search', 'Поиск');
     }
     if (block.group_type === 'tools_only') {
-      return `工具调用 (${toolCount})`;
+      return tf('工具调用 ({0})', 'Tool calls ({0})', 'Вызовы инструментов ({0})', toolCount);
     }
     if (searchCount > 0 && toolCount > 0) {
-      return `思考、搜索并调用工具 (${toolCount})`;
+      return tf(
+        '思考、搜索并调用工具 ({0})',
+        'Thinking, search and tool calls ({0})',
+        'Рассуждения, поиск и вызовы инструментов ({0})',
+        toolCount
+      );
     }
     if (searchCount > 0) {
-      return '思考并搜索';
+      return t('思考并搜索', 'Thinking and searching', 'Рассуждения и поиск');
     }
-    return `思考与工具 (${toolCount})`;
+    return tf('思考与工具 ({0})', 'Thinking and tools ({0})', 'Рассуждения и инструменты ({0})', toolCount);
   })();
 
   useEffect(() => {
@@ -375,7 +381,7 @@ function ThinkBlock({
             return nextValue;
           });
         }}
-        title="思考过程"
+        title={t('思考过程', 'Thinking Process', 'Процесс рассуждений')}
       />
       {thinkContent ? (
         <AnimatedExpandBody
@@ -424,7 +430,7 @@ function SearchBlock({ block }: { block: WebMessageContentBlock }) {
         <StructuredExpandRow
           expanded={expanded}
           onClick={() => setExpanded((value) => !value)}
-          title="搜索来源"
+          title={t('搜索来源', 'Search Sources', 'Источники поиска')}
         />
         <AnimatedExpandBody className="structured-search-body" durationMs={200} visible={expanded}>
           <div className="structured-search-body-content">
@@ -515,11 +521,11 @@ function SearchSourceDialog({
           <footer className="structured-modal-footer">
             {source.url ? (
               <a className="structured-modal-primary" href={source.url} rel="noreferrer" target="_blank">
-                打开网页
+                {t('打开网页', 'Open webpage', 'Открыть веб-страницу')}
               </a>
             ) : null}
             <button className="structured-modal-secondary" onClick={onDismiss} type="button">
-              关闭
+              {t('关闭', 'Close', 'Закрыть')}
             </button>
           </footer>
         </div>
@@ -546,7 +552,9 @@ function StatusBlock({ block }: { block: WebMessageContentBlock }) {
           type="button"
         >
           <span className="structured-warning-bar" />
-          <span className="structured-warning-text">AI犯了一个错误</span>
+          <span className="structured-warning-text">
+            {t('AI犯了一个错误', 'The AI made an error', 'В работе ИИ произошла ошибка')}
+          </span>
         </button>
         {detailOpen ? (
           <div className="structured-modal-backdrop" onClick={() => setDetailOpen(false)} role="presentation">
@@ -557,7 +565,7 @@ function StatusBlock({ block }: { block: WebMessageContentBlock }) {
             >
               <header className="structured-modal-header">
                 <div className="structured-modal-title-row">
-                  <strong>AI错误原因</strong>
+                  <strong>{t('AI错误原因', 'AI Error Reason', 'Причина ошибки ИИ')}</strong>
                 </div>
               </header>
               <div className="structured-modal-divider" />
@@ -566,7 +574,7 @@ function StatusBlock({ block }: { block: WebMessageContentBlock }) {
               </div>
               <footer className="structured-modal-footer">
                 <button className="structured-modal-primary" onClick={() => setDetailOpen(false)} type="button">
-                  关闭
+                  {t('关闭', 'Close', 'Закрыть')}
                 </button>
               </footer>
             </section>

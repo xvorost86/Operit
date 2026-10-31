@@ -32,6 +32,7 @@ import {
   readStoredToken,
   writeStoredToken
 } from '../util/ConfigurationStateHolder';
+import { t, tf } from '../util/i18n';
 import type {
   ChatStyle,
   ContextStatsSnapshot,
@@ -925,7 +926,13 @@ export function useChatViewModel(): ChatViewModel {
       return true;
     }
     return window.confirm(
-      `当前消息可能超过上下文上限（${projectedTokens} / ${inputSettings.max_window_tokens}）。仍要发送吗？`
+      tf(
+        '当前消息可能超过上下文上限（{0} / {1}）。仍要发送吗？',
+        'This message may exceed the context limit ({0} / {1}). Send it anyway?',
+        'Сообщение может превысить лимит контекста ({0} / {1}). Всё равно отправить?',
+        projectedTokens,
+        inputSettings.max_window_tokens
+      )
     );
   }
 
@@ -992,7 +999,7 @@ export function useChatViewModel(): ChatViewModel {
       }
 
       if (!targetChatId) {
-        throw new Error('无法创建会话');
+        throw new Error(t('无法创建会话', 'Could not create the conversation', 'Не удалось создать беседу'));
       }
 
       const optimisticUserMessage: WebChatMessage = {
@@ -1091,7 +1098,7 @@ export function useChatViewModel(): ChatViewModel {
   function submitToken() {
     const normalizedToken = tokenDraft.trim();
     if (!normalizedToken) {
-      setError('请输入 Bearer Token');
+      setError(t('请输入 Bearer Token', 'Enter the Bearer Token', 'Введите Bearer Token'));
       return;
     }
 
@@ -1638,7 +1645,11 @@ export function useChatViewModel(): ChatViewModel {
   const activeChatStyle: ChatStyle = theme?.chat_style === 'bubble' ? 'bubble' : 'cursor';
   const activeInputStyle: InputStyle = theme?.input.style === 'agent' ? 'agent' : 'classic';
 
-  const activeCharacterName = characterSelector?.active_prompt.name ?? '当前角色';
+  const activeCharacterName = characterSelector?.active_prompt.name ?? t(
+    '当前角色',
+    'Current character',
+    'Текущий персонаж'
+  );
   const activeCharacterAvatarUrl = characterSelector?.active_prompt.avatar_url ?? null;
 
   const activeStreamingCount = useMemo(

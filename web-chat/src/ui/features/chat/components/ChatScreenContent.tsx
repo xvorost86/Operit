@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChatArea } from './ChatArea';
+import { tf } from '../util/i18n';
 import { CharacterSelectorPanel } from './CharacterSelectorPanel';
 import { ChatHistorySelector } from './ChatHistorySelector';
 import { ChatScreenHeader } from './ChatScreenHeader';
@@ -227,7 +228,7 @@ export function ChatScreenContent({
               activeCharacterAvatarUrl={viewModel.activeCharacterAvatarUrl}
               activeCharacterName={viewModel.activeCharacterName}
               contextCurrentValue={viewModel.contextStats.currentValue}
-              contextLabel={`上下文 ${viewModel.contextStats.percent}%`}
+              contextLabel={tf('上下文 {0}%', 'Context: {0}%', 'Контекст: {0}%', viewModel.contextStats.percent)}
               contextMaxValue={viewModel.contextStats.maxValue}
               contextPercent={viewModel.contextStats.percent}
               isConnecting={viewModel.isConnecting}

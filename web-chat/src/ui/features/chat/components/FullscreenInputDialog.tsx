@@ -1,3 +1,5 @@
+import { t } from '../util/i18n';
+
 export function FullscreenInputDialog({
   value,
   onValueChange,
@@ -13,16 +15,16 @@ export function FullscreenInputDialog({
     <div className="dialog-scrim" role="presentation">
       <div className="fullscreen-input-dialog" role="dialog">
         <header>
-          <span>输入扩展</span>
-          <h3>全屏输入</h3>
+          <span>{t('输入扩展', 'Input extension', 'Расширенный ввод')}</span>
+          <h3>{t('全屏输入', 'Fullscreen Input', 'Полноэкранный ввод')}</h3>
         </header>
         <textarea onChange={(event) => onValueChange(event.target.value)} value={value} />
         <footer>
           <button onClick={onDismiss} type="button">
-            取消
+            {t('取消', 'Cancel', 'Отмена')}
           </button>
           <button onClick={onConfirm} type="button">
-            完成
+            {t('完成', 'Done', 'Готово')}
           </button>
         </footer>
       </div>

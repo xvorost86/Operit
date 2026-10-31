@@ -3,6 +3,7 @@ import { FileDiffDisplay, type FileDiff } from './FileDiffDisplay';
 import { ToolResultDetailDialog } from './DialogComponents';
 import { ToolResultRow } from './XmlCanvasSummaryComponents';
 import type { WebMessageContentBlock } from '../../util/chatTypes';
+import { t, tf } from '../../util/i18n';
 
 function extractTaggedContent(content: string, tagName: string) {
   const match = content.match(new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, 'i'));
@@ -51,7 +52,7 @@ function isFileDiffTool(toolName: string) {
 }
 
 function normalizeToolResult(block: WebMessageContentBlock) {
-  const toolName = block.attrs?.name?.trim() || '未知工具';
+  const toolName = block.attrs?.name?.trim() || t('未知工具', 'Unknown Tool', 'Неизвестный инструмент');
   const status = (block.attrs?.status?.trim()?.toLowerCase() || 'success');
   const outerContent = block.content ?? '';
   const rawResultContent = extractTaggedContent(outerContent, 'content') || outerContent.trim();
@@ -76,7 +77,9 @@ function buildSummaryText(result: string, isSuccess: boolean) {
   if (result.trim()) {
     return result.slice(0, 200);
   }
-  return isSuccess ? '执行成功' : '执行失败';
+  return isSuccess
+    ? t('执行成功', 'Success', 'Успешно')
+    : t('执行失败', 'Failed', 'Не удалось');
 }
 
 function buildSemanticDescription(toolName: string, summaryText: string, result: string, isSuccess: boolean) {
@@ -86,10 +89,24 @@ function buildSemanticDescription(toolName: string, summaryText: string, result:
     .trim();
   const preview =
     normalizedPreview.length <= 20 ? normalizedPreview : `${normalizedPreview.slice(0, 20)}...`;
-  const statusLabel = isSuccess ? '成功' : '失败';
+  const statusLabel = isSuccess ? t('成功', 'Success', 'Успешно') : t('失败', 'Failed', 'Сбой');
   return preview
-    ? `工具执行结果: ${toolName}，${statusLabel}，${preview}`
-    : `工具执行结果: ${toolName}，${statusLabel}，${summaryText}`;
+    ? tf(
+        '工具执行结果: {0}，{1}，{2}',
+        'Tool execution result: {0}, {1}, {2}',
+        'Результат выполнения инструмента: {0}, {1}, {2}',
+        toolName,
+        statusLabel,
+        preview
+      )
+    : tf(
+        '工具执行结果: {0}，{1}，{2}',
+        'Tool execution result: {0}, {1}, {2}',
+        'Результат выполнения инструмента: {0}, {1}, {2}',
+        toolName,
+        statusLabel,
+        summaryText
+      );
 }
 
 export function ToolResultDisplay({ block }: { block: WebMessageContentBlock }) {

@@ -1,3 +1,5 @@
+import { t } from '../../util/i18n';
+
 function unescapeXml(input: string) {
   let result = input;
 
@@ -45,7 +47,7 @@ export function ParamVisualizer({ xmlContent }: { xmlContent: string }) {
               onClick={() => copyText(param.value)}
               type="button"
             >
-              复制
+              {t('复制', 'Copy', 'Копировать')}
             </button>
           </header>
           <pre className="param-visualizer-value">{param.value}</pre>

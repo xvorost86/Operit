@@ -10,10 +10,14 @@ import type {
   WebModelSelectorState,
   WebSelectModelResponse
 } from '../../../../util/chatTypes';
+import { t, tf } from '../../../../util/i18n';
 import { CharacterCardModelBindingSwitchConfirmDialog } from './CharacterCardModelBindingSwitchConfirmDialog';
 
-const AUTO_GLM_WARNING =
-  '禁止使用autoglm作为对话主模型。对话模型和ui控制模型是分离的，请选择任意一个别的聪明的大模型。如有疑问，请仔细阅读文档学习软件的模型配置机制。';
+const AUTO_GLM_WARNING = t(
+  '禁止使用autoglm作为对话主模型。对话模型和ui控制模型是分离的，请选择任意一个别的聪明的大模型。如有疑问，请仔细阅读文档学习软件的模型配置机制。',
+  'Using autoglm as the main conversation model is prohibited. The conversation model and UI control model are separated. Please choose any other smart large model. If you have questions, please read the documentation carefully to learn about the model configuration mechanism.',
+  'Не используйте autoglm как основную модель беседы. Модель беседы и модель управления интерфейсом настраиваются отдельно: выберите для беседы другую подходящую языковую модель. Подробности настройки моделей описаны в документации.'
+);
 
 type PendingSelection = {
   configId: string;
@@ -22,14 +26,14 @@ type PendingSelection = {
 
 function currentModelName(selector: WebModelSelectorState | null) {
   const value = selector?.current_model_name?.trim();
-  return value ? value : '未选择';
+  return value ? value : t('未选择', 'Not selected', 'Не выбрано');
 }
 
 function configModelSummary(config: WebModelSelectorConfig) {
   if (config.models.length > 1) {
-    return `${config.models.length}个模型`;
+    return tf('{0}个模型', '{0} models', 'Моделей: {0}', config.models.length);
   }
-  return config.model_name || '未选择';
+  return config.model_name || t('未选择', 'Not selected', 'Не выбрано');
 }
 
 export function ModelSelectorPanel({
@@ -119,7 +123,7 @@ export function ModelSelectorPanel({
             type="button"
           >
             <span className="model-selector-summary-main">
-              <span className="model-selector-summary-label">模型:</span>
+              <span className="model-selector-summary-label">{t('模型:', 'Model:', 'Модель:')}</span>
               <span className="model-selector-summary-label-spacer" />
               <span className="model-selector-summary-value">{modelName}</span>
             </span>
@@ -131,10 +135,16 @@ export function ModelSelectorPanel({
 
         {expanded ? (
           <div className="model-selector-body">
-            {loading ? <div className="model-selector-empty">正在加载模型配置...</div> : null}
+            {loading ? (
+              <div className="model-selector-empty">
+                {t('正在加载模型配置...', 'Loading model configuration...', 'Загрузка конфигурации моделей…')}
+              </div>
+            ) : null}
 
             {!loading && !selector?.configs.length ? (
-              <div className="model-selector-empty">没有可用的模型</div>
+              <div className="model-selector-empty">
+                {t('没有可用的模型', 'No models available', 'Нет доступных моделей')}
+              </div>
             ) : null}
 
             {!loading
@@ -160,7 +170,7 @@ export function ModelSelectorPanel({
                         {hasMultipleModels ? (
                           <span className="model-selector-config-tail">
                             <span className="model-selector-config-count">
-                              {config.models.length}个模型
+                              {tf('{0}个模型', '{0} models', 'Моделей: {0}', config.models.length)}
                             </span>
                             {isExpanded ? (
                               <ChevronUpIcon size={16} />
@@ -202,13 +212,18 @@ export function ModelSelectorPanel({
 
             {onManageModels ? (
               <button className="model-selector-manage-button" onClick={onManageModels} type="button">
-                管理配置
+                {t('管理配置', 'Manage Configuration', 'Управление конфигурацией')}
               </button>
             ) : null}
 
             {selector?.locked_by_character_card ? (
               <div className="model-selector-lock-hint">
-                当前角色卡已固定模型: {selector.locked_character_card_name || '当前角色'}
+                {tf(
+                  '当前角色卡已固定模型: {0}',
+                  'Model is fixed by the character card: {0}',
+                  'Модель закреплена карточкой персонажа: {0}',
+                  selector.locked_character_card_name || t('当前角色', 'Current character', 'Текущий персонаж')
+                )}
               </div>
             ) : null}
 

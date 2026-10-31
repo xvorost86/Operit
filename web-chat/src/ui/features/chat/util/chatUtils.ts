@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react';
 import type { WebChatMessage, WebMessageAttachment, WebThemeSnapshot } from './chatTypes';
+import { UI_LANGUAGE_TAG } from './i18n';
 
 export function formatTime(timestamp: number) {
-  return new Intl.DateTimeFormat('zh-CN', {
+  return new Intl.DateTimeFormat(UI_LANGUAGE_TAG, {
     hour: '2-digit',
     minute: '2-digit'
   }).format(timestamp);

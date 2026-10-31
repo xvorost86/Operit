@@ -1,4 +1,5 @@
 import { MessageAttachmentTag } from '../../attachments';
+import { t } from '../../../util/i18n';
 import { GlassSurface } from '../../part/GlassSurface';
 import { effectiveUserDisplayContent, effectiveUserDisplayName } from '../../../util/chatUtils';
 import type {
@@ -11,7 +12,9 @@ import type {
 function imageLinkToAttachment(imageLink: WebMessageImageLink): WebMessageAttachment {
   return {
     id: `image-link:${imageLink.id}`,
-    file_name: imageLink.expired ? '图片已过期' : '图片',
+    file_name: imageLink.expired
+      ? t('图片已过期', 'Image expired', 'Изображение устарело')
+      : t('图片', 'Image', 'Изображение'),
     mime_type: 'image/*',
     file_size: 0,
     asset_url: imageLink.asset_url

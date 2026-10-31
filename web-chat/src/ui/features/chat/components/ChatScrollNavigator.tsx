@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { WebChatMessage, WebChatMessageLocatorPreview } from '../util/chatTypes';
 import { ChevronDownIcon, StarFilledIcon, StarOutlineIcon } from '../util/chatIcons';
+import { t, tf } from '../util/i18n';
 
 interface ChatScrollMessageAnchor {
   absoluteTopPx: number;
@@ -14,7 +15,11 @@ interface ChatMessageLocatorEntry {
 
 const LOCATOR_PREVIEW_CHAR_COUNT = 48;
 const LOCATOR_HIDE_DELAY_MS = 650;
-const HIDDEN_PLACEHOLDER_TEXT = '自动触发用户消息（内容已隐藏）';
+const HIDDEN_PLACEHOLDER_TEXT = t(
+  '自动触发用户消息（内容已隐藏）',
+  'Auto-triggered user message (content hidden)',
+  'Сообщение пользователя, запущенное автоматически (содержимое скрыто)'
+);
 
 function resolveCenteredMessageIndex(
   scrollElement: HTMLDivElement | null,
@@ -125,22 +130,22 @@ function buildMessagePreview(
 
 function senderLabel(sender: string) {
   if (sender === 'user') {
-    return '用户';
+    return t('用户', 'User', 'Пользователь');
   }
   if (sender === 'assistant') {
     return 'AI';
   }
   if (sender === 'summary') {
-    return '总结';
+    return t('总结', 'Summary', 'Сводка');
   }
   if (sender === 'system') {
-    return '系统';
+    return t('系统', 'System', 'Система');
   }
   if (sender === 'think') {
-    return '思考';
+    return t('思考', 'Thinking', 'Размышление');
   }
 
-  return '其他';
+  return t('其他', 'Other', 'Другое');
 }
 
 function ChatMessageLocatorDialog({
@@ -296,11 +301,19 @@ function ChatMessageLocatorDialog({
         <div className="chat-message-locator-content">
           <div className="chat-message-locator-header">
             <div className="chat-message-locator-header-copy">
-              <strong>跳转到消息</strong>
-              <span>{`当前定位：第 ${Math.max(currentMessageIndex + 1, 0)} / ${locatorEntries.length} 条`}</span>
+              <strong>{t('跳转到消息', 'Jump to Message', 'Переход к сообщению')}</strong>
+              <span>
+                {tf(
+                  '当前定位：第 {0} / {1} 条',
+                  'Position {0} of {1}',
+                  'Позиция {0} из {1}',
+                  Math.max(currentMessageIndex + 1, 0),
+                  locatorEntries.length
+                )}
+              </span>
             </div>
             <button className="chat-message-locator-close" onClick={onDismiss} type="button">
-              关闭
+              {t('关闭', 'Close', 'Закрыть')}
             </button>
           </div>
 
@@ -313,13 +326,21 @@ function ChatMessageLocatorDialog({
                   searchFocused || searchQuery.length > 0 ? 'is-floating' : ''
                 }`}
               >
-                搜索消息
+                {t('搜索消息', 'Search Messages', 'Поиск сообщений')}
               </span>
               <input
                 onChange={(event) => setSearchQuery(event.target.value)}
                 onBlur={() => setSearchFocused(false)}
                 onFocus={() => setSearchFocused(true)}
-                placeholder={searchFocused ? '输入消息内容关键词' : ''}
+                placeholder={
+                  searchFocused
+                    ? t(
+                      '输入消息内容关键词',
+                      'Enter a keyword from the message',
+                      'Введите ключевое слово из сообщения'
+                    )
+                    : ''
+                }
                 value={searchQuery}
               />
             </label>
@@ -334,17 +355,34 @@ function ChatMessageLocatorDialog({
           </div>
 
           {normalizedSearchQuery.length === 0 && !favoritesOnly ? (
-            <div className="chat-message-locator-hint">点击任意一条消息即可快速跳转</div>
+            <div className="chat-message-locator-hint">
+              {t(
+                '点击任意一条消息即可快速跳转',
+                'Tap any message to jump there quickly',
+                'Нажмите любое сообщение, чтобы быстро перейти к нему'
+              )}
+            </div>
           ) : filteredEntries.length > 0 ? (
-            <div className="chat-message-locator-hint">{`找到 ${filteredEntries.length} 条结果，点击即可跳转`}</div>
+            <div className="chat-message-locator-hint">
+              {tf(
+                '找到 {0} 条结果，点击即可跳转',
+                '{0} results, click to jump',
+                'Найдено результатов: {0}, нажмите для перехода',
+                filteredEntries.length
+              )}
+            </div>
           ) : null}
 
           {combinedLoading ? (
-            <div className="chat-message-locator-empty">正在加载...</div>
+            <div className="chat-message-locator-empty">{t('正在加载...', 'Loading...', 'Загрузка…')}</div>
           ) : combinedLoadFailed ? (
-            <div className="chat-message-locator-empty">加载失败: 跳转到消息</div>
+            <div className="chat-message-locator-empty">
+              {t('加载失败: 跳转到消息', 'Failed to load: jump to message', 'Ошибка загрузки: переход к сообщению')}
+            </div>
           ) : filteredEntries.length === 0 ? (
-            <div className="chat-message-locator-empty">没有找到匹配的消息</div>
+            <div className="chat-message-locator-empty">
+              {t('没有找到匹配的消息', 'No matching messages found', 'Подходящие сообщения не найдены')}
+            </div>
           ) : (
             <div className="chat-message-locator-list" ref={listRef}>
               {filteredEntries.map((entry, visibleIndex) => {
@@ -370,7 +408,11 @@ function ChatMessageLocatorDialog({
                       <div className="chat-message-locator-index-top">
                         <strong>{entry.index + 1}</strong>
                         <button
-                          aria-label={isFavorite ? '取消收藏消息' : '收藏消息'}
+                          aria-label={
+                            isFavorite
+                              ? t('取消收藏消息', 'Remove from favorites', 'Убрать из избранного')
+                              : t('收藏消息', 'Add to favorites', 'Добавить в избранное')
+                          }
                           className="chat-message-locator-favorite-toggle"
                           onClick={(event) => {
                             event.preventDefault();
@@ -716,7 +758,7 @@ export function ChatScrollNavigator({
       {shouldShowNavigatorControl ? (
         <div className="chat-scroll-navigator-chip">
           <button
-            aria-label="跳转到消息"
+            aria-label={t('跳转到消息', 'Jump to Message', 'Переход к сообщению')}
             className="chat-scroll-navigator-locator-button"
             onClick={() => {
               setShowLocatorDialog(true);
@@ -738,7 +780,7 @@ export function ChatScrollNavigator({
             <span className="chat-scroll-navigator-arrow" />
           </button>
           <button
-            aria-label="滚动到底部"
+            aria-label={t('滚动到底部', 'Scroll to Bottom', 'Прокрутить вниз')}
             className="chat-scroll-navigator-bottom-button"
             onClick={() => {
               if (hasNewerDisplayHistory && onRequestLatestMessages) {

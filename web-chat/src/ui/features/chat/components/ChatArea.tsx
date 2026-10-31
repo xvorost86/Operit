@@ -8,6 +8,7 @@ import type {
   WebChatMessageLocatorPreview,
   WebThemeSnapshot
 } from '../util/chatTypes';
+import { t } from '../util/i18n';
 
 function LoadingDots() {
   return (
@@ -237,7 +238,11 @@ export function ChatArea({
               }}
               type="button"
             >
-              点击加载更早的历史记录
+              {t(
+                '点击加载更早的历史记录',
+                'Tap to load older chat history',
+                'Нажмите, чтобы загрузить более старую историю чата'
+              )}
             </button>
           ) : null}
 
@@ -265,11 +270,23 @@ export function ChatArea({
             })
           ) : (
             <section className="chat-empty-state">
-              <strong>{isConversationLoading ? '正在同步会话' : '准备开始聊天'}</strong>
+              <strong>
+                {isConversationLoading
+                  ? t('正在同步会话', 'Syncing the conversation', 'Синхронизация беседы')
+                  : t('准备开始聊天', 'Ready to chat', 'Готово к общению')}
+              </strong>
               <p>
                 {isConversationLoading
-                  ? '正在按需拉取当前会话的主题和最近消息。'
-                  : '这里会显示手机当前会话、主题和流式回复。'}
+                  ? t(
+                    '正在按需拉取当前会话的主题和最近消息。',
+                    'Fetching the conversation theme and recent messages on demand.',
+                    'Тема беседы и последние сообщения загружаются по мере необходимости.'
+                  )
+                  : t(
+                    '这里会显示手机当前会话、主题和流式回复。',
+                    'The current conversation, its theme and streaming replies from the phone appear here.',
+                    'Здесь появятся текущая беседа с телефона, её тема и потоковые ответы.'
+                  )}
               </p>
             </section>
           )}
@@ -284,7 +301,7 @@ export function ChatArea({
               }}
               type="button"
             >
-              点击加载较新的消息
+              {t('点击加载较新的消息', 'Tap to load newer messages', 'Нажмите, чтобы загрузить более новые сообщения')}
             </button>
           ) : null}
 

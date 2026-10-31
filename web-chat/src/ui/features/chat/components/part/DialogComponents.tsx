@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ParamVisualizer } from './ParamVisualizer';
+import { t, tf } from '../../util/i18n';
 import {
   StructuredIcon,
   type StructuredIconName
@@ -146,7 +147,11 @@ export function ContentDetailDialog({
             <div className="structured-modal-actions">
               {isXmlContent && !isDiffContent ? (
                 <button
-                  aria-label={isRawView ? '切换到可视视图' : '切换到原始视图'}
+                  aria-label={
+                    isRawView
+                      ? t('切换到可视视图', 'Switch to visual view', 'Переключить на визуальный вид')
+                      : t('切换到原始视图', 'Switch to raw view', 'Переключить на исходный вид')
+                  }
                   className="structured-modal-icon-button"
                   onClick={() => setRawView((value) => !value)}
                   type="button"
@@ -171,7 +176,7 @@ export function ContentDetailDialog({
 
           <footer className="structured-modal-footer">
             <button className="structured-modal-primary" onClick={onDismiss} type="button">
-              关闭
+              {t('关闭', 'Close', 'Закрыть')}
             </button>
           </footer>
         </div>
@@ -207,12 +212,22 @@ export function ToolResultDetailDialog({
                 size={20}
               />
               <div className="structured-modal-title-stack">
-                <strong>{`${toolName} ${isSuccess ? '执行成功' : '执行失败'}`}</strong>
+                <strong>
+                  {tf(
+                    '{0} {1}',
+                    '{0} {1}',
+                    '{0}: {1}',
+                    toolName,
+                    isSuccess
+                      ? t('执行成功', 'succeeded', 'выполнено успешно')
+                      : t('执行失败', 'failed', 'выполнено с ошибкой')
+                  )}
+                </strong>
               </div>
             </div>
             <div className="structured-modal-actions">
               <button
-                aria-label="复制结果"
+                aria-label={t('复制结果', 'Copy result', 'Копировать результат')}
                 className="structured-modal-icon-button"
                 onClick={() => copyText(result)}
                 type="button"
@@ -230,7 +245,7 @@ export function ToolResultDetailDialog({
 
           <footer className="structured-modal-footer">
             <button className="structured-modal-primary" onClick={onDismiss} type="button">
-              关闭
+              {t('关闭', 'Close', 'Закрыть')}
             </button>
           </footer>
         </div>

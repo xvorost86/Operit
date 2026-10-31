@@ -1,4 +1,5 @@
 import { HistoryIcon, PersonIcon, PictureInPictureIcon } from '../util/chatIcons';
+import { t } from '../util/i18n';
 
 const CHAT_HEADER_CHARACTER_NAME_MAX_LENGTH = 12;
 
@@ -45,7 +46,11 @@ export function ChatHeader({
   activeCharacterAvatarUrl?: string | null;
   onCharacterClick: () => void;
 }) {
-  const displayCharacterName = toChatHeaderName(activeCharacterName || '当前角色');
+  const displayCharacterName = toChatHeaderName(activeCharacterName || t(
+    '当前角色',
+    'Current character',
+    'Текущий персонаж'
+  ));
 
   return (
     <div className="chat-header-row">

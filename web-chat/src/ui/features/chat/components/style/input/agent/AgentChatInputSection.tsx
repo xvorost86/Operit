@@ -23,6 +23,7 @@ import { InputOverlayPopup } from '../common/InputOverlayPopup';
 import { CharacterCardModelBindingSwitchConfirmDialog } from '../common/CharacterCardModelBindingSwitchConfirmDialog';
 import { PendingMessageQueuePanel } from '../common/PendingMessageQueuePanel';
 import { ThinkingQualitySlider } from '../common/ThinkingQualitySlider';
+import { t, tf } from '../../../../util/i18n';
 import type {
   InputProcessingStage,
   PendingQueueMessageItem,
@@ -47,75 +48,127 @@ type PendingSelection = {
   modelIndex: number;
 };
 
-const AUTO_GLM_WARNING =
-  '禁止使用autoglm作为对话主模型。对话模型和ui控制模型是分离的，请选择任意一个别的聪明的大模型。如有疑问，请仔细阅读文档学习软件的模型配置机制。';
+const AUTO_GLM_WARNING = t(
+  '禁止使用autoglm作为对话主模型。对话模型和ui控制模型是分离的，请选择任意一个别的聪明的大模型。如有疑问，请仔细阅读文档学习软件的模型配置机制。',
+  'Using autoglm as the main conversation model is prohibited. The conversation model and UI control model are separated. Please choose any other smart large model. If you have questions, please read the documentation carefully to learn about the model configuration mechanism.',
+  'Не используйте autoglm как основную модель беседы. Модель беседы и модель управления интерфейсом настраиваются отдельно: выберите для беседы другую подходящую языковую модель. Подробности настройки моделей описаны в документации.'
+);
 
 const INFO_COPY = {
   thinkingSettings: {
-    title: '思考',
-    description: '管理思考模式'
+    title: t('思考', 'Thinking', 'Рассуждения'),
+    description: t('管理思考模式', 'Manage thinking mode', 'Управление режимом рассуждений')
   },
   thinkingMode: {
-    title: '思考模式',
-    description: '目前支持Gemini、Qwen3、Claude、豆包、NVIDIA、硅基流动和MNN本地模型，能够启用内置的思考。'
+    title: t('思考模式', 'Thinking Mode', 'Режим рассуждений'),
+    description: t(
+      '目前支持Gemini、Qwen3、Claude、豆包、NVIDIA、硅基流动和MNN本地模型，能够启用内置的思考。',
+      'Currently supports the built-in thinking of Gemini, Qwen3, Claude, Doubao, NVIDIA, SiliconFlow and local MNN models.',
+      'Сейчас поддерживаются встроенные рассуждения Gemini, Qwen3, Claude, Doubao, NVIDIA, SiliconFlow и локальных моделей MNN.'
+    )
   },
   thinkingQuality: {
-    title: '思考程度',
-    description: '仅在思考模式下生效；具体档位与当前模型配置一致。'
+    title: t('思考程度', 'Thinking intensity', 'Интенсивность рассуждений'),
+    description: t(
+      '仅在思考模式下生效；具体档位与当前模型配置一致。',
+      'Applies only in thinking mode; the available levels follow the current model configuration.',
+      'Действует только в режиме рассуждений; доступные уровни соответствуют настройкам текущей модели.'
+    )
   },
   maxMode: {
-    title: 'Max模式',
-    description: '开启后使用更大的上下文窗口。'
+    title: t('Max模式', 'Max Mode', 'Режим Max'),
+    description: t(
+      '开启后使用更大的上下文窗口。',
+      'Uses a larger context window when enabled.',
+      'При включении используется большее окно контекста.'
+    )
   },
   memory: {
-    title: '记忆',
-    description: '切换当前对话使用的记忆配置。'
+    title: t('记忆', 'Memory', 'Память'),
+    description: t(
+      '切换当前对话使用的记忆配置。',
+      'Switches the memory profile used by this conversation.',
+      'Переключает профиль памяти для текущей беседы.'
+    )
   },
   memoryAutoUpdate: {
-    title: '自动保存记忆',
-    description: '开启后，当前轮回复结束时会把候选内容加入长期记忆队列。'
+    title: t('自动保存记忆', 'Auto Save Memory', 'Автосохранение памяти'),
+    description: t(
+      '开启后，当前轮回复结束时会把候选内容加入长期记忆队列。',
+      'When enabled, candidate content from the finished turn is queued for long-term memory.',
+      'При включении содержимое, отобранное после завершения хода, попадает в очередь долговременной памяти.'
+    )
   },
   manualMemoryUpdate: {
-    title: '手动更新记忆',
-    description: '立即基于当前对话内容触发一次记忆保存。'
+    title: t('手动更新记忆', 'Update memory now', 'Обновить память сейчас'),
+    description: t(
+      '立即基于当前对话内容触发一次记忆保存。',
+      'Triggers one memory save from the current conversation right away.',
+      'Сразу запускает одно сохранение памяти по текущей беседе.'
+    )
   },
   autoRead: {
-    title: '自动朗读',
-    description: '收到新回复后自动朗读内容。'
+    title: t('自动朗读', 'Auto Read', 'Авточтение'),
+    description: t(
+      '收到新回复后自动朗读内容。',
+      'Reads new replies aloud automatically.',
+      'Автоматически озвучивает новые ответы.'
+    )
   },
   autoApprove: {
-    title: '自动批准',
-    description: '开启后，默认直接执行所有工具调用而不再弹出确认。'
+    title: t('自动批准', 'Auto-approve', 'Автоподтверждение'),
+    description: t(
+      '开启后，默认直接执行所有工具调用而不再弹出确认。',
+      'When enabled, all tool calls run without a confirmation prompt.',
+      'При включении все вызовы инструментов выполняются без запроса подтверждения.'
+    )
   },
   disableGroup: {
-    title: '禁用项',
-    description: '集中管理会影响回复行为的禁用开关。'
+    title: t('禁用项', 'Disable Options', 'Параметры отключения'),
+    description: t(
+      '集中管理会影响回复行为的禁用开关。',
+      'All switches that change reply behaviour in one place.',
+      'Все переключатели, влияющие на поведение ответов, в одном месте.'
+    )
   },
   disableStream: {
-    title: '禁用流式输出',
-    description: '禁用后，AI回复将一次性完整显示，而不是逐字流式显示。'
+    title: t('禁用流式输出', 'Disable Stream Output', 'Отключить потоковый вывод'),
+    description: t(
+      '禁用后，AI回复将一次性完整显示，而不是逐字流式显示。',
+      'The AI reply appears complete at once instead of streaming word by word.',
+      'Ответ AI показывается целиком сразу, а не потоком по словам.'
+    )
   },
   disableTools: {
-    title: '禁用工具',
-    description: '禁用后，AI将无法调用包括记忆查询在内的内置工具。'
+    title: t('禁用工具', 'Disable Tools', 'Отключить инструменты'),
+    description: t(
+      '禁用后，AI将无法调用包括记忆查询在内的内置工具。',
+      'The AI can no longer call built-in tools, including memory lookups.',
+      'AI больше не сможет вызывать встроенные инструменты, включая запросы к памяти.'
+    )
   },
   disablePreferenceDescription: {
-    title: '禁用用户偏好描述',
-    description: '禁用后，系统提示词中不再附加 User preference description 段落。'
+    title: t('禁用用户偏好描述', 'Disable user preference description', 'Отключить описание предпочтений'),
+    description: t(
+      '禁用后，系统提示词中不再附加 User preference description 段落。',
+      'The “User preference description” block is no longer appended to the system prompt.',
+      'Блок «User preference description» больше не добавляется к системному промпту.'
+    )
   }
 } as const;
 
 function configModelSummary(config: WebModelSelectorConfig) {
   if (config.models.length > 1) {
-    return `${config.models.length}个模型`;
+    return tf('{0}个模型', '{0} models', 'Моделей: {0}', config.models.length);
   }
-  return config.model_name || '未选择';
+  return config.model_name || t('未选择', 'Not selected', 'Не выбрано');
 }
 
 function processingLabel(stage: InputProcessingStage) {
-  if (stage === 'connecting') return '正在同步会话与主题';
-  if (stage === 'uploading') return '正在上传附件';
-  if (stage === 'streaming') return '正在接收回复';
+  if (stage === 'connecting')
+    return t('正在同步会话与主题', 'Syncing the conversation and theme', 'Синхронизация беседы и темы');
+  if (stage === 'uploading') return t('正在上传附件', 'Uploading attachments', 'Загрузка вложений');
+  if (stage === 'streaming') return t('正在接收回复', 'Receiving the reply', 'Получение ответа');
   return '';
 }
 
@@ -262,7 +315,8 @@ function AgentModelSelectorItem({
   const [expandedConfigId, setExpandedConfigId] = useState<string | null>(null);
   const [pendingSelection, setPendingSelection] = useState<PendingSelection | null>(null);
   const [localMessage, setLocalMessage] = useState<string | null>(null);
-  const currentModelName = selector?.current_model_name?.trim() || '未选择';
+  const currentModelName =
+    selector?.current_model_name?.trim() || t('未选择', 'Not selected', 'Не выбрано');
 
   useEffect(() => {
     if (!expanded) {
@@ -311,7 +365,7 @@ function AgentModelSelectorItem({
           <AgentInfoButton onClick={onInfoClick} />
           <AgentInfoSpacer />
           <span className="agent-settings-summary">
-            <strong>模型:</strong>
+            <strong>{t('模型:', 'Model:', 'Модель:')}</strong>
             <span className="agent-settings-summary-value">{currentModelName}</span>
           </span>
           {allowCollapse ? (
@@ -323,10 +377,16 @@ function AgentModelSelectorItem({
 
         {expanded ? (
           <div className="agent-model-selector-body">
-            {loading ? <div className="agent-model-selector-empty">正在加载模型配置...</div> : null}
+            {loading ? (
+              <div className="agent-model-selector-empty">
+                {t('正在加载模型配置...', 'Loading model configuration...', 'Загрузка конфигурации моделей…')}
+              </div>
+            ) : null}
 
             {!loading && !selector?.configs.length ? (
-              <div className="agent-model-selector-empty">没有可用的模型</div>
+              <div className="agent-model-selector-empty">
+                {t('没有可用的模型', 'No models available', 'Нет доступных моделей')}
+              </div>
             ) : null}
 
             {!loading
@@ -355,7 +415,7 @@ function AgentModelSelectorItem({
                         {hasMultipleModels ? (
                           <span className="agent-model-selector-config-tail">
                             <span className="agent-model-selector-config-count">
-                              {config.models.length}个模型
+                              {tf('{0}个模型', '{0} models', 'Моделей: {0}', config.models.length)}
                             </span>
                             {isExpanded ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}
                           </span>
@@ -396,7 +456,12 @@ function AgentModelSelectorItem({
 
             {selector?.locked_by_character_card ? (
               <div className="agent-model-selector-lock-hint">
-                当前角色卡已固定模型: {selector.locked_character_card_name || '当前角色'}
+                {tf(
+                  '当前角色卡已固定模型: {0}',
+                  'Model is fixed by the character card: {0}',
+                  'Модель закреплена карточкой персонажа: {0}',
+                  selector.locked_character_card_name || t('当前角色', 'Current character', 'Текущий персонаж')
+                )}
               </div>
             ) : null}
 
@@ -438,7 +503,7 @@ function AgentMemorySelectorItem({
 }) {
   const currentProfileName =
     memorySelector?.profiles.find((profile) => profile.id === memorySelector.current_profile_id)?.name ??
-    '未选择';
+    t('未选择', 'Not selected', 'Не выбрано');
 
   return (
     <>
@@ -449,7 +514,7 @@ function AgentMemorySelectorItem({
         <AgentInfoButton onClick={onInfoClick} />
         <AgentInfoSpacer />
         <span className="agent-settings-summary">
-          <strong>记忆:</strong>
+          <strong>{t('记忆:', 'Memory:', 'Память:')}</strong>
           <span className="agent-settings-summary-value">{currentProfileName}</span>
         </span>
         <span className="agent-settings-chevron">
@@ -513,8 +578,10 @@ function AgentThinkingSettingsItem({
         <AgentInfoButton onClick={onInfoClick} />
         <AgentInfoSpacer />
         <span className="agent-settings-summary">
-          <strong>思考:</strong>
-          <span className="agent-settings-summary-value">{enabled ? '思考模式' : '关闭'}</span>
+          <strong>{t('思考:', 'Thinking:', 'Рассуждения:')}</strong>
+          <span className="agent-settings-summary-value">
+            {enabled ? t('思考模式', 'Thinking Mode', 'Режим рассуждений') : t('关闭', 'Off', 'Выкл.')}
+          </span>
         </span>
         <span className="agent-settings-chevron">
           {expanded ? <ChevronUpIcon size={18} /> : <ChevronDownIcon size={18} />}
@@ -528,7 +595,7 @@ function AgentThinkingSettingsItem({
             icon={TuneIcon}
             onInfoClick={onToggleInfoClick}
             onToggle={onToggle}
-            title="思考模式"
+            title={t('思考模式', 'Thinking Mode', 'Режим рассуждений')}
           />
           {enabled && qualityMapping?.mode === 'levels' ? (
             <AgentSettingsRow className="is-child">
@@ -538,7 +605,7 @@ function AgentThinkingSettingsItem({
               <AgentInfoButton onClick={onQualityInfoClick} />
               <AgentInfoSpacer />
               <ThinkingQualitySlider
-                label="思考程度"
+                label={t('思考程度', 'Thinking intensity', 'Интенсивность рассуждений')}
                 mapping={qualityMapping}
                 onChange={onQualityChange}
                 value={qualityOptionId}
@@ -567,7 +634,7 @@ function AgentMaxContextSettingItem({
       </span>
       <AgentInfoButton onClick={onInfoClick} />
       <AgentInfoSpacer />
-      <span className="agent-settings-title">Max模式</span>
+      <span className="agent-settings-title">{t('Max模式', 'Max Mode', 'Режим Max')}</span>
       <AgentSwitch checked={checked} />
     </AgentSettingsRow>
   );
@@ -611,7 +678,7 @@ function AgentDisableSettingsGroupItem({
         <AgentInfoButton onClick={onGroupInfoClick} />
         <AgentInfoSpacer />
         <span className="agent-settings-summary">
-          <strong>禁用项:</strong>
+          <strong>{t('禁用项:', 'Disabled:', 'Параметры отключения:')}</strong>
           <span className="agent-settings-summary-value">{`${disabledCount}/3`}</span>
         </span>
         <span className="agent-settings-chevron">
@@ -626,21 +693,21 @@ function AgentDisableSettingsGroupItem({
             icon={InfoIcon}
             onInfoClick={onDisableStreamOutputInfoClick}
             onToggle={onDisableStreamOutput}
-            title="禁用流式输出"
+            title={t('禁用流式输出', 'Disable Stream Output', 'Отключить потоковый вывод')}
           />
           <AgentSimpleToggleSettingItem
             checked={!enableTools}
             icon={TuneIcon}
             onInfoClick={onDisableToolsInfoClick}
             onToggle={onToggleTools}
-            title="禁用工具"
+            title={t('禁用工具', 'Disable Tools', 'Отключить инструменты')}
           />
           <AgentSimpleToggleSettingItem
             checked={disableUserPreferenceDescription}
             icon={PersonIcon}
             onInfoClick={onDisablePreferenceDescriptionInfoClick}
             onToggle={onDisablePreferenceDescription}
-            title="禁用用户偏好描述"
+            title={t('禁用用户偏好描述', 'Disable user preference description', 'Отключить описание предпочтений')}
           />
         </div>
       ) : null}
@@ -759,7 +826,7 @@ export function AgentChatInputSection({
   const modelLabel = (() => {
     const currentModelName = modelSelector?.current_model_name?.trim();
     if (!currentModelName) {
-      return '模型配置';
+      return t('模型配置', 'Model Configuration', 'Конфигурация модели');
     }
     return currentModelName.length > 26 ? `${currentModelName.slice(0, 26)}...` : currentModelName;
   })();
@@ -867,7 +934,7 @@ export function AgentChatInputSection({
                 submitCurrentAction();
               }
             }}
-            placeholder="请输入您的问题..."
+            placeholder={t('请输入您的问题...', 'Enter your question...', 'Введите вопрос…')}
             ref={textareaRef}
             rows={1}
             value={messageInput}
@@ -889,7 +956,7 @@ export function AgentChatInputSection({
               }}
               type="button"
             >
-              <strong>{modelLabel || '未选择'}</strong>
+              <strong>{modelLabel || t('未选择', 'Not selected', 'Не выбрано')}</strong>
               {showModelSelector ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}
             </button>
           </div>
@@ -901,7 +968,7 @@ export function AgentChatInputSection({
               setShowModelSelector(false);
               setShowExtraSettings(!showExtraSettings);
             }}
-            title="设置选项"
+            title={t('设置选项', 'Settings options', 'Параметры настроек')}
             type="button"
           >
             <TuneIcon size={20} />
@@ -914,7 +981,7 @@ export function AgentChatInputSection({
               setShowExtraSettings(false);
               onAttachmentPanelChange(!attachmentPanelOpen);
             }}
-            title="附件"
+            title={t('附件', 'Attachments', 'Вложения')}
             type="button"
           >
             <PlusIcon size={24} />
@@ -995,8 +1062,12 @@ export function AgentChatInputSection({
                 onExpandedChange={() => {}}
                 onInfoClick={() =>
                   setInfoPopupContent({
-                    title: '模型配置',
-                    description: '在这里选择一个已经配置好的模型，或者点击下方的管理配置去新建或修改模型'
+                    title: t('模型配置', 'Model Configuration', 'Конфигурация модели'),
+                    description: t(
+                      '在这里选择一个已经配置好的模型，或者点击下方的管理配置去新建或修改模型',
+                      'Select a configured model here, or click Manage Configuration below to create or modify models',
+                      'Выберите здесь настроенную модель или нажмите «Управление конфигурацией» ниже, чтобы создать или изменить модели'
+                    )
                   })
                 }
                 onSelectModel={onSelectModelConfig}
@@ -1026,7 +1097,7 @@ export function AgentChatInputSection({
                 onToggle={() => {
                   void onUpdateInputSettings({ enable_memory_auto_update: !enableMemoryAutoUpdate });
                 }}
-                title="自动保存记忆"
+                title={t('自动保存记忆', 'Auto Save Memory', 'Автосохранение памяти')}
               />
 
               <AgentActionSettingItem
@@ -1036,7 +1107,7 @@ export function AgentChatInputSection({
                   setShowExtraSettings(false);
                 }}
                 onInfoClick={() => setInfoPopupContent(INFO_COPY.manualMemoryUpdate)}
-                title="手动更新记忆"
+                title={t('手动更新记忆', 'Update memory now', 'Обновить память сейчас')}
               />
 
               <AgentSimpleToggleSettingItem
@@ -1046,7 +1117,7 @@ export function AgentChatInputSection({
                 onToggle={() => {
                   void onUpdateInputSettings({ enable_auto_read: !enableAutoRead });
                 }}
-                title="自动朗读"
+                title={t('自动朗读', 'Auto Read', 'Авточтение')}
               />
 
               <AgentSimpleToggleSettingItem
@@ -1058,7 +1129,7 @@ export function AgentChatInputSection({
                     permission_level: permissionLevel === 'ALLOW' ? 'ASK' : 'ALLOW'
                   });
                 }}
-                title="自动批准"
+                title={t('自动批准', 'Auto-approve', 'Автоподтверждение')}
               />
 
               <AgentDisableSettingsGroupItem

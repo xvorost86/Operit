@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ChatHeader } from './ChatHeader';
+import { t } from '../util/i18n';
 
 function UsageRing({
   percent,
@@ -64,12 +65,12 @@ export function ChatScreenHeader({
   const [showStats, setShowStats] = useState(false);
   const statusLabel = useMemo(() => {
     if (isConnecting) {
-      return '同步中';
+      return t('同步中', 'Syncing', 'Синхронизация');
     }
     if (isStreaming) {
-      return '回复中';
+      return t('回复中', 'Replying', 'Отвечает');
     }
-    return '已连接';
+    return t('已连接', 'Connected', 'Подключено');
   }, [isConnecting, isStreaming]);
   const totalTokens = contextCurrentValue;
   const ringTone =
@@ -102,15 +103,15 @@ export function ChatScreenHeader({
             <span>{statusLabel}</span>
             <strong>{contextLabel}</strong>
             <div className="chat-screen-header-stat-row">
-              <span>当前窗口</span>
+              <span>{t('当前窗口', 'Current window', 'Текущее окно')}</span>
               <strong>{contextCurrentValue}</strong>
             </div>
             <div className="chat-screen-header-stat-row">
-              <span>窗口上限</span>
+              <span>{t('窗口上限', 'Window limit', 'Лимит окна')}</span>
               <strong>{contextMaxValue}</strong>
             </div>
             <div className="chat-screen-header-stat-row is-highlight">
-              <span>总计估算</span>
+              <span>{t('总计估算', 'Total estimate', 'Всего (оценка)')}</span>
               <strong>{totalTokens}</strong>
             </div>
           </div>
