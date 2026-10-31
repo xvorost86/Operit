@@ -29,10 +29,20 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-private const val SNAPSHOT_PACKAGE_NAME_PREFIX = "com.ai.assistance.operit"
+// Raw-snapshot zips are validated by the packageName recorded in their manifest. The format is
+// shared by the Operit app family, so both package families are accepted: the fork's own
+// ru.xvorost.operit* (backups made by this build) and com.ai.assistance.operit* (backups made by
+// the official app, which must stay restorable when migrating data into the fork).
+// This is a closed whitelist of two owning families, not a chain of alternatives.
+private val SUPPORTED_SNAPSHOT_PACKAGE_NAMES = listOf(
+    "ru.xvorost.operit",
+    "com.ai.assistance.operit",
+)
 
 internal fun isSupportedSnapshotPackageName(packageName: String): Boolean =
-    packageName.startsWith(SNAPSHOT_PACKAGE_NAME_PREFIX)
+    SUPPORTED_SNAPSHOT_PACKAGE_NAMES.any { family ->
+        packageName == family || packageName.startsWith("$family.")
+    }
 
 object RawSnapshotBackupManager {
 
