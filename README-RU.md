@@ -25,16 +25,27 @@
   пользовательских сообщениях через селектор `localizedText` (D11: `zh` → китайский, `ru` → русский,
   остальные коды → английский).
 - 9 языковых кодов и `res/xml/locales_config.xml` — русская локаль зарегистрирована наравне с остальными.
+- `web-chat/` (LAN-страница на Vite) — 327 вызовов `t`/`tf` в 56 файлах `src`, язык берётся из
+  `navigator.language` (ru → русский, zh → китайский, любой другой тег → английский, та же политика D11);
+  где строка уже была в Android-ресурсах, en и ru взяты оттуда дословно.
 
 ## Сборка
 
-Требуется JDK 21 (апстрим не собирается на JDK 25) и Android SDK. Путь к JDK в этом проекте:
+Требуется JDK 21 (апстрим не собирается на JDK 25), Android SDK и Node.js для `web-chat`. Путь к JDK
+в этом проекте:
 
 ```bash
 export JAVA_HOME=$HOME/Android/jdk21
+npm --prefix web-chat install          # один раз, для сборки LAN-страницы
+npm run build:webchat                  # обязательно перед сборкой APK
 ./gradlew :app:assembleRelease      # релизный APK с нашей подписью
 ./gradlew :app:assembleDebug        # отладочный, applicationId ru.xvorost.operit.debug
 ```
+
+`npm run build:webchat` собирает `web-chat/` (Vite) и синхронизирует результат в
+`app/src/main/assets/web-chat`; этот каталог в git не лежит. Без шага APK собирается без LAN-страницы,
+и `WebChatHttpBridge` отвечает 404 — апстрим помечает шаг как ключевой
+(`docs/doc-src/dev-core/BUILDING.md`, п. 6). Правили `web-chat/src` — повторите шаг перед сборкой.
 
 Результат: `app/build/outputs/apk/release/app-release.apk` (arm64-v8a, ~420 МБ).
 
@@ -108,7 +119,19 @@ request, который трогает ресурсы или `tools/l10n`. Ин�
   собственном написании (`中文`, `日本語`, `한국어`), имена пакетов, протокольные ключи (D5).
 - Содержимое внешних источников: объявления с сервера (перевод привязан к исходному тексту, при смене
   формулировки показывается оригинал), маркет плагинов, ответы моделей, MCP-серверы.
-- `web-chat/` (LAN-страница чата на Vite) пока не локализована — отдельная задача.
+- В `web-chat/` остались только 3 `console.error` (D4) — интерфейс переведён.
+
+## Известные ограничения и долги
+
+| # | Что | Состояние |
+|---|---|---|
+| 1 | Публикация: форка нет (`origin` и `upstream` — оба `AAswordman/Operit`), ветка `ru-localization` нигде не опубликована, `l10n-check.yml` на GitHub ни разу не запускался — локально прогнаны только его команды | открыто, ждёт команды владельца |
+| 2 | LAN-страница: исходники `web-chat/src` локализованы, но `dist` в `assets` не синхронизирован и APK не пересобран; в текущем `dist/*.apk` записей `assets/web-chat` нет вообще | открыто, шаг поставки |
+| 3 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`) и `super_admin.js` (`hint: Output is large…`) | продуктовое решение: перевод добавил бы zh-значение, которого не было |
+| 4 | Рантайм JS-пакетов (QuickJS) и переключение языка внутри них | подтверждено статически (`node --check`, сверка zh-сегментов и METADATA), исполнение не проверялось |
+| 5 | `terminal`: 13 оставшихся иероглифов — комментарии `#` внутри shell-скриптов | подтверждено статически |
+| 6 | Ротация подписи апстрима: finalizer `assembleRelease` включается только при заданных `APK_ROTATION_*` (legacy-ключа нет) | не настроено осознанно |
+| 7 | CI: проверки локалей и тестов — гейт, инвентарь CJK — только в job summary; `l10n/inventory.json` локальный, поэтому `--diff` в CI недоступен | рост `literal` виден, но не блокируется |
 
 ## Отчёты
 
@@ -129,6 +152,7 @@ python3 tools/l10n/check_locale.py app/src/main/res/values-ru --base app/src/mai
     --files strings.xml strings_l10n.xml --strict-android
 python3 tools/l10n/check_locale.py terminal/src/main/res/values-ru --base terminal/src/main/res/values \
     --files strings.xml strings_l10n.xml --strict-android
+npm run build:webchat
 ./gradlew :app:testDebugUnitTest :app:assembleRelease
 adb install -r app/build/outputs/apk/release/app-release.apk
 ```

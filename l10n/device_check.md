@@ -102,3 +102,11 @@ sha256 выше относится к файлу в `dist/` — именно о�
 Не проверялось и в этот проход: экраны под API-ключ/аккаунт (реальный диалог с моделью, публикация в
 маркет, вход в GitHub), содержимое маркета и внешних источников.
 
+LAN-страница (`web-chat`) не проверялась, и проверять её в этом APK бессмысленно: каталога
+`assets/web-chat` в нём нет (`unzip -l ~/Projects/Operit-ru/dist/Operit-1.12.2-ru1-arm64-v8a.apk |
+grep -c assets/web-chat` → `0`), потому что релизная сборка шла без обязательного шага
+`npm run build:webchat` (`docs/doc-src/dev-core/BUILDING.md`, п. 6). `WebChatHttpBridge` в такой
+сборке отвечает 404 «Web assets are not available in app assets/web-chat». После локализации
+`web-chat/src` (партия P4.C) APK нужно пересобрать с этим шагом и только затем проходить страницу на
+устройстве.
+
