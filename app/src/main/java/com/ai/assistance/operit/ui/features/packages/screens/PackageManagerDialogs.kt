@@ -227,7 +227,7 @@ fun PackageEnvironmentVariablesDialog(
                                                     ) {
                                                         Icon(
                                                             imageVector = Icons.Default.Check,
-                                                            contentDescription = "Optional",
+                                                            contentDescription = stringResource(R.string.l10n_packages_env_optional),
                                                             modifier = Modifier.size(10.dp),
                                                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                                                         )

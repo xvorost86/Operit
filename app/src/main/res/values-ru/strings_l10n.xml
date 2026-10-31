@@ -119,4 +119,5 @@
     <string name="l10n_chat_prompt_label">Запрос</string>
     <string name="l10n_chat_prompt_by_label">Запрос от %1$s</string>
     <string name="l10n_chat_response_label">Ответ</string>
+    <string name="l10n_packages_env_optional">Необязательно</string>
 </resources>

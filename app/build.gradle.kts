@@ -402,8 +402,8 @@ android {
         targetSdk = 34
         // versionCode = upstream * 10 + ru revision: 51 -> 510 leaves nine rebuilds per upstream
         // release and can never collide with an upstream versionCode.
-        versionCode = 511
-        versionName = "1.12.2-ru2"
+        versionCode = 512
+        versionName = "1.12.2-ru3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

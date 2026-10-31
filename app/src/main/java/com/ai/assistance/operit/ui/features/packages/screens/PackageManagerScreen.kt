@@ -584,7 +584,7 @@ fun PackageManagerScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Store,
-                            contentDescription = "Artifact Market"
+                            contentDescription = stringResource(R.string.screen_title_artifact_market)
                         )
                     }
 
