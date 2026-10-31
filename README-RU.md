@@ -133,6 +133,40 @@ sha256sum -c Operit-1.12.2-ru1-arm64-v8a.apk.sha256
 adb install -r Operit-1.12.2-ru1-arm64-v8a.apk
 ```
 
+## Как обновляться
+
+Схема версий: `versionCode = версия апстрима × 10 + ревизия ru-сборки`, `versionName = <апстрим>-ru<ревизия>`.
+Текущая — `1.12.2-ru1` / `510`. Правка поверх того же апстрима — `1.12.2-ru2` / `511`, новый апстрим
+`1.13.0` — `1.13.0-ru1` / 600.
+
+Обновление на телефоне (подпись и `applicationId` те же, данные и настройки сохраняются):
+
+```bash
+gh release download <тег> --repo xvorost86/Operit    # либо взять APK из ~/Projects/Operit-ru/dist
+sha256sum -c Operit-…-arm64-v8a.apk.sha256
+adb install -r Operit-…-arm64-v8a.apk
+```
+
+Без кабеля: скачать APK из релиза на телефоне и открыть — браузеру нужно разрешение «Установка
+неизвестных приложений». Официальный Operit обновляется отдельно и наш пакет не трогает.
+
+**Ключ подписи обязателен.** `~/Projects/Operit-ru/keys/operit-ru-release.jks` + `keystore.env`
+(вне git) — без них обновить установленное приложение нельзя: Android отвергнет APK с другой
+подписью, придётся удалять приложение вместе с данными. Копию ключа держите вне этой машины.
+
+**Когда выйдет новый апстрим:**
+
+1. `git fetch upstream && git merge upstream/main` — конфликты почти всегда в `strings.xml` и
+   `.gitmodules`.
+2. `check_locale.py` покажет новые ключи без перевода, `scan_cjk.py --diff` — новые иероглифы;
+   разбор — по рецепту из «Как подтянуть апстрим».
+3. `npm run build:webchat` (без него LAN-страница не попадёт в APK) и
+   `./gradlew :app:testDebugUnitTest :app:assembleRelease`.
+4. Поднять `versionCode`/`versionName` по схеме выше, обновить `dist/` и `.sha256`, дождаться
+   зелёного `L10n Check`.
+5. `git tag -a <версия> -F <сообщение> && git push fork <версия>`, затем
+   `gh release create <версия> --verify-tag … APK .sha256`.
+
 ## Инструменты проверки
 
 | Команда | Что делает |
