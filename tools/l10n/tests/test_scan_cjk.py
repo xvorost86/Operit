@@ -249,6 +249,78 @@ class ScanCjkTest(unittest.TestCase):
         self.assertIn("files with more literal lines: 1", text)
         self.assertIn("demo/Old.kt", text)
 
+    def test_budget_gate_passes_on_unchanged_tree(self) -> None:
+        self.ws.write("demo/Sample.kt", ['val s = "中文"'])
+        inventory = self.ws.inventory()
+        path = self.ws.root / "l10n" / "cjk_budget.json"
+        with redirect_stdout(io.StringIO()):
+            scan_cjk.write_budget(inventory, str(path))
+        self.assertEqual(json.loads(path.read_text(encoding="utf-8")), {"literal": 1, "other": 0})
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = scan_cjk.check_budget(inventory, str(path))
+        self.assertEqual(code, 0)
+        self.assertIn("literal         1 /        1  OK (+0)", out.getvalue())
+
+    def test_budget_gate_fails_when_literal_grows(self) -> None:
+        # Гейт существует ради этого случая: новый иероглифный литерал в дереве
+        # должен валить job, а не печататься в summary рядом с зелёной галочкой.
+        self.ws.write("demo/Sample.kt", ['val s = "中文"'])
+        inventory = self.ws.inventory()
+        path = self.ws.root / "budget.json"
+        path.write_text(json.dumps({"literal": 0, "other": 0}), encoding="utf-8")
+        err = io.StringIO()
+        original_stderr = sys.stderr
+        sys.stderr = err
+        try:
+            with redirect_stdout(io.StringIO()):
+                code = scan_cjk.check_budget(inventory, str(path))
+        finally:
+            sys.stderr = original_stderr
+        self.assertEqual(code, 1)
+        self.assertIn("CJK budget exceeded: literal", err.getvalue())
+
+    def test_budget_without_a_class_is_rejected(self) -> None:
+        self.ws.write("demo/Sample.kt", ['val s = "中文"'])
+        inventory = self.ws.inventory()
+        path = self.ws.root / "budget.json"
+        path.write_text(json.dumps({"literal": 1}), encoding="utf-8")
+        err = io.StringIO()
+        original_stderr = sys.stderr
+        sys.stderr = err
+        try:
+            with redirect_stdout(io.StringIO()):
+                code = scan_cjk.check_budget(inventory, str(path))
+        finally:
+            sys.stderr = original_stderr
+        self.assertEqual(code, 2)
+        self.assertIn("нет класса(ов) other", err.getvalue())
+
+    def test_cli_budget_exit_codes(self) -> None:
+        self.ws.write("demo/Sample.kt", ["val s = \"中文\""])
+        budget_path = self.ws.root / "l10n" / "cjk_budget.json"
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(
+                scan_cjk.main(["--root", str(self.ws.root), "--write-budget", str(budget_path)]),
+                0,
+            )
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(
+                scan_cjk.main(["--root", str(self.ws.root), "--budget", str(budget_path)]),
+                0,
+            )
+        self.ws.write("demo/Sample.kt", ["val s = \"中文\"", "val t = \"中文\""])
+        err = io.StringIO()
+        original_stderr = sys.stderr
+        sys.stderr = err
+        try:
+            with redirect_stdout(io.StringIO()):
+                code = scan_cjk.main(["--root", str(self.ws.root), "--budget", str(budget_path)])
+        finally:
+            sys.stderr = original_stderr
+        self.assertEqual(code, 1)
+        self.assertIn("CJK budget exceeded", err.getvalue())
+
     def test_missing_root_exits(self) -> None:
         err = io.StringIO()
         original_stderr = sys.stderr

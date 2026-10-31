@@ -26,7 +26,9 @@
   апстриме были зашиты в Kotlin.
 - `ru` в 31 JS-пакете `app/src/main/assets/packages/*.js` — и в METADATA (974 объекта `zh/en/ru`), и в
   пользовательских сообщениях через селектор `localizedText` (D11: `zh` → китайский, `ru` → русский,
-  остальные коды → английский).
+  остальные коды → английский). Семь строк, которые в апстриме были только по-английски (в
+  `code_runner.js` и `super_admin.js`), тоже переведены: английский оригинал стоит байт-в-байт в
+  `zh`-ветке, поэтому вывод для zh и en не изменился.
 - 9 языковых кодов и `res/xml/locales_config.xml` — русская локаль зарегистрирована наравне с остальными.
 - `web-chat/` (LAN-страница на Vite) — 327 вызовов `t`/`tf` в 56 файлах `src`, язык берётся из
   `navigator.language` (ru → русский, zh → китайский, любой другой тег → английский, та же политика D11);
@@ -193,8 +195,10 @@ NAS фактически даёт право подписать обновлен
 
 1. `git fetch upstream && git merge upstream/main` — конфликты почти всегда в `strings.xml` и
    `.gitmodules`.
-2. `check_locale.py` покажет новые ключи без перевода, `scan_cjk.py --diff` — новые иероглифы;
-   разбор — по рецепту из «Как подтянуть апстрим».
+2. `check_locale.py` покажет новые ключи без перевода; `scan_cjk.py --summary --budget
+   l10n/cjk_budget.json` — вырос ли `literal` против эталона. Разобранный (классифицированный) текст
+   принимается обновлением эталона тем же коммитом: `scan_cjk.py --write-budget l10n/cjk_budget.json`;
+   остальное — по рецепту из «Как подтянуть апстрим».
 3. `npm run build:webchat` (без него LAN-страница не попадёт в APK) и
    `./gradlew :app:testDebugUnitTest :app:assembleRelease`.
 4. Поднять `versionCode`/`versionName` по схеме выше, обновить `dist/` и `.sha256`, дождаться
@@ -208,13 +212,18 @@ NAS фактически даёт право подписать обновлен
 |---|---|
 | `python3 tools/l10n/check_locale.py <локаль> --base <база> --files ...` | набор ключей, типы, плейсхолдеры, HTML/`xliff`-теги, escape-последовательности; с `--strict-android` — ещё и Android-экранирование (`\"`, `\'`, реальные переводы строк) |
 | `python3 tools/l10n/scan_cjk.py --summary` | инвентарь иероглифов по классам (`comment` / `log` / `literal` / `other`) |
+| `python3 tools/l10n/scan_cjk.py --summary --budget l10n/cjk_budget.json` | гейт: код возврата 1, если `literal` или `other` вырос против принятого эталона |
+| `python3 tools/l10n/scan_cjk.py --write-budget l10n/cjk_budget.json` | принять текущие счётчики как новый эталон (осознанное действие, тем же коммитом, что и принятый текст) |
 | `python3 tools/l10n/scan_cjk.py --diff l10n/inventory.json` | сравнение с эталонным инвентарём: рост `literal` виден сразу |
-| `python3 -m unittest discover -s tools/l10n/tests` | 66 тестов самих инструментов |
+| `python3 -m unittest discover -s tools/l10n/tests` | 71 тест самих инструментов |
 
 `.github/workflows/l10n-check.yml` прогоняет всё это на каждый push в `ru-localization` и на pull
-request, который трогает ресурсы или `tools/l10n`. Инвентарь CJK печатается информационно: остаток
-`literal` классифицирован в `l10n/coverage_audit.md` (промпты, логи, функциональные данные), а не
-является непереведённым интерфейсом.
+request, который трогает ресурсы или `tools/l10n`. Инвентарь CJK — **гейт**: принятые счётчики лежат
+в `l10n/cjk_budget.json` (`literal 2513`, `other 1`), и job падает, если любой из них вырос. Остаток
+`literal` классифицирован в `l10n/coverage_audit.md` (промпты, логи, функциональные данные), поэтому
+рост означает либо новый непереведённый текст, либо новую функциональную строку, которую нужно внести
+в allowlist и осознанно поднять эталон. Полный `--diff` в CI недоступен: `l10n/inventory.json` — 4 МБ
+машинного вывода, в git его не кладут.
 
 ## Что не переводится (осознанно)
 
@@ -230,14 +239,14 @@ request, который трогает ресурсы или `tools/l10n`. Ин�
 
 | # | Что | Состояние |
 |---|---|---|
-| 1 | Пользовательские строки только по-английски без zh-оригинала, оставшиеся неисправленными: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`) и `super_admin.js` (`hint: Output is large…`) | продуктовое решение: перевод добавил бы zh-значение, которого не было, и изменил вывод для китайского интерфейса. Подписи сообщений `Prompt`/`Response` из этого списка **исправлены в ru2** (zh/en — исходный текст, ru — «Запрос»/«Ответ») |
+| 1 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Installed with pnpm in …:`, `Return value:`, `Script execution failed:` ×2, `(No output from console.log or return value)`) и `super_admin.js` (`hint: Output is large…`) | **закрыт**: 7 строк обёрнуты в `localizedText`, где zh-ветка — исходный английский текст байт-в-байт. Вывод zh/en не изменился, ru переведён («Установлено через pip:», «Возвращаемое значение:», «Не удалось выполнить скрипт:», «Вывод большой, сохранён в файл…»). Самопроверка `code_runner` собирает ожидаемый вывод тем же селектором, иначе тест падал бы на ru |
 | 2 | Рантайм JS-пакетов (QuickJS) и переключение языка внутри них | подтверждено статически (`node --check`, сверка zh-сегментов и METADATA), исполнение не проверялось |
 | 3 | `terminal`: 13 оставшихся иероглифов — комментарии `#` внутри shell-скриптов | подтверждено статически |
 | 4 | Ротация подписи апстрима: finalizer `assembleRelease` включается только при заданных `APK_ROTATION_*` (legacy-ключа нет) | не настроено осознанно |
-| 5 | CI: проверки локалей и тестов — гейт, инвентарь CJK — только в job summary; `l10n/inventory.json` локальный, поэтому `--diff` в CI недоступен | рост `literal` виден, но не блокируется |
+| 5 | CI: инвентарь CJK | **закрыт**: гейт `--budget l10n/cjk_budget.json` валит job при росте `literal` или `other`; `--diff` против 4-МБ `l10n/inventory.json` остаётся только локальным |
 | 6 | Экраны под API-ключ/аккаунт (реальный диалог, публикация в маркет, вход в GitHub), содержимое маркета и внешних источников, подключённый сеанс LAN-страницы | не проверялись: нужны ключи/аккаунты и Bearer Token |
 
-Закрыто 2026-10-31: скан `literal` больше не зависит от того, собран ли фронтенд (`tools/l10n/scan_cjk.py` исключает сгенерированный `app/src/main/assets/web-chat`, тест `test_generated_web_chat_bundle_is_skipped`, 67 тестов инструментов).
+Закрыто 2026-10-31: скан `literal` больше не зависит от того, собран ли фронтенд (`tools/l10n/scan_cjk.py` исключает сгенерированный `app/src/main/assets/web-chat`, тест `test_generated_web_chat_bundle_is_skipped`); инвентарь CJK стал гейтом с эталоном `l10n/cjk_budget.json` (тесты `test_budget_gate_*`, `test_cli_budget_exit_codes`); английские строки без zh-оригинала в `code_runner.js`/`super_admin.js` переведены с сохранением английского в zh-ветке. Всего 71 тест инструментов.
 
 ## Отчёты
 
@@ -258,6 +267,7 @@ python3 tools/l10n/check_locale.py app/src/main/res/values-ru --base app/src/mai
     --files strings.xml strings_l10n.xml --strict-android
 python3 tools/l10n/check_locale.py terminal/src/main/res/values-ru --base terminal/src/main/res/values \
     --files strings.xml strings_l10n.xml --strict-android
+python3 tools/l10n/scan_cjk.py --budget l10n/cjk_budget.json
 npm run build:webchat
 ./gradlew :app:testDebugUnitTest :app:assembleRelease
 adb install -r app/build/outputs/apk/release/app-release.apk

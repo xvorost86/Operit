@@ -46,6 +46,17 @@ terser.bundle.min.js, CryptoJS.js, Jimp.js, pako.js, OkHttp3.js, любые *.mi
     python3 tools/l10n/scan_cjk.py --out l10n/inventory.json --summary
     python3 tools/l10n/scan_cjk.py --root app/src/main/java --root terminal/src
     python3 tools/l10n/scan_cjk.py --diff l10n/inventory.json
+    python3 tools/l10n/scan_cjk.py --summary --budget l10n/cjk_budget.json
+    python3 tools/l10n/scan_cjk.py --write-budget l10n/cjk_budget.json
+
+Гейт (--budget)
+---------------
+`l10n/cjk_budget.json` хранит принятые счётчики классов `literal` и `other`.
+Проверка падает (код 1), если любой из них вырос: новый иероглифный текст либо
+классифицируется (промпт/лог/функциональные данные в allowlist), либо эталон
+обновляется осознанно через `--write-budget` в том же коммите, где принят текст.
+Полный `--diff` против `l10n/inventory.json` в CI недоступен: тот файл — 4 МБ
+машинного вывода и в git не лежит.
 """
 
 from __future__ import annotations
@@ -429,12 +440,68 @@ def print_diff(inventory: dict, old_path: str) -> None:
         print(f"  {name}: {before} -> {after}")
 
 
+BUDGET_CLASSES = ("literal", "other")
+
+
+def class_counts(inventory: dict) -> Counter:
+    return Counter(entry["cls"] for entry in inventory["entries"])
+
+
+def write_budget(inventory: dict, path: str) -> None:
+    """Записывает текущие счётчики классов как эталон гейта.
+
+    Перезапись — осознанное действие принимающего: гейт сравнивает дерево с этим
+    файлом, поэтому новый принятый текст и новый эталон едут одним коммитом.
+    """
+    counts = class_counts(inventory)
+    budget = {cls: counts.get(cls, 0) for cls in BUDGET_CLASSES}
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(budget, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    summary = ", ".join(f"{cls} {budget[cls]}" for cls in BUDGET_CLASSES)
+    print(f"wrote budget {target}: {summary}")
+
+
+def check_budget(inventory: dict, path: str) -> int:
+    """Сверяет счётчики с эталоном. 0 — в пределах, 1 — рост, 2 — эталон непригоден."""
+    with open(path, encoding="utf-8") as handle:
+        budget = json.load(handle)
+    missing = [cls for cls in BUDGET_CLASSES if cls not in budget]
+    if missing:
+        print(f"ERROR budget {path}: нет класса(ов) {', '.join(missing)}", file=sys.stderr)
+        return 2
+    counts = class_counts(inventory)
+    print(f"budget vs {path}:")
+    grown: list[str] = []
+    for cls in BUDGET_CLASSES:
+        allowed = int(budget[cls])
+        actual = counts.get(cls, 0)
+        delta = actual - allowed
+        state = "OK" if delta <= 0 else "OVER"
+        print(f"{cls:8} {actual:>8} / {allowed:>8}  {state} ({delta:+d})")
+        if delta > 0:
+            grown.append(cls)
+    if grown:
+        print(
+            "ERROR CJK budget exceeded: "
+            + ", ".join(grown)
+            + " — classify the new text (prompt/log/functional allowlist) or accept the "
+            "baseline with `python3 tools/l10n/scan_cjk.py --write-budget l10n/cjk_budget.json`"
+            " in the same commit",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Инвентаризация иероглифов в исходниках проекта.")
     parser.add_argument("--root", action="append", dest="roots", help="корень сканирования (можно несколько)")
     parser.add_argument("--out", help="куда записать JSON-инвентарь")
     parser.add_argument("--diff", help="старый инвентарь для сравнения")
     parser.add_argument("--summary", action="store_true", help="напечатать сводку по классам и каталогам")
+    parser.add_argument("--budget", help="эталон счётчиков: код возврата 1, если literal или other вырос")
+    parser.add_argument("--write-budget", help="записать текущие счётчики как эталон")
     args = parser.parse_args(argv)
 
     roots: list[str] = list(args.roots) if args.roots else list(DEFAULT_ROOTS)
@@ -449,12 +516,16 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(f"wrote {out_path}")
 
+    if args.write_budget:
+        write_budget(inventory, args.write_budget)
     if args.summary:
         print_summary(inventory)
     if args.diff:
         print_diff(inventory, args.diff)
     if not args.summary and not args.diff:
         print(f"scanned {inventory['files_scanned']} files, {inventory['total']} lines with CJK")
+    if args.budget:
+        return check_budget(inventory, args.budget)
     return 0
 
 

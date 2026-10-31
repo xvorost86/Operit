@@ -62,14 +62,17 @@ jobs:
             --files strings.xml strings_l10n.xml \
             --strict-android
 
-      - name: CJK inventory (informational)
-        # Not a gate: the remaining non-comment CJK is classified in l10n/coverage_audit.md
-        # (prompts, logs, functional data, zh branches of the D11 selector). The summary is
-        # printed so a growing literal count is visible in CI output and in the job summary.
+      - name: CJK inventory gate
+        # `l10n/cjk_budget.json` holds the accepted `literal`/`other` counts. Any growth fails
+        # the job, so new CJK text is either classified (prompts, logs, functional data in the
+        # allowlist) or the baseline is bumped deliberately, in the same commit:
+        #   python3 tools/l10n/scan_cjk.py --write-budget l10n/cjk_budget.json
+        # `set -o pipefail` keeps scan_cjk.py's exit code visible through `tee`.
         run: |
+          set -o pipefail
           {
-            echo '### CJK inventory'
+            echo '### CJK inventory (budget gate)'
             echo '```'
-            python3 tools/l10n/scan_cjk.py --summary
+            python3 tools/l10n/scan_cjk.py --summary --budget l10n/cjk_budget.json
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
