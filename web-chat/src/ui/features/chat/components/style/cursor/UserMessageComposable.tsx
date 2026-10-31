@@ -1,5 +1,5 @@
 import { MessageAttachmentTag } from '../../attachments';
-import { t } from '../../../util/i18n';
+import { t, tf } from '../../../util/i18n';
 import { GlassSurface } from '../../part/GlassSurface';
 import { effectiveUserDisplayContent, effectiveUserDisplayName } from '../../../util/chatUtils';
 import type {
@@ -29,7 +29,10 @@ export function UserMessageComposable({
   theme: WebThemeSnapshot | null;
 }) {
   const userName = effectiveUserDisplayName(message, theme);
-  const promptTitle = message.display_name_is_proxy && userName ? `Prompt by ${userName}` : 'Prompt';
+  const promptTitle =
+    message.display_name_is_proxy && userName
+      ? tf('Prompt by {0}', 'Prompt by {0}', 'Запрос от {0}', userName)
+      : t('Prompt', 'Prompt', 'Запрос');
   const imageLinks = message.image_links ?? [];
   const cursorUserColor =
     theme?.bubble.cursor_user_follow_theme

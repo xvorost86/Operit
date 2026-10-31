@@ -116,4 +116,7 @@
     <string name="l10n_memory_search">Поиск</string>
     <string name="l10n_memory_clear_search">Очистить поиск</string>
     <string name="l10n_memory_select_profile">Выбрать профиль</string>
+    <string name="l10n_chat_prompt_label">Запрос</string>
+    <string name="l10n_chat_prompt_by_label">Запрос от %1$s</string>
+    <string name="l10n_chat_response_label">Ответ</string>
 </resources>

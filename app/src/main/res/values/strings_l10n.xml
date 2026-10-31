@@ -116,4 +116,7 @@
     <string name="l10n_memory_search">Search Icon</string>
     <string name="l10n_memory_clear_search">Clear Search</string>
     <string name="l10n_memory_select_profile">Select Profile</string>
+    <string name="l10n_chat_prompt_label">Prompt</string>
+    <string name="l10n_chat_prompt_by_label">Prompt by %1$s</string>
+    <string name="l10n_chat_response_label">Response</string>
 </resources>

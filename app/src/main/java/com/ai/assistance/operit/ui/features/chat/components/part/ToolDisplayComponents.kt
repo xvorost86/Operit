@@ -534,7 +534,7 @@ private fun buildParamsHeadPreview(params: String, maxChars: Int = 120): String 
     val cleaned = (matched?.takeIf { it.isNotEmpty() } ?: params)
         .replace("\n", " ")
         .trim()
-    return if (cleaned.length <= maxChars) cleaned else cleaned.take(maxChars) + "..."
+    return if (cleaned.length <= maxChars) cleaned else cleaned.take(maxChars) + "…"
 }
 
 /** 工具参数详情弹窗 美观的弹窗显示完整的工具参数内容 */

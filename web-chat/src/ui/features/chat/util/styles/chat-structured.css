@@ -240,9 +240,14 @@
 
 .xml-canvas-tool-summary-title {
   min-width: 0;
+  /* Длинные имена инструментов (daily_life:get_current_time) в одну строку не влезали и
+     обрезались как «daily_life:get_current_tim…» — допускаем две строки. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
   color: var(--chat-primary);
   font-size: 12px;
   font-weight: 500;

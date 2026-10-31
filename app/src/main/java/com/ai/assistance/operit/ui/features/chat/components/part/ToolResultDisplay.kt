@@ -76,7 +76,9 @@ fun ToolResultDisplay(
                 .replace(Regex("\\s+"), " ")
                 .trim()
                 .let { normalized ->
-                    if (normalized.length <= 20) normalized else normalized.take(20) + "..."
+                    // 80 символов вместо 20: русский текст статуса («Время ожидания подтверждения…»)
+                    // обрезался до «Время ожидания подтв...», и TalkBack читал обрубок.
+                    if (normalized.length <= 80) normalized else normalized.take(80) + "…"
                 }
         }
     }

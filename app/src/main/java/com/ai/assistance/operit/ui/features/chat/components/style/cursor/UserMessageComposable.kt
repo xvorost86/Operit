@@ -291,11 +291,13 @@ fun UserMessageComposable(
                     )
                 } else {
                     // 用户消息标题
+                    // Подпись пользовательского сообщения: zh/en — исходный текст апстрима,
+                    // ru — ресурс, иначе в русском интерфейсе оставалось английское «Prompt».
                     Text(
                         text = if (!proxySenderName.isNullOrBlank()) {
-                            "Prompt by $proxySenderName"
+                            stringResource(R.string.l10n_chat_prompt_by_label, proxySenderName)
                         } else {
-                            "Prompt"
+                            stringResource(R.string.l10n_chat_prompt_label)
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = effectiveTextColor.copy(alpha = 0.7f),

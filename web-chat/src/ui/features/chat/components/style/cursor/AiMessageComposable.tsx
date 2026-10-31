@@ -1,4 +1,5 @@
 import { MessageAttachmentTag } from '../../attachments';
+import { t } from '../../../util/i18n';
 import { CustomXmlRenderer } from '../../part/CustomXmlRenderer';
 import { assistantCompactMeta } from '../../../util/chatUtils';
 import type { WebChatMessage, WebThemeSnapshot } from '../../../util/chatTypes';
@@ -17,7 +18,7 @@ export function AiMessageComposable({
   return (
     <article className="cursor-ai-message">
       <div className="cursor-message-header">
-        <strong className="cursor-message-label">Response</strong>
+        <strong className="cursor-message-label">{t('Response', 'Response', 'Ответ')}</strong>
         {detailText ? (
           <span className="cursor-message-detail" title={detailText}>
             {detailText}

@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.ai.assistance.operit.R
 import com.ai.assistance.operit.data.model.ChatMessage
 import com.ai.assistance.operit.ui.common.markdown.StreamMarkdownRenderer
 import com.ai.assistance.operit.ui.features.chat.components.ChatMessageHeightMemory
@@ -133,9 +135,9 @@ fun AiMessageComposable(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 左侧：Response标题
+            // Слева: подпись ответа. zh/en — исходный текст апстрима, ru — ресурс.
             Text(
-                text = "Response",
+                text = stringResource(R.string.l10n_chat_response_label),
                 style = MaterialTheme.typography.labelSmall,
                 color = textColor.copy(alpha = 0.7f)
             )
