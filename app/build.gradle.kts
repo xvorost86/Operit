@@ -394,11 +394,16 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.ai.assistance.operit"
+        // Our own applicationId so the Russian build installs alongside the official Operit APK
+        // (D7: separate data, own signing key). The namespace stays com.ai.assistance.operit so
+        // upstream class names, ${applicationId}-based authorities and merge conflicts are untouched.
+        applicationId = "ru.xvorost.operit"
         minSdk = 26
         targetSdk = 34
-        versionCode = 51
-        versionName = "1.12.2"
+        // versionCode = upstream * 10 + ru revision: 51 -> 510 leaves nine rebuilds per upstream
+        // release and can never collide with an upstream versionCode.
+        versionCode = 510
+        versionName = "1.12.2-ru1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -552,12 +557,23 @@ val signRotatedNightlyApk by tasks.registering {
     }
 }
 
-tasks.matching { it.name == "assembleRelease" }.configureEach {
-    finalizedBy(signRotatedReleaseApk)
-}
+// APK v3 rotation signing is upstream's key-change infrastructure: it re-signs the packaged APK
+// with a legacy signer plus a rotated signer and a lineage file. It only applies when such a
+// lineage exists, so it is wired into assembleRelease/assembleNightly only when the rotation
+// properties are actually configured in local.properties. A fresh fork signs with the single
+// release signingConfig above, and assembleRelease must not fail on a rotation that cannot exist.
+val apkRotationConfigured =
+    !localProperties.getProperty("APK_ROTATION_NEW_STORE_FILE").isNullOrBlank() &&
+        !localProperties.getProperty("APK_ROTATION_LINEAGE_FILE").isNullOrBlank()
 
-tasks.matching { it.name == "assembleNightly" }.configureEach {
-    finalizedBy(signRotatedNightlyApk)
+if (apkRotationConfigured) {
+    tasks.matching { it.name == "assembleRelease" }.configureEach {
+        finalizedBy(signRotatedReleaseApk)
+    }
+
+    tasks.matching { it.name == "assembleNightly" }.configureEach {
+        finalizedBy(signRotatedNightlyApk)
+    }
 }
 
 tasks.named("preBuild") {
