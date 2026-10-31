@@ -392,7 +392,7 @@ const codeRunner = (function () {
         if (r2.exitCode !== 0 || hasError(r2.output)) {
             throw new Error(localizedText(`安装依赖失败：\n${r2.output}`, `Не удалось установить зависимости:\n${r2.output}`, `Failed to install dependencies:\n${r2.output}`));
         }
-        return `Installed with pip:\n${r2.output}`.trim();
+        return localizedText(`Installed with pip:\n${r2.output}`, `Установлено через pip:\n${r2.output}`, `Installed with pip:\n${r2.output}`).trim();
     }
     async function ensureNodeAvailable() {
         const nodeCheckResult = await executeTerminalCommand("node --version");
@@ -435,7 +435,7 @@ EOF`);
         if (result.exitCode !== 0 || hasError(result.output)) {
             throw new Error(localizedText(`安装 pnpm 依赖失败:\n${result.output}`, `Не удалось установить зависимости pnpm:\n${result.output}`, `Failed to install pnpm dependencies:\n${result.output}`));
         }
-        return `Installed with pnpm in ${workspaceDir}:\n${result.output}`.trim();
+        return localizedText(`Installed with pnpm in ${workspaceDir}:\n${result.output}`, `Установлено через pnpm в ${workspaceDir}:\n${result.output}`, `Installed with pnpm in ${workspaceDir}:\n${result.output}`).trim();
     }
     // Helper function to safely escape strings for shell commands
     function escapeForShell(str) {
@@ -543,17 +543,17 @@ EOF`);
                 else {
                     formattedReturnValue = returnValue.toString();
                 }
-                output += `Return value: ${formattedReturnValue}`;
+                output += localizedText(`Return value: ${formattedReturnValue}`, `Возвращаемое значение: ${formattedReturnValue}`, `Return value: ${formattedReturnValue}`);
             }
-            return output || "(No output from console.log or return value)";
+            return output || localizedText("(No output from console.log or return value)", "(Нет вывода console.log и нет возвращаемого значения)", "(No output from console.log or return value)");
         }
         catch (e) {
             const errorOutput = logs.join('\n');
             if (errorOutput) {
-                throw new Error(`Script execution failed: ${e.message}\n\nLogs before error:\n${errorOutput}`);
+                throw new Error(localizedText(`Script execution failed: ${e.message}\n\nLogs before error:\n${errorOutput}`, `Не удалось выполнить скрипт: ${e.message}\n\nЛоги до ошибки:\n${errorOutput}`, `Script execution failed: ${e.message}\n\nLogs before error:\n${errorOutput}`));
             }
             else {
-                throw new Error(`Script execution failed: ${e.message}`);
+                throw new Error(localizedText(`Script execution failed: ${e.message}`, `Не удалось выполнить скрипт: ${e.message}`, `Script execution failed: ${e.message}`));
             }
         }
     }
@@ -597,7 +597,7 @@ EOF`);
             // 测试简单的JS代码
             const script = "console.log('JavaScript 运行正常'); const testVar = 42; return '测试值: ' + testVar;";
             const result = await executeJavaScript(script);
-            const expectedOutput = `JavaScript 运行正常\nReturn value: "测试值: 42"`;
+            const expectedOutput = `JavaScript 运行正常\n${localizedText("Return value: ", "Возвращаемое значение: ", "Return value: ")}"测试值: 42"`;
             if (result !== expectedOutput) {
                 return { success: false, message: localizedText(`JavaScript执行器测试失败: 期望 "${expectedOutput}", 实际 "${result}"`, `Проверка исполнителя JavaScript не пройдена: ожидалось «${expectedOutput}», получено «${result}»`, `JavaScript runner test failed: expected "${expectedOutput}", got "${result}"`) };
             }

@@ -165,7 +165,7 @@ const superAdmin = (function () {
             output_saved_to: filePath,
             output_chars: outputStr.length,
             operit_clean_on_exit_dir: OPERIT_CLEAN_ON_EXIT_DIR,
-            hint: "Output is large and saved to file. Use read_file_part or grep_code to inspect it.",
+            hint: localizedText("Output is large and saved to file. Use read_file_part or grep_code to inspect it.", "Вывод большой, сохранён в файл. Используйте read_file_part или grep_code, чтобы его посмотреть.", "Output is large and saved to file. Use read_file_part or grep_code to inspect it."),
         };
     }
     /**
