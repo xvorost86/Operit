@@ -102,11 +102,27 @@ sha256 выше относится к файлу в `dist/` — именно о�
 Не проверялось и в этот проход: экраны под API-ключ/аккаунт (реальный диалог с моделью, публикация в
 маркет, вход в GitHub), содержимое маркета и внешних источников.
 
-LAN-страница (`web-chat`) не проверялась, и проверять её в этом APK бессмысленно: каталога
-`assets/web-chat` в нём нет (`unzip -l ~/Projects/Operit-ru/dist/Operit-1.12.2-ru1-arm64-v8a.apk |
-grep -c assets/web-chat` → `0`), потому что релизная сборка шла без обязательного шага
-`npm run build:webchat` (`docs/doc-src/dev-core/BUILDING.md`, п. 6). `WebChatHttpBridge` в такой
-сборке отвечает 404 «Web assets are not available in app assets/web-chat». После локализации
-`web-chat/src` (партия P4.C) APK нужно пересобрать с этим шагом и только затем проходить страницу на
-устройстве.
+LAN-страница (`web-chat`) в том проходе не проверялась: в APK от 10:49 каталога `assets/web-chat` не
+было — релизная сборка шла без обязательного шага `npm run build:webchat`
+(`docs/doc-src/dev-core/BUILDING.md`, п. 6), и `WebChatHttpBridge` отвечал 404 «Web assets are not
+available in app assets/web-chat». Пересобрано и проверено 2026-10-31 — раздел «P4.2» ниже.
+
+## P4.2 — LAN-страница (`web-chat`) в релизном APK (2026-10-31)
+
+Закрывает дефект поставки из P4.1: APK собирался без сгенерированных ассетов LAN-страницы.
+
+| Шаг | Факт |
+|---|---|
+| Сборка страницы | `npm run build:webchat` → `✓ 332 modules transformed`, `dist/assets/index-xSse0ZpB.js` 616 540 байт, `✓ built in 1.21s`, `EXIT=0`; синхронизировано в `app/src/main/assets/web-chat/` (`index.html`, `favicon.svg`, `assets/index-Cwo1gTwd.css`, `assets/index-xSse0ZpB.js`). Лог `runs/t44_s1_build_webchat.log` |
+| Сборка APK | `JAVA_HOME=~/Android/jdk21 ./gradlew :app:testDebugUnitTest :app:assembleRelease` → `BUILD SUCCESSFUL in 1m 22s`, `GRADLE_EXIT=0` (`runs/t44_s2_build.log`); тесты были `UP-TO-DATE`, поэтому принудительный прогон `:app:testDebugUnitTest --rerun-tasks --no-build-cache` → `BUILD SUCCESSFUL in 3m 3s`, 159 задач, **157 наборов, 1335 тестов, 0 падений, 6 пропущено** (`runs/t44_s2_tests_rerun.log`) |
+| APK | `app-release.apk` 377 765 404 байта, sha256 `8c39efa3367b4c041220d6f64a43a534585136a30216c72499aa03f8fa942077`; `unzip -l` → 4 записи `assets/web-chat` (ранее 0); `aapt2 dump badging` → `ru.xvorost.operit`, `versionCode='510'`, `versionName='1.12.2-ru1'`; `apksigner verify --print-certs` → V2, `CN=Xvorost, OU=Operit RU, O=ru.xvorost` |
+| `dist/` | `Operit-1.12.2-ru1-arm64-v8a.apk` заменён, `.sha256` пересчитан на `8c39ef…` (прежний `1310453…` относился к сборке без LAN-страницы). Версия намеренно не поднята: исправлен нераспространявшийся артефакт, а не выпущен новый |
+| Установка | `adb install -r` → `Success`; на устройстве `versionCode=510`, `versionName=1.12.2-ru1` |
+| Проверка страницы | «Настройки → Внешние вызовы → Внешние вызовы HTTP» → «Включить внешнюю HTTP-службу» (порт 8094), `adb forward tcp:18094 tcp:8094`: `GET /` → **HTTP 200**, 519 байт (`text/html`), `GET /assets/index-xSse0ZpB.js` → HTTP 200, 616 540 байт; в отданном бандле есть «История чата», «Новый чат», «Подключение к LAN-странице», «Настройки истории чата» |
+| Локали страницы | Chromium с `Emulation.setUserAgentOverride`/`setLocaleOverride`: `ru-RU` → `<html lang="ru-RU">`, «История чата / Новый чат / Подключение к LAN-странице», иероглифов 0; `en-GB` → английский, 0; `zh-CN` → исходный китайский, 129 иероглифов (ожидаемо); `de-DE` → английский по политике D11, 0. Скриншот ru-экрана: `~/.hermes/plans/operit-ru/p3/shots/` (сессия браузера) |
+| После проверки | служба выключена («Служба отключена»), `adb forward --remove-all`; порт 8094 на LAN не слушает |
+
+Не проверено: подключённый сеанс внутри LAN-страницы (история, потоковые ответы, тулзы, локатор) —
+для входа нужен Bearer Token, который пользователь вводит сам; в этом проходе проверялась только
+выдача страницы из APK и её локализация.
 
