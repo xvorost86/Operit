@@ -26,6 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The terminal module lives in a submodule and carries its own Russian resources.
+      # Only `terminal` is initialised: the second submodule (OperitNightlyRelease) is
+      # referenced over SSH and is not needed for locale checks.
+      - name: Terminal submodule
+        run: git submodule update --init terminal
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
