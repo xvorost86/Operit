@@ -176,3 +176,26 @@ available in app assets/web-chat». Пересобрано и проверено
 снят, файл с токеном удалён. В данных приложения остались тестовые обмены: «Проверка русской
 LAN-страницы» и вопрос про день недели.
 
+
+### P4.3 — 1.12.2-ru2: подписи сообщений и обрезка (2026-10-31)
+
+Что исправлено против ru1:
+
+- подписи сообщений: `l10n_chat_prompt_label` / `l10n_chat_prompt_by_label` / `l10n_chat_response_label`
+  в триаде (zh и en — исходные английские строки байт-в-байт, ru — «Запрос» / «Запрос от %1$s» / «Ответ»),
+  замена в `style/cursor/UserMessageComposable.kt`, `AiMessageComposable.kt` и в `web-chat/.../cursor/*.tsx`;
+- описание результата инструмента для TalkBack: обрезка 20 → 80 символов с «…» (`ToolResultDisplay.kt`),
+  `buildParamsHeadPreview` отдаёт типографское «…» вместо трёх точек (`ToolDisplayComponents.kt`);
+- LAN-страница: имя инструмента в две строки (`-webkit-line-clamp: 2`) вместо «daily_life:get_current_tim…»
+  (`chat-structured.css`).
+
+| Шаг | Факт |
+|---|---|
+| Проверки ресурсов | `check_locale.py` ru (strict) и en по `strings_l10n.xml` → `OK`; три ключа в триаде, 120/120/120, порядок совпадает |
+| web-chat | `npm --prefix web-chat run typecheck` → `TSC_EXIT=0`; `npm run build:webchat` → `index-DJcaKZ0E.js` 616 639 байт, `index-CHzgNtCy.css` 107 687 байт, `✓ built in 1.23s` |
+| Сборка APK | `:app:testDebugUnitTest :app:assembleRelease` → `BUILD SUCCESSFUL in 4m 59s`, `GRADLE_EXIT=0` (`runs/t46_ru2_build.log`), 157 наборов / 1335 тестов / 0 падений / 6 пропущено |
+| APK | 377 774 132 байта, sha256 `3c331f32dd960c52aa524a22134fbed179385000033aca2149863671f6202eaa`, `versionCode 511`, `versionName 1.12.2-ru2`, 4 записи `assets/web-chat` |
+| Установка | `adb install -r` → `Success`; на устройстве `versionCode=511 versionName=1.12.2-ru2` |
+| Приложение | в чате подписи «Запрос» / «Ответ» (было `Prompt` / `Response`), CJK 0; карточка «Вызовы инструментов (2)» раскрыта — описания полные: «Результат выполнения инструмента: use_package, Сбой, Время ожидания подтверждения выполнения инструмента истекло.» (было «Время ожидания подтв…»). Скриншот `p3/shots/t46_ru2_labels.png` |
+| LAN-страница (ru-RU) | подписи «Запрос» / «Ответ», строк `Prompt` / `Response` в тексте нет, CJK 0; `.xml-canvas-tool-summary-title` для `daily_life:get_current_time` — высота 32 px при `line-height` 16 px и `-webkit-line-clamp: 2`, то есть две строки вместо обрезки. Скриншот `p3/shots/t46_ru2_lan_tool_wrap.png` |
+| Уборка | служба выключена (`GET /` → HTTP 000), `adb forward` снят, файл с токеном удалён |
