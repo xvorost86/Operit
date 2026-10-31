@@ -112,10 +112,26 @@ git clone --recurse-submodules -b ru-localization https://github.com/xvorost86/O
 ```
 
 Pull request в апстрим не открывается: `applicationId`, подпись и версия отличаются от апстрима
-(D7). Гейт — `.github/workflows/l10n-check.yml` (job `L10n Check`): 66 тестов инструментов, строгие
+(D7). Гейт — `.github/workflows/l10n-check.yml` (job `L10n Check`): 67 тестов инструментов, строгие
 проверки ru/en/terminal и информационный инвентарь CJK. На `822b910` прогон зелёный за 30 c:
 `OK` (ru, strict, 13 warnings), `OK` (en, 45 warnings), `OK` (terminal ru), инвентарь
 `literal 2513 / 118`.
+
+### Релиз
+
+Готовый APK лежит в релизе: **https://github.com/xvorost86/Operit/releases/tag/v1.12.2-ru1**
+(тег `v1.12.2-ru1` → коммит `4087dbe`, тот же код приложения, из которого собрана сборка).
+
+| Ассет | Размер | sha256 |
+|---|---:|---|
+| `Operit-1.12.2-ru1-arm64-v8a.apk` | 377 765 404 | `8c39efa3367b4c041220d6f64a43a534585136a30216c72499aa03f8fa942077` |
+| `Operit-1.12.2-ru1-arm64-v8a.apk.sha256` | 98 | `4f4d7516198871b243e3ca815037c32996ad87e6893cc49c80ce0c952b246f0b` |
+
+```bash
+gh release download v1.12.2-ru1 --repo xvorost86/Operit
+sha256sum -c Operit-1.12.2-ru1-arm64-v8a.apk.sha256
+adb install -r Operit-1.12.2-ru1-arm64-v8a.apk
+```
 
 ## Инструменты проверки
 
