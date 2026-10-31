@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Operit AI</string>
+    <string name="app_name">Operit</string>
     <string name="accessibility_service_description">Используется для получения иерархии интерфейса: ассистенты ИИ быстрее анализируют экран. Личные данные не собираются и не сохраняются.</string>
     <string name="model_selector_title">Выбрать конфигурацию модели</string>
     <string name="model_selector_toggle">Показывать выбор модели</string>
