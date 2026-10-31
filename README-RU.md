@@ -200,7 +200,7 @@ request, который трогает ресурсы или `tools/l10n`. Ин�
 
 | # | Что | Состояние |
 |---|---|---|
-| 1 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`) и `super_admin.js` (`hint: Output is large…`) | продуктовое решение: перевод добавил бы zh-значение, которого не было |
+| 1 | Пользовательские строки только по-английски без zh-оригинала: `code_runner.js` (`Installed with pip:`, `Return value:`, `Script execution failed:`), `super_admin.js` (`hint: Output is large…`), LAN-страница (`Prompt`, `Prompt by …`, `Response` в `style/cursor/*.tsx`) | продуктовое решение: перевод добавил бы zh-значение, которого не было, и изменил вывод для китайского интерфейса |
 | 2 | Рантайм JS-пакетов (QuickJS) и переключение языка внутри них | подтверждено статически (`node --check`, сверка zh-сегментов и METADATA), исполнение не проверялось |
 | 3 | `terminal`: 13 оставшихся иероглифов — комментарии `#` внутри shell-скриптов | подтверждено статически |
 | 4 | Ротация подписи апстрима: finalizer `assembleRelease` включается только при заданных `APK_ROTATION_*` (legacy-ключа нет) | не настроено осознанно |
