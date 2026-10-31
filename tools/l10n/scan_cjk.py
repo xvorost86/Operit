@@ -36,6 +36,12 @@ log (JS):      \\bconsole\\.(?:log|warn|error|info|debug)\\s*\\(
 terser.bundle.min.js, CryptoJS.js, Jimp.js, pako.js, OkHttp3.js, любые *.min.js,
 а также каталоги .git, build, node_modules, __pycache__, .gradle.
 
+Отдельно исключается сгенерированный бандл LAN-страницы
+`app/src/main/assets/web-chat` — его кладёт `npm run build:webchat`, каталог в
+.gitignore, но внутри сканируемого `assets`. В бандле те же zh-аргументы
+селектора, что и в `web-chat/src`, поэтому без исключения счётчик `literal`
+зависел бы от того, собран ли фронтенд на этой машине.
+
 Использование:
     python3 tools/l10n/scan_cjk.py --out l10n/inventory.json --summary
     python3 tools/l10n/scan_cjk.py --root app/src/main/java --root terminal/src
@@ -65,6 +71,11 @@ SKIP_FILES = {
     "pako.js",
     "okhttp3.js",
 }
+# Сгенерированные артефакты сборки: `npm run build:webchat` синхронизирует собранный
+# бандл LAN-страницы в этот каталог. Он в .gitignore, но лежит внутри сканируемого
+# `app/src/main/assets`, и в нём те же zh-аргументы селектора, что и в web-chat/src —
+# без исключения цифры инвентаря зависели бы от того, собран ли фронтенд.
+GENERATED_PATHS = ("app/src/main/assets/web-chat",)
 
 CJK_RE = re.compile(r"[\u3400-\u4DBF\u4E00-\u9FFF\u3000-\u303F]")
 KT_LOG_RE = re.compile(r"\b(?:Log\.[diwev]|println|Timber\.[A-Za-z]+|AppLogger\.[A-Za-z_]\w*)\s*\(")
@@ -298,13 +309,29 @@ def classify_line(text: str, state: LineState, is_js: bool) -> str | None:
     return None
 
 
+def is_generated(path: Path) -> bool:
+    """True, если путь лежит внутри сгенерированного каталога сборки.
+
+    Сравнение идёт по сегментам пути: `web-chat-notes` или `assets/web-chat.css`
+    под исключение не попадают.
+    """
+    normalized = "/" + str(path).replace(os.sep, "/").strip("/") + "/"
+    return any(f"/{generated}/" in normalized for generated in GENERATED_PATHS)
+
+
 def iter_source_files(root: Path):
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = sorted(name for name in dirnames if name not in SKIP_DIRS)
+        dirnames[:] = sorted(
+            name
+            for name in dirnames
+            if name not in SKIP_DIRS and not is_generated(Path(dirpath) / name)
+        )
         for name in sorted(filenames):
             if not name.endswith(EXTENSIONS):
                 continue
             if name.lower() in SKIP_FILES or name.endswith(".min.js"):
+                continue
+            if is_generated(Path(dirpath) / name):
                 continue
             yield Path(dirpath) / name
 

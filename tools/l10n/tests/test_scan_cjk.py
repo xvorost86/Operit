@@ -159,6 +159,29 @@ class ScanCjkTest(unittest.TestCase):
         inventory = self.ws.inventory()
         self.assertEqual(inventory["files_scanned"], 1)
 
+    def test_generated_web_chat_bundle_is_skipped(self) -> None:
+        # `npm run build:webchat` синхронизирует готовый бандл в assets/web-chat: каталог
+        # в .gitignore, но лежит внутри сканируемого assets, поэтому без исключения
+        # цифры инвентаря зависели бы от того, собирали ли фронтенд на этой машине.
+        self.ws.write("app/src/main/assets/web-chat/assets/index-abc.js", ['const s = "中文";'])
+        self.ws.write("app/src/main/assets/web-chat/index.js", ['const s = "中文";'])
+        self.ws.write("app/src/main/assets/packages/demo.js", ['const s = "中文";'])
+        # Похожие имена под исключение не попадают.
+        self.ws.write("app/src/main/assets/web-chat-notes/demo.js", ['const s = "中文";'])
+        self.ws.write("app/src/main/assets/packages/web-chat.js", ['const s = "中文";'])
+        inventory = self.ws.inventory()
+        self.assertEqual(inventory["files_scanned"], 3)
+        self.assertEqual(
+            sorted(entry["file"] for entry in inventory["entries"]),
+            sorted(
+                [
+                    str(self.ws.root / "app/src/main/assets/packages/demo.js"),
+                    str(self.ws.root / "app/src/main/assets/packages/web-chat.js"),
+                    str(self.ws.root / "app/src/main/assets/web-chat-notes/demo.js"),
+                ]
+            ),
+        )
+
     def test_text_is_truncated_and_stripped(self) -> None:
         long_line = '    val s = "' + "中" * 300 + '"'
         self.ws.write("demo/Long.kt", [long_line])
